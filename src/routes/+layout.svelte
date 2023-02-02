@@ -11,6 +11,6 @@
 
 <style>
 	.main {
-		background-color: beige;
+		background-color: black;
 	}
 </style>
