@@ -5,11 +5,14 @@
 
 <div class="main">
 
-    <button type="button" class="menu" on:click={() => open = true}></button>
-    <img src="pong-icon.svg" alt="icon pong" class="pong-icon"/>
-    <h1>ft_transcendence</h1>
+    <a href="/">
+        <img src="pong-icon.svg" alt="icon pong" class="pong-icon"/>
+    </a>
+    <span>Transcendence</span>
     <button type="button" class="pp" ></button>
-    
+    <button type="button" class="menu" on:click={() => open = true}></button>
+ 
+</div>
     <Drawer {open} size='50%' placement='left' on:clickAway={() => open=false}>
         <div class="drawer-container">
             <button class='close' on:click={() => open = false}><img src="xmark.svg" alt="xmark" class="xmark"></button>
@@ -19,7 +22,6 @@
             <a href="/">Friends</a>
         </div>
     </Drawer>
-</div>
     
 
 <style>
@@ -27,32 +29,53 @@
         background-color:aquamarine;
         display: flex;
         justify-content: space-between;
-        margin: 5% 0;
-        padding: 0 5%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 0.625rem;
+        padding-right: 1rem;
+        padding-left: 1rem;
+        align-items: center;
     }
 
     .pong-icon {
-        width: 20%;
+        height: 1.5rem;
     }
 
     .drawer-container {
         display: flex;
         flex-direction: column;
+        padding: 0% 5%;
+    }
+
+    .drawer-container a {
+        padding-bottom: 5%;
     }
 
     .xmark {
         width: 8vw;
+        align-self: left;
     }
 
-    h1 {
-        font-size: 100%;
+    span {
+        font-weight: 400;
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        align-self: center;
+        margin-left: 0.8rem;
+        margin-right: 1.5rem;
     }
 
     button {
-    background-color: transparent;
-    background-size: cover;
-    width: 10vw;
-    border: none;
+        background-color: transparent;
+        background-size: cover;
+        border: none;
+        height: 2.5rem;
+        width: 2.5rem;
+    }
+
+    .main button {
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .menu {
