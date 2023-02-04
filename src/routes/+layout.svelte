@@ -20,17 +20,6 @@
 
 <style>
 	.main {
-		background-color: beige;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.page {
-		background-color: antiquewhite;
-		width: 90%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
+		background-color: rgb(209, 82, 82);
 	}
 </style>
