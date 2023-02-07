@@ -23,6 +23,7 @@
             <a href="/">Channels</a>
             <a href="/profile">Profile</a>
             <a href="/">Friends</a>
+            <a href="/game">Game</a>
         </div>
     </Drawer>
     

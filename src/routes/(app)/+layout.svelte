@@ -1,6 +1,6 @@
 <script lang="ts">
 	import "@picocss/pico";
-	import "../app.css";
+	import "../../app.css";
 	import 'iconify-icon';
 	import Navbar from "$lib/Navbar.svelte";
 </script>
