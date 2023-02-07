@@ -39,6 +39,14 @@
 	]
 </script>
 
+<section>
+	<h1>Playing with flexbox</h1>
+	<div class="my-container">
+		<div>Element 1</div>
+		<div>Element 2</div>
+		<div>Element 3</div>
+	</div>
+</section>
 <div class="main">
 	Profile Page
 	<div class="presentation">
@@ -57,6 +65,20 @@
 </div>
 
 <style>
+	.my-container {
+		display: flex;
+		flex-direction: row;
+		background-color: aqua;
+		column-gap: 1em;
+	}
+	
+	.my-container div {
+		display: flex;
+		flex-grow: 1;
+		justify-content: center;
+		background-color: rgb(119, 198, 198);
+	}
+
 	.main {
 		background-color: aqua;
 		width: 100%;

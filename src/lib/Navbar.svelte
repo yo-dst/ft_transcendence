@@ -24,6 +24,8 @@
             <a href="/profile">Profile</a>
             <a href="/">Friends</a>
             <a href="/game">Game</a>
+            <a href="/login">Log In</a>
+            <a href="/register">Register</a>
         </div>
     </Drawer>
     
