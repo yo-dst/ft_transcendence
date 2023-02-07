@@ -50,11 +50,6 @@
 		{#each matchHistory as match, key}
 			<div class="match">
 				<div>{match.opponent}</div>
-				{#if match.win}
-					<i class="fa-solid fa-check"></i>
-				{:else}
-					<i class="fa-solid fa-xmark"></i>
-				{/if}
 				<div>{match.result.myPoints} / {match.result.opponnentPoints} {match.date}</div>
 			</div>
 		{/each}

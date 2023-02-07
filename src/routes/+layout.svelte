@@ -3,24 +3,23 @@
 </svelte:head>
 
 <script lang="ts">
-	import "../app.css";
 	import "@picocss/pico";
-	import Footer from "$lib/Footer.svelte";
+	import "../app.css";
+	import 'iconify-icon';
 	import Navbar from "$lib/Navbar.svelte";
 </script>
 
-<div class="main">
-	<a href="/">Go To Main Page</a>
-	<a href="/profile">Go To Profile Page</a>
+<header>
+	<h1>Header</h1>
 	<Navbar/>
-	<div class="page">
-		<slot></slot>
-	</div>
-	<Footer/>
-</div>
+</header>
+<main>
+	<slot></slot>
+</main>
+<footer>
+	<h1>Footer</h1>
+</footer>
 
 <style>
-	.main {
-		background-color: rgb(209, 82, 82);
-	}
+
 </style>

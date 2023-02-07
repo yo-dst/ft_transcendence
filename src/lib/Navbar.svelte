@@ -15,7 +15,10 @@
 </div>
     <Drawer {open} size='50%' placement='left' on:clickAway={() => open=false}>
         <div class="drawer-container">
-            <button class='close' on:click={() => open = false}><img src="xmark.svg" alt="xmark" class="xmark"></button>
+            <button class='close' on:click={() => open = false}>
+                <iconify-icon icon="fa6-solid:xmark" style="color: black;"></iconify-icon>
+                Close
+            </button>
             <a href="/">Play</a>
             <a href="/">Channels</a>
             <a href="/">Profil</a>
@@ -66,6 +69,10 @@
     }
 
     button {
+        display: flex;
+        align-items: center;
+        color: black;
+        gap: 0.5em;
         background-color: transparent;
         background-size: cover;
         border: none;
