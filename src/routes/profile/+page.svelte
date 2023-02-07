@@ -6,7 +6,8 @@
 			result: {
 				opponnentPoints: 6,
 				myPoints: 7
-			}
+			},
+			date: new Date().toDateString()
 		},
 		{
 			opponent: "mlecherb",
@@ -14,7 +15,8 @@
 			result: {
 				opponnentPoints: 5,
 				myPoints: 8
-			}
+			},
+			date: new Date().toDateString()
 		},
 		{
 			opponent: "ydanset",
@@ -22,7 +24,8 @@
 			result: {
 				opponnentPoints: 14,
 				myPoints: 6
-			}
+			},
+			date: new Date().toDateString()
 		},
 		{
 			opponent: "prout",
@@ -30,7 +33,8 @@
 			result: {
 				opponnentPoints: 4,
 				myPoints: 0
-			}
+			},
+			date: new Date().toDateString()
 		}
 	]
 </script>
@@ -51,7 +55,7 @@
 				{:else}
 					<i class="fa-solid fa-xmark"></i>
 				{/if}
-				<div>{match.result.myPoints} / {match.result.opponnentPoints}</div>
+				<div>{match.result.myPoints} / {match.result.opponnentPoints} {match.date}</div>
 			</div>
 		{/each}
 	</div>

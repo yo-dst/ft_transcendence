@@ -3,6 +3,8 @@
 </svelte:head>
 
 <script lang="ts">
+	import "../app.css";
+	import "@picocss/pico";
 	import Footer from "$lib/Footer.svelte";
 	import Navbar from "$lib/Navbar.svelte";
 </script>
@@ -15,7 +17,6 @@
 		<slot></slot>
 	</div>
 	<Footer/>
-	<i class="fa-solid fa-xmark"></i>
 </div>
 
 <style>
