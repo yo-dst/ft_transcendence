@@ -21,7 +21,7 @@
             </button>
             <a href="/">Play</a>
             <a href="/">Channels</a>
-            <a href="/">Profil</a>
+            <a href="/profile">Profile</a>
             <a href="/">Friends</a>
         </div>
     </Drawer>
@@ -54,9 +54,8 @@
         padding-bottom: 5%;
     }
 
-    .xmark {
-        width: 8vw;
-        align-self: left;
+    .drawer-container a:focus {
+        background-color: transparent;
     }
 
     span {

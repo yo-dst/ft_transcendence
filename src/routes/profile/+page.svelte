@@ -77,10 +77,6 @@
 		border-radius: 50%;
 	}
 
-	.match-history {
-
-	}
-
 	.match {
 		display: flex;
 	}
