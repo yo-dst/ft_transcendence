@@ -53,7 +53,7 @@
 	h1 {
 		display: flex;
 		align-items: center;
-		gap: 0.5em;
+		gap: 0.5rem;
 	}
 
 	.grid-item {

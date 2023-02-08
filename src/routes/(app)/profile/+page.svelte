@@ -1,105 +1,140 @@
 <script lang="ts">
-	const matchHistory = [
-		{
-			opponent: "nferre",
-			win: true,
-			result: {
-				opponnentPoints: 6,
-				myPoints: 7
-			},
-			date: new Date().toDateString()
-		},
-		{
-			opponent: "mlecherb",
-			win: true,
-			result: {
-				opponnentPoints: 5,
-				myPoints: 8
-			},
-			date: new Date().toDateString()
-		},
-		{
-			opponent: "ydanset",
-			win: false,
-			result: {
-				opponnentPoints: 14,
-				myPoints: 6
-			},
-			date: new Date().toDateString()
-		},
-		{
-			opponent: "prout",
-			win: false,
-			result: {
-				opponnentPoints: 4,
-				myPoints: 0
-			},
-			date: new Date().toDateString()
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+
+	const matchHistory = data.matchHistory;
+	let username = "Walachnibar";
+	let nbWin = 3;
+	let nbLose = 2;
+	let nbTie = 1;
+	
+	let matchShowed = matchHistory.slice(0, 5);
+
+	function loadMore() {
+		if (matchShowed.length < matchHistory.length) {
+			const matchAdded = matchHistory.slice(matchShowed.length, matchShowed.length + 5)
+			matchShowed = [...matchShowed, ...matchAdded]
 		}
-	]
+	}
 </script>
 
-<section>
-	<h1>Playing with flexbox</h1>
-	<div class="my-container">
-		<div>Element 1</div>
-		<div>Element 2</div>
-		<div>Element 3</div>
+<h1>Profile Page</h1>
+<section class="first-section">
+	<img src="https://picsum.photos/500/500" alt="profile" class="first-section-img"/>
+	<div class="first-section-stats">
+		<span>{username}</span>
+		<div>
+			<span style="color: green;">{nbWin}</span>
+			/
+			<span style="color: grey">{nbTie}</span>
+			/
+			<span style="color: red;">{nbLose}</span>
+		</div>
+		
 	</div>
 </section>
-<div class="main">
-	Profile Page
-	<div class="presentation">
-		<img src="https://picsum.photos/500/500" alt="profile" class="profile-img"/>
-		<div>Username</div>
-	</div>
-	<div class="match-history">
-		<h3>Match History</h3>
-		{#each matchHistory as match, key}
-			<div class="match">
-				<div>{match.opponent}</div>
-				<div>{match.result.myPoints} / {match.result.opponnentPoints} {match.date}</div>
-			</div>
-		{/each}
-	</div>
-</div>
+<section class="second-section">
+	<h3>Match History</h3>
+	<figure>
+		<table>
+			<thead>
+				<tr>
+					<th>Players</th>
+					<th>Result</th>
+					<th>Date</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each matchShowed as match}
+					<tr>
+						<td>
+							<div class="players-cell">
+								<span>{username}</span>
+								<span>{match.opponent}</span>
+							</div>
+						</td>
+						<td class="result-cell">
+							<div style="display: flex; flex-direction: column; min-width: 1.5em">
+								<span>{match.result.myPoints}</span>
+								<span>{match.result.opponnentPoints}</span>
+							</div>
+							{#if match.result.myPoints > match.result.opponnentPoints}
+								<iconify-icon icon="material-symbols:check-small-rounded" style="color: green; font-size: 2rem;"></iconify-icon>
+							{:else if match.result.myPoints < match.result.opponnentPoints}
+								<iconify-icon icon="ic:round-close" style="color: red; font-size: 1.5rem; margin-left: 0.3rem;"></iconify-icon>
+							{:else}
+								<iconify-icon icon="ic:round-minus" style="color: gray; font-size: 1.5rem; margin-left: 0.3rem;"></iconify-icon>
+							{/if}
+						</td>
+						<td>
+							<span style="white-space: nowrap;">{match.date.toDateString()}</span>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</figure>
+	{#if matchShowed.length < matchHistory.length}
+		<div style="display: flex; justify-content: center;">
+			<button on:click={loadMore} class="secondary load-more-button">
+				<iconify-icon icon="ic:round-plus" style="font-size: 1.5rem;"></iconify-icon>
+			</button>
+		</div>
+	{/if}
+</section>
 
 <style>
-	.my-container {
-		display: flex;
-		flex-direction: row;
-		background-color: aqua;
-		column-gap: 1em;
+	figure {
+		margin-bottom: -0.5rem;
 	}
-	
-	.my-container div {
+
+	.first-section {
 		display: flex;
-		flex-grow: 1;
+		align-items: center;
 		justify-content: center;
-		background-color: rgb(119, 198, 198);
+		gap: 2.5rem;
 	}
 
-	.main {
-		background-color: aqua;
+	.first-section-img {
 		width: 100%;
-		display: flex;
-		align-items: center;
-		flex-direction: column;
-	}
-
-	.presentation {
-		background-color: bisque;
-		display: flex;
-		align-items: center;
-	}
-
-	.profile-img {
-		width: 50px;
-		height: 50px;
+		height: auto;
 		border-radius: 50%;
 	}
 
-	.match {
+	.first-section-stats {
 		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.players-cell {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.result-cell {
+		display: flex;
+		align-items: center;
+	}
+
+	.load-more-button {
+		width: auto;
+		border-radius: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 0.1rem;
+	}
+
+	@media (max-width: 576px) {
+		.first-section {
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.first-section-img {
+			width: 50%;
+		}
 	}
 </style>
