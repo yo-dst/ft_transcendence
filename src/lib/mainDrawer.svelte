@@ -1,6 +1,6 @@
 <script>
     import Drawer from 'svelte-drawer-component'
-    export let open: boolean;
+    export let open;
 </script>
 
 <Drawer {open} size='50%' placement='left' on:clickAway={() => open=false}>
