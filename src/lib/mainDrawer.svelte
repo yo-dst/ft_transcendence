@@ -1,6 +1,6 @@
 <script>
     import Drawer from 'svelte-drawer-component'
-    export let open;
+    export let open: boolean;
 </script>
 
 <Drawer {open} size='50%' placement='left' on:clickAway={() => open=false}>
@@ -8,8 +8,11 @@
         <button class='close' on:click={() => open = false}><img src="xmark.svg" alt="xmark" class="xmark"></button>
         <a href="/">Play</a>
         <a href="/">Channels</a>
-        <a href="/">Profil</a>
-        <a href="/">Friends</a>
+        <a href="/profile">Profile</a>
+        <a href="/friends">Friends</a>
+        <a href="/game">Game</a>
+        <a href="/login">Log In</a>
+        <a href="/register">Register</a>
     </div>
 </Drawer>
 

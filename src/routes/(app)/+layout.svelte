@@ -6,7 +6,6 @@
 </script>
 
 <header>
-	<h1>Header</h1>
 	<Navbar/>
 </header>
 <main class="container">
