@@ -46,7 +46,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each matchShowed as match}
+				{#each matchShowed as match (match.id)}
 					<tr>
 						<td>
 							<div class="players-cell">
