@@ -22,13 +22,7 @@
     </li>
     <button type="button" class="menu" on:click={() => open = true}></button>
     <MainDrawer open={open}/>
-<<<<<<< HEAD
-</div>
-
-    
-=======
 </div>    
->>>>>>> 6724f8bb4f3bb46b2ce2865b885c319522a438be
 
 <style>
     .main {

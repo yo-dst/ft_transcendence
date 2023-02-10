@@ -8,6 +8,10 @@
 
 <h1>Friends Page</h1>
 <section>
+	<h3>Add Friend</h3>
+	<inpput></inpput>
+</section>
+<section>
 	<h3>Friends</h3>
 	<ul>
 		{#each friends as friend}
