@@ -20,7 +20,7 @@
                 <a href="/">Link 3</a>
         </div>
     </li>
-    <button type="button" class="menu" on:click={() => open = true}></button>
+    <button type="button" class="menu" on:click={() => open = true} on:blur={() => {open = false}}></button>
     <MainDrawer open={open}/>
 </div>    
 
