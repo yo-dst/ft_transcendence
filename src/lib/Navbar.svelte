@@ -22,20 +22,7 @@
     </li>
     <button type="button" class="menu" on:click={() => open = true}></button>
     <MainDrawer open={open}/>
-</div>
-    <Drawer {open} size='50%' placement='left' on:clickAway={() => open=false}>
-        <div class="drawer-container">
-            <button class='close' on:click={() => open = false}><img src="xmark.svg" alt="xmark" class="xmark"></button>
-            <a href="/">Play</a>
-            <a href="/">Channels</a>
-            <a href="/profile">Profile</a>
-            <a href="/friends">Friends</a>
-            <a href="/game">Game</a>
-            <a href="/login">Log In</a>
-            <a href="/register">Register</a>
-        </div>
-    </Drawer>
-    
+</div>    
 
 <style>
     .main {
