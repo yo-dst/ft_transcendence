@@ -20,6 +20,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@picocss/pico": "^1.5.7",
+		"iconify-icon": "^1.0.3",
 		"svelte-drawer-component": "^1.2.2"
 	}
 }

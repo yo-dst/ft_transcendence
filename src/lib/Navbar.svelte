@@ -1,4 +1,4 @@
-<script>
+    <script>
     import MainDrawer from "./mainDrawer.svelte";
     let open = false;
     let show = false;
@@ -23,7 +23,15 @@
     <button type="button" class="menu" on:click={() => open = true}></button>
     <MainDrawer open={open}/>
 </div>
-
+    <Drawer {open} size='50%' placement='left' on:clickAway={() => open=false}>
+        <div class="drawer-container">
+            <button class='close' on:click={() => open = false}><img src="xmark.svg" alt="xmark" class="xmark"></button>
+            <a href="/">Play</a>
+            <a href="/">Channels</a>
+            <a href="/">Profil</a>
+            <a href="/">Friends</a>
+        </div>
+    </Drawer>
     
 
 <style>
@@ -43,8 +51,19 @@
         height: 1.5rem;
     }
 
-    .first-block {
-        display: block;
+    .drawer-container {
+        display: flex;
+        flex-direction: column;
+        padding: 0% 5%;
+    }
+
+    .drawer-container a {
+        padding-bottom: 5%;
+    }
+
+    .xmark {
+        width: 8vw;
+        align-self: left;
     }
 
     span {
@@ -57,6 +76,10 @@
     }
 
     button {
+        display: flex;
+        align-items: center;
+        color: black;
+        gap: 0.5em;
         background-color: transparent;
         background-size: cover;
         border: none;
