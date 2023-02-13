@@ -12,5 +12,26 @@
 	<slot/>
 </main>
 <footer>
-	<h1>Footer</h1>
+	<div>
+		<span>Made with Love by <a href="https://github.com/NoahFerre">Him</a>, <a href="https://github.com/yo-dst">I</a> and <a href="https://fr.wikipedia.org/wiki/Angelina_Jolie">Her </a></span>
+	</div>
 </footer>
+
+<style>
+	main {
+		margin-bottom: 100px;
+	}
+
+	footer {
+		position: absolute;
+		height: 50px;
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		background-color: var(--secondary);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: white;
+	}
+</style>

@@ -35,3 +35,8 @@
   --switch-color: var(--primary-inverse);
   --switch-checked-background-color: var(--primary);
 }
+
+html {
+  position: relative;
+  min-height: 100%;
+}
