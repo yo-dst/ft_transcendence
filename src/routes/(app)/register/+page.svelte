@@ -4,7 +4,6 @@
 	let confirmPassword: string;
 </script>
 
-<h1>Register Page</h1>
 <section>
 	<form>
 		<label for="username">

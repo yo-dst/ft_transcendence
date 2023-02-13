@@ -6,9 +6,8 @@
 	let friends = data.friends;
 </script>
 
-<h1>Friends Page</h1>
 <section>
-	<h3>Friends</h3>
+	<div class="friend-title">Friends</div>
 	<ul>
 		{#each friends as friend}
 			<li>
@@ -36,5 +35,12 @@
 		width: auto;
 		border-radius: 50%;
 		margin-right: 0.5rem;
+	}
+
+	.friend-title {
+		padding-left: 0.5rem;
+		margin-bottom: 0.5rem;
+		font-size: 1.5rem;
+		color: var(--h3-color);
 	}
 </style>

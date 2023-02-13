@@ -19,7 +19,6 @@
 	}
 </script>
 
-<h1>Profile Page</h1>
 <section class="first-section">
 	<img src="https://picsum.photos/500/500" alt="profile" class="first-section-img"/>
 	<div class="first-section-stats">
@@ -35,7 +34,7 @@
 	</div>
 </section>
 <section class="second-section">
-	<h3>Match History</h3>
+	<div class="match-history-title">Match History</div>
 	<figure>
 		<table>
 			<thead>
@@ -125,6 +124,13 @@
 		justify-content: center;
 		align-items: center;
 		padding: 0.1rem;
+	}
+
+	.match-history-title {
+		padding-left: 0.5rem;
+		margin-bottom: 0.5rem;
+		font-size: 1.5rem;
+		color: var(--h3-color);
 	}
 
 	@media (max-width: 576px) {

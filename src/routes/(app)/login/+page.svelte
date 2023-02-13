@@ -3,7 +3,6 @@
 	let password: string;
 </script>
 
-<h1>Login Page</h1>
 <section>
 	<form>
 		<label for="username">Username</label>
@@ -22,7 +21,7 @@
 		<span class="separator-text">OR</span>
 		<span></span>
 	</div>
-	<a href="/" role="button" class="contrast login-with-42-link">Log In with 42</a>
+	<a href="/" role="button" class="contrast outline login-with-42-link">Log In with 42</a>
 </section>
 
 <style>

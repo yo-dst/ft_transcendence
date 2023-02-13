@@ -40,7 +40,7 @@
 
 <style>
     .header {
-        background-color: var(--secondary);
+        background-color: var(--contrast);
         display: flex;
         justify-content: space-between;
         align-items: center;

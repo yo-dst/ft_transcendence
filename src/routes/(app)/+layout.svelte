@@ -18,6 +18,10 @@
 </footer>
 
 <style>
+	header {
+		margin-bottom: 50px;
+	}
+
 	main {
 		margin-bottom: 100px;
 	}
@@ -28,10 +32,10 @@
 		left: 0;
 		bottom: 0;
 		width: 100%;
-		background-color: var(--secondary);
+		background-color: var(--contrast);;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		color: white;
+		color: black;
 	}
 </style>
