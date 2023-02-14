@@ -32,10 +32,10 @@
 		left: 0;
 		bottom: 0;
 		width: 100%;
-		background-color: var(--contrast);;
+		background-color: #030405;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		color: black;
+		color: var(--color);
 	}
 </style>

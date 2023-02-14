@@ -12,7 +12,7 @@
 
 <div class="header">
     <button class="hamburger-button" on:click={() => setShowDrawer(true)}>
-        <iconify-icon icon="icon-park:hamburger-button" style="font-size: 50px;"></iconify-icon>
+        <iconify-icon icon="charm:menu-hamburger" style="font-size: 50px; color: var(--contrast);"></iconify-icon>
     </button>
     <a href="/">
         <img src="pong-icon.svg" alt="icon pong" class="pong-icon"/>
@@ -21,7 +21,7 @@
         {#if userLoggedIn}
             <img src="https://picsum.photos/200" alt="profile" class="header-profile-img"/>
         {:else}
-            <iconify-icon icon="mdi:user-circle" style="color: black; font-size: 50px;"></iconify-icon>
+            <iconify-icon icon="mdi:user-circle" style="color: black; font-size: 50px; color: var(--contrast);"></iconify-icon>
         {/if}
     </div>
     <!-- <span>Transcendence</span> -->
@@ -40,7 +40,7 @@
 
 <style>
     .header {
-        background-color: var(--contrast);
+        background-color: #030405;
         display: flex;
         justify-content: space-between;
         align-items: center;
