@@ -13,12 +13,12 @@
 	
 		<label for="password">
 			Password
-			<input type="text" name="password" placeholder="Password" bind:value={password}/>
+			<input type="password" name="password" placeholder="Password" bind:value={password}/>
 		</label>
 	
 		<label for="confirmPassword">
 			Confirm Password
-			<input type="text" name="confirmPassword" placeholder="Confirm Password" bind:value={confirmPassword}/>
+			<input type="password" name="confirmPassword" placeholder="Confirm Password" bind:value={confirmPassword}/>
 		</label>
 	
 		<label for="terms_sharing">

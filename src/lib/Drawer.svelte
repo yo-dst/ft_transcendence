@@ -35,11 +35,6 @@
                         Friends
                     </a>
                 </li>
-                <li>
-                    <a role="button" href="/game">
-                        Game
-                    </a>
-                </li>
             </ul>
         </nav>
         <nav>
@@ -52,7 +47,7 @@
                 </li>
                 <li>
                     {#if userLoggedIn}
-                        <a href="#" role="button" class="contrast outline">
+                        <a href="/parameters" role="button" class="contrast outline">
                             <iconify-icon icon="material-symbols:logout"></iconify-icon>
                             Log Out
                         </a>

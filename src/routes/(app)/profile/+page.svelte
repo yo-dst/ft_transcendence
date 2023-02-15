@@ -24,17 +24,17 @@
 	<div class="first-section-stats">
 		<span>{username}</span>
 		<div>
-			<span style="color: green;">{nbWin}</span>
+			<span style="color: var(--ins-color);;">{nbWin}</span>
 			/
-			<span style="color: grey">{nbTie}</span>
+			<span style="color: var(--color);">{nbTie}</span>
 			/
-			<span style="color: red;">{nbLose}</span>
+			<span style="color: var(--del-color);;">{nbLose}</span>
 		</div>
 		
 	</div>
 </section>
 <section class="second-section">
-	<div class="match-history-title">Match History</div>
+	<div class="match-history-title">Match history</div>
 	<figure>
 		<table>
 			<thead>
@@ -59,11 +59,11 @@
 								<span>{match.result.opponnentPoints}</span>
 							</div>
 							{#if match.result.myPoints > match.result.opponnentPoints}
-								<iconify-icon icon="material-symbols:check-small-rounded" style="color: green; font-size: 2rem;"></iconify-icon>
+								<iconify-icon icon="material-symbols:check-small-rounded" style="color: var(--ins-color); font-size: 2rem;"></iconify-icon>
 							{:else if match.result.myPoints < match.result.opponnentPoints}
-								<iconify-icon icon="ic:round-close" style="color: red; font-size: 1.5rem; margin-left: 0.3rem;"></iconify-icon>
+								<iconify-icon icon="ic:round-close" style="color: var(--del-color); font-size: 1.5rem; margin-left: 0.3rem;"></iconify-icon>
 							{:else}
-								<iconify-icon icon="ic:round-minus" style="color: gray; font-size: 1.5rem; margin-left: 0.3rem;"></iconify-icon>
+								<iconify-icon icon="ic:round-minus" style="color: var(--color); font-size: 1.5rem; margin-left: 0.3rem;"></iconify-icon>
 							{/if}
 						</td>
 						<td>
@@ -77,7 +77,7 @@
 	{#if matchShowed.length < matchHistory.length}
 		<div style="display: flex; justify-content: center;">
 			<button on:click={loadMore} class="secondary load-more-button">
-				<iconify-icon icon="ic:round-plus" style="font-size: 1.5rem;"></iconify-icon>
+				<iconify-icon icon="ic:round-plus" style="font-size: 1rem;"></iconify-icon>
 			</button>
 		</div>
 	{/if}
@@ -86,6 +86,13 @@
 <style>
 	figure {
 		margin-bottom: -0.5rem;
+		border-radius: 0 0 5px 5px;
+		background-color: #090D10;
+		padding: 0.5rem 1rem 0.5rem 0.5rem;
+	}
+
+	thead {
+		border: none;
 	}
 
 	.first-section {
@@ -123,14 +130,16 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		padding: 0.1rem;
+		padding: 0.05rem;
 	}
 
 	.match-history-title {
 		padding-left: 0.5rem;
-		margin-bottom: 0.5rem;
 		font-size: 1.5rem;
 		color: var(--h3-color);
+		padding-top: 0.2rem;
+		border-radius: 5px 5px 0 0;
+		background-color: #090D10;
 	}
 
 	@media (max-width: 576px) {

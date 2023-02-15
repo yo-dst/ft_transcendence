@@ -50,4 +50,8 @@
 		display: flex;
 		justify-content: center;
 	}
+
+	button {
+		margin-top: 1rem;
+	}
 </style>

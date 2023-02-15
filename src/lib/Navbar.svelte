@@ -21,7 +21,8 @@
         {#if userLoggedIn}
             <img src="https://picsum.photos/200" alt="profile" class="header-profile-img"/>
         {:else}
-            <iconify-icon icon="mdi:user-circle" style="color: black; font-size: 50px; color: var(--contrast);"></iconify-icon>
+            <iconify-icon icon="mdi:user" style="color: black; font-size: 50px; color: var(--contrast);"></iconify-icon>
+            <!-- <iconify-icon icon="mdi:user-circle" ></iconify-icon> -->
         {/if}
     </div>
     <!-- <span>Transcendence</span> -->
@@ -40,13 +41,13 @@
 
 <style>
     .header {
-        background-color: #030405;
+        background-color: #090D10;
+        /* background-color: #030405; */
         display: flex;
         justify-content: space-between;
         align-items: center;
         height: 50px;
         padding: 0 0.3rem;
-        margin-bottom: 1rem;
     }
 
     .pong-icon {

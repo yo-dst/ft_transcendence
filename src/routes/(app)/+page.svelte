@@ -3,7 +3,7 @@
 
 <section>
 	<button>Play</button>
-	<button>Play vs Friends</button>
+	<button>Play vs friends</button>
 </section>
 	
 <style>
