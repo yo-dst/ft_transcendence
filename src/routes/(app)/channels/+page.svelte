@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageData } from "./$types";
-	import SvelteTooltip from 'svelte-tooltip';
 
 	export let data: PageData;
 
@@ -33,7 +32,9 @@
 					{#if !channel.public}
 						<iconify-icon icon="material-symbols:lock" style="font-size: 1.5rem;"></iconify-icon>
 					{/if}
-						<button class="secondary" on:click={joinChannel}><iconify-icon icon="material-symbols:open-in-browser"></iconify-icon></button>
+						<button class="secondary" on:click={joinChannel}>
+							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
+						</button>
 				</div>
 			</li>
 		{/each}

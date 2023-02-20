@@ -1,11 +1,13 @@
 <script lang="ts">
     import Drawer from "./Drawer.svelte";
+    import Notifications from "./Notifications.svelte";
 
     let showDrawer = false;
-
     function setShowDrawer(val: boolean) {
         showDrawer = val;
     }
+
+    let showNotif = false;
 
     let userLoggedIn = false;
 </script>
@@ -17,15 +19,15 @@
     <a href="/">
         <img src="pong-icon.svg" alt="icon pong" class="pong-icon"/>
     </a>
-    <div class="header-profile" on:click={() => userLoggedIn = !userLoggedIn}>
+    <div class="header-profile">
         {#if userLoggedIn}
-        <img src="https://picsum.photos/200" alt="profile" class="header-profile-img"/>
+            <img src="https://picsum.photos/200" alt="profile" class="header-profile-img"/>
         {:else}
             <!-- <iconify-icon icon="mdi:user" style="font-size: 50px; color: var(--contrast);"></iconify-icon> -->
-            <div class="ring-wrapper">
+            <button class="ring-wrapper" on:click={() => showNotif = !showNotif}>
                 <iconify-icon icon="mdi:bell-ring" style="font-size: 40px; color: var(--contrast);"></iconify-icon>
                 <span class="ring-notif">2</span>
-            </div>
+            </button>
             <!-- <iconify-icon icon="mdi:user-circle" ></iconify-icon> -->
         {/if}
     </div>
@@ -42,6 +44,7 @@
     </li> -->
 </div>
 <Drawer show={showDrawer} setShow={setShowDrawer}/>
+<Notifications show={showNotif}/>
 
 <style>
     .header {
@@ -84,6 +87,10 @@
 
     .ring-wrapper {
         position: relative;
+        background-color: transparent;
+        border: none;
+        margin-bottom: 0;
+        padding: 0;
     }
 
     .ring-notif {
