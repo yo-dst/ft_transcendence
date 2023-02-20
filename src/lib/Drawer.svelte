@@ -7,7 +7,7 @@
     let userLoggedIn = false;
 </script>
 
-<Drawer open={show} size='50%' placement='left' on:clickAway={() => setShow(false)}>
+<Drawer open={show} size='200px' placement='left' on:clickAway={() => setShow(false)}>
     <div class="drawer-container">
         <nav>
             <ul>
@@ -40,14 +40,14 @@
         <nav>
             <ul>
                 <li>
-                    <a role="button" class="contrast" href="/">
+                    <a role="button" class="contrast" href="/parameters">
                         <iconify-icon icon="mdi:cog"></iconify-icon>
                         Parameters
                     </a>
                 </li>
                 <li>
                     {#if userLoggedIn}
-                        <a href="/parameters" role="button" class="contrast outline">
+                        <a href="/#" role="button" class="contrast outline">
                             <iconify-icon icon="material-symbols:logout"></iconify-icon>
                             Log Out
                         </a>

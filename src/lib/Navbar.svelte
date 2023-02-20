@@ -19,9 +19,13 @@
     </a>
     <div class="header-profile" on:click={() => userLoggedIn = !userLoggedIn}>
         {#if userLoggedIn}
-            <img src="https://picsum.photos/200" alt="profile" class="header-profile-img"/>
+        <img src="https://picsum.photos/200" alt="profile" class="header-profile-img"/>
         {:else}
-            <iconify-icon icon="mdi:user" style="color: black; font-size: 50px; color: var(--contrast);"></iconify-icon>
+            <!-- <iconify-icon icon="mdi:user" style="font-size: 50px; color: var(--contrast);"></iconify-icon> -->
+            <div class="ring-wrapper">
+                <iconify-icon icon="mdi:bell-ring" style="font-size: 40px; color: var(--contrast);"></iconify-icon>
+                <span class="ring-notif">2</span>
+            </div>
             <!-- <iconify-icon icon="mdi:user-circle" ></iconify-icon> -->
         {/if}
     </div>
@@ -76,6 +80,23 @@
         height: 45px;
         width: auto;
         border-radius: 50%;
+    }
+
+    .ring-wrapper {
+        position: relative;
+    }
+
+    .ring-notif {
+        position: absolute;
+        background-color: var(--del-color);
+        width: 1.2rem;
+        height: 1.2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        right: -1px;
+        top: 3px;
     }
 
     /* li {

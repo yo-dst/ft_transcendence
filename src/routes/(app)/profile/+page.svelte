@@ -125,6 +125,7 @@
 	}
 
 	.load-more-button {
+		margin-top: -0.5rem;
 		width: auto;
 		border-radius: 50%;
 		display: flex;
