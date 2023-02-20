@@ -47,6 +47,10 @@
 <Notifications show={showNotif}/>
 
 <style>
+    button:focus {
+        --primary-focus: transparent;
+    }
+
     .header {
         background-color: #090D10;
         /* background-color: #030405; */
