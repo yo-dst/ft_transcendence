@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import type { PageData } from "./$types";
 
 	export let data: PageData;
 
@@ -9,28 +9,51 @@
 <section>
 	<div class="title">Add a friend</div>
 	<div class="add-friend">
-		<input type="text" placeholder="Username"/>
-		<button style="background-color: var(--ins-color); border:none;"><iconify-icon icon="fluent-mdl2:add-friend" style="font-size: 1.5rem"></iconify-icon></button>
+		<input type="text" placeholder="Username" />
+		<button style="background-color: var(--ins-color); border:none;"
+			><iconify-icon
+				icon="fluent-mdl2:add-friend"
+				style="font-size: 1.5rem"
+			/></button
+		>
 	</div>
 	<div class="friends-title">Friends</div>
 	<ul>
 		{#each friends as friend}
 			<li>
 				<div class="friend-right">
-					<img src="https://picsum.photos/200" alt="friend" class="friend-img"/>
+					<img
+						src="https://picsum.photos/200"
+						alt="friend"
+						class="friend-img"
+					/>
 					<span>{friend.username}</span>
 				</div>
 				<div class="friend-left">
 					{#if friend.inGame}
-						<button class="spec-button"><iconify-icon icon="ic:baseline-remove-red-eye"></iconify-icon></button>
+						<button class="spec-button"
+							><iconify-icon
+								icon="ic:baseline-remove-red-eye"
+							/></button
+						>
 					{/if}
 					{#if friend.inChannel}
-						<button class="secondary"><iconify-icon icon="material-symbols:open-in-browser"></iconify-icon></button>
+						<button class="secondary"
+							><iconify-icon
+								icon="material-symbols:open-in-browser"
+							/></button
+						>
 					{/if}
 					{#if friend.online}
-						<button class="invite-button"><iconify-icon icon="material-symbols:auto-read-play-outline-sharp"></iconify-icon></button>
+						<button class="invite-button"
+							><iconify-icon
+								icon="material-symbols:auto-read-play-outline-sharp"
+							/></button
+						>
 					{/if}
-					<button class="del-button"><iconify-icon icon="charm:cross"></iconify-icon></button>
+					<button class="del-button"
+						><iconify-icon icon="charm:cross" /></button
+					>
 				</div>
 			</li>
 		{/each}
@@ -39,7 +62,7 @@
 
 <style>
 	ul {
-		background-color: #090D10;
+		background-color: #090d10;
 		padding: 0.5rem 1rem 0.5rem 0.5rem;
 		border-radius: 0 0 5px 5px;
 	}
@@ -86,7 +109,7 @@
 		color: var(--h3-color);
 		padding-top: 0.2rem;
 		border-radius: 5px 5px 0 0;
-		background-color: #090D10;
+		background-color: #090d10;
 	}
 
 	.add-friend {

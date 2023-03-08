@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from "$app/navigation";
 	import io from "socket.io-client";
 	let selectedGameMode = 0;
 	let isSearching = false;
@@ -16,6 +17,11 @@
 
 	socket.on("game-message", (data) => {
 		console.log(data);
+	});
+
+	socket.on("matched", (id) => {
+		socket.disconnect();
+		goto("/game/" + id);
 	});
 </script>
 
