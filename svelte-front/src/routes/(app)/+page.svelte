@@ -1,18 +1,41 @@
 <script lang="ts">
+	import io from "socket.io-client";
+	let selectedGameMode = 0;
 	let isSearching = false;
+	const socket = io("localhost:3000", { path: "/matchmaking" });
 
-	function match() {
+	function joinQueue() {
+		socket.emit("joinQueue", selectedGameMode);
 		isSearching = !isSearching;
 	}
+
+	function leaveQueue() {
+		socket.emit("leaveQueue", selectedGameMode);
+		isSearching = !isSearching;
+	}
+
+	socket.on("game-message", (data) => {
+		console.log(data);
+	});
 </script>
 
 <section>
 	{#if !isSearching}
-		<button on:click={match}>Find match</button>
+		<button on:click={joinQueue}>Find match</button>
 	{:else}
-		<button on:click={match}>Leave</button>
+		<button on:click={leaveQueue}>Leave</button>
 	{/if}
 	<button>Play vs friends</button>
+	Game Mode
+	<button on:click={() => (selectedGameMode = 0)} disabled={isSearching}
+		>{selectedGameMode === 0 ? "✅" : "🧢"} Default</button
+	>
+	<button on:click={() => (selectedGameMode = 1)} disabled={isSearching}
+		>{selectedGameMode === 1 ? "✅" : "⚡"} Speed</button
+	>
+	<button on:click={() => (selectedGameMode = 2)} disabled={isSearching}
+		>{selectedGameMode === 2 ? "✅" : "👻"} Ghost</button
+	>
 </section>
 
 <style>
