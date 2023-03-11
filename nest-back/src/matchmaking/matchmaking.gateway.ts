@@ -5,7 +5,6 @@ import { gameRooms } from './sharedRooms';
 import { GameRoom } from './gameRoom';
 
 @WebSocketGateway({
-	path: "/matchmaking",
 	cors: { origin: '*' }
 })
 export class MatchmakingGateway {
@@ -31,7 +30,7 @@ export class MatchmakingGateway {
 	@SubscribeMessage('leaveQueue')
 	leaveQueue(client: Socket, gameMode: number) {
 		const index = this.masterQueue[gameMode].indexOf(client);
-		this.masterQueue[gameMode].slice(index, 1);
+		this.masterQueue[gameMode].splice(index, 1);
 	}
 
 	// if 2 players in the array, match them and create a new room
@@ -42,7 +41,7 @@ export class MatchmakingGateway {
 			const roomId = v4();
 
 			// create a new room in the shared instance of GameRooms
-			const room = new GameRoom(roomId, p1, p2);
+			const room = new GameRoom(roomId, gameMode, p1, p2);
 			gameRooms.push(room);
 			console.log('players matched');
 
