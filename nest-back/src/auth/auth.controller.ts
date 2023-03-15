@@ -1,8 +1,13 @@
-import { Controller, Get, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import JwtAuthGuard from './jwtAuth.guard';
 import RequestWithUser from './requestWithUser.interface';
+
+/*
+	notes
+	- i get a console error when hitting /auth/logout endpoint and redirecting to client url (it sends 'Access-Control-Allow-Origin: *' header)
+*/
 
 @Controller('auth')
 export class AuthController {
@@ -12,6 +17,12 @@ export class AuthController {
 	@Get()
 	@UseGuards(JwtAuthGuard)
 	authenticate(@Req() req: RequestWithUser) {
+		return req.user;
+	}
+
+	@Post()
+	@UseGuards(JwtAuthGuard)
+	testingPostWithCookie(@Req() req: RequestWithUser) {
 		return req.user;
 	}
 
@@ -44,9 +55,5 @@ export class AuthController {
 	logout(@Res({ passthrough: true }) res: Response) {
 		const cookie = this.authService.getCookieForLogOut();
 		res.setHeader("Set-Cookie", cookie);
-		return {
-      url: "http://localhost:5173",
-      statusCode: 302
-    };
 	}
 }
