@@ -46,7 +46,7 @@ export class TwoFactorAuthController {
 	@Post("login")
 	@UseGuards(JwtAuthGuard)
 	@HttpCode(200)
-	async loginWith2fa(
+	async login(
 		@Req() req: RequestWithUser,
 		@Res({ passthrough: true }) res: Response,
 		@Body() { twoFactorAuthenticationCode }: TwoFactorAuthCodeDto
