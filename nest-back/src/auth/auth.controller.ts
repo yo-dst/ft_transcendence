@@ -1,47 +1,39 @@
-import { Controller, Get, Post, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
+import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import JwtAuthGuard from './jwtAuth.guard';
 import RequestWithUser from './requestWithUser.interface';
+import JwtTwoFactorAuthGuard from './twoFactorAuth/jwtTwoFactorAuth.guard';
 
 /*
 	notes
-	- i get a console error when hitting /auth/logout endpoint and redirecting to client url (it sends 'Access-Control-Allow-Origin: *' header)
 */
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService) {}
+	constructor(
+		private authService: AuthService,
+		private usersService: UsersService
+	) {}
 
-	// for testing purpose
 	@Get()
 	@UseGuards(JwtAuthGuard)
 	authenticate(@Req() req: RequestWithUser) {
 		return req.user;
 	}
 
-	@Post()
-	@UseGuards(JwtAuthGuard)
-	testingPostWithCookie(@Req() req: RequestWithUser) {
-		return req.user;
-	}
-
 	// callback endpoint to be supplied to 42 intra app page
-	@Get("access-token-42")
-	@Redirect()
-	async get42AccessToken(@Query("code") code: string) {
-		const accessToken42 = await this.authService.getAccessToken42(code);
-    return {
-      url: `http://localhost:3000/auth/login?token=${accessToken42}`,
-      statusCode: 302
-    };
-	}
-
 	@Get("login")
 	@Redirect()
-	async login(@Query("token") accessToken42: string, @Res({ passthrough: true }) res: Response) {
-		const token = await this.authService.login(accessToken42);
-		const cookie = this.authService.getCookieWithToken(token);
+	async login(@Query("code") code: string, @Res({ passthrough: true }) res: Response) {
+		const accessToken42 = await this.authService.getAccessToken42(code);
+		const user42 = await this.authService.getUser42Info(accessToken42);
+		let user = await this.usersService.getByEmail(user42?.email);
+		if (!user) {
+			user = await this.authService.register(user42);
+		}
+		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
     return {
       url: "http://localhost:5173",
@@ -50,8 +42,7 @@ export class AuthController {
   }
 
 	@Get("logout")
-	@UseGuards(JwtAuthGuard)
-	@Redirect()
+	@UseGuards(JwtTwoFactorAuthGuard)
 	logout(@Res({ passthrough: true }) res: Response) {
 		const cookie = this.authService.getCookieForLogOut();
 		res.setHeader("Set-Cookie", cookie);

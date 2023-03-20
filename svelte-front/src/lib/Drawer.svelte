@@ -1,10 +1,18 @@
 <script lang="ts">
-    import Drawer from 'svelte-drawer-component'
+    import Drawer from 'svelte-drawer-component';
+    import { user } from "../stores";
     
     export let show;
     export let setShow;
 
-    let userLoggedIn = false;
+    async function logout() {
+        const res = await fetch("http://localhost:3000/auth/logout", {
+            credentials: "include"
+        });
+        if (res.ok) {
+            $user = null;
+        }
+    }
 </script>
 
 <Drawer open={show} size='200px' placement='left' on:clickAway={() => setShow(false)}>
@@ -46,13 +54,13 @@
                     </a>
                 </li>
                 <li>
-                    {#if userLoggedIn}
-                        <a href="/#" role="button" class="contrast outline">
+                    {#if $user}
+                        <a href="/#" role="button" on:click={logout} class="contrast outline">
                             <iconify-icon icon="material-symbols:logout"></iconify-icon>
                             Log Out
                         </a>
                     {:else}
-                        <a role="button" class="contrast outline" href="/login">
+                        <a role="button" class="contrast outline" href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-7470221ce45a9a6950c2b7324e6e5a9a069460af572ce5daa2a0fb547a3d5fda&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Flogin&response_type=code">
                             <iconify-icon icon="material-symbols:login"></iconify-icon>
                             Log In
                         </a>

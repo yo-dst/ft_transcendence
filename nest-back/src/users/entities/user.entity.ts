@@ -8,8 +8,14 @@ class User {
 	@Column({ unique: true })
 	email: string;
 
-	@Column()
+	@Column({ unique: true })
   username: string;
+
+	@Column({ nullable: true })
+	twoFactorAuthenticationSecret: string;
+
+	@Column({ default: false })
+	isTwoFactorAuthenticationEnabled: boolean;
 }
 
 export default User;

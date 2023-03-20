@@ -27,9 +27,9 @@ export class AuthService {
       client_id: "u-s4t2ud-7470221ce45a9a6950c2b7324e6e5a9a069460af572ce5daa2a0fb547a3d5fda",
       client_secret: "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",
       code: code,
-      redirect_uri: "http://localhost:3000/auth/access-token-42"
+      redirect_uri: "http://localhost:3000/auth/login"
     });
-    return res?.data?.access_token;
+    return res.data?.access_token;
 	}
 
 	async getAccessToken42Info(accessToken42: string): Promise<any> {
@@ -38,7 +38,7 @@ export class AuthService {
 				Authorization: `Bearer ${accessToken42}`
 			}
 		});
-		return res?.data;
+		return res.data;
   }
 
 	async getUser42Info(accessToken42: string): Promise<any> {
@@ -47,9 +47,10 @@ export class AuthService {
 				Authorization: `Bearer ${accessToken42}`
 			}
 		});
-		return res?.data;
+		return res.data;
   }
 
+	// try to throw outside service
 	async register(user42: any): Promise<User> {
     const { email, login, ...rest } = user42;
 		try {
@@ -66,18 +67,12 @@ export class AuthService {
 		}
   }
 
-	async login(accessToken42: string): Promise<string> {
-			const user42 = await this.getUser42Info(accessToken42);
-			let user = await this.usersService.getByEmail(user42?.email);
-			if (!user) {
-				user = await this.register(user42);
-			}
-			const payload: TokenPayload = { userId: user.id };
-			const token = this.jwtService.sign(payload);
-			return token;
-	}
-
-	getCookieWithToken(token: string) {
+	getCookieWithJwtAccessToken(userId: number, isTwoFactorAuthenticated = false) {
+		const payload: TokenPayload = {
+			userId,
+			isTwoFactorAuthenticated
+    };
+		const token = this.jwtService.sign(payload);
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRATION_TIME')}`;
   }
 

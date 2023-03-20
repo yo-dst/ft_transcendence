@@ -17,7 +17,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 				entities: [
 					__dirname + "/../**/*.entity.{js,ts}"
 				],
-				synchronize: true
+				synchronize: true // shouldn't be set in production - otherwise you can lose production data
 			})
 		})
 	]
