@@ -5,6 +5,7 @@ import { gameRooms } from './sharedRooms';
 import { GameRoom } from './gameRoom';
 
 @WebSocketGateway({
+	namespace: 'matchmaking',
 	cors: { origin: '*' }
 })
 export class MatchmakingGateway {

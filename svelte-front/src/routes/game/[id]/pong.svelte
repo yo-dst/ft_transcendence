@@ -1,13 +1,15 @@
 <script>
 	import { paddle, gameInfo, ball as Ball } from "./pong";
 	import { onMount } from "svelte";
-	import { User } from "../../(app)/user";
 	import Timer from "$lib/timer.svelte";
+	import { io } from "socket.io-client";
 
 	/**
 	 * @type {number}
 	 */
 	export let gameMode;
+
+	let socket = io("localhost:3000/game");
 
 	let isPlaying = true;
 	let isMobile = false;
@@ -25,7 +27,6 @@
 		UP: 1,
 		DOWN: 2,
 	};
-	//connect to backend
 	let timer = 0;
 
 	/**
@@ -66,45 +67,46 @@
 		} else
 			canvas.style.cssText =
 				"position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);color: #b6b6f2;";
-		$User.socket.emit("ready");
+		while (window.innerHeight > window.innerWidth) {}
+		socket.emit("ready");
 		requestAnimationFrame(draw);
 	});
 
-	$User.socket.on("startGame", () => {
+	socket.on("startGame", () => {
 		// ball.reset(game, rand);
 	});
 
-	$User.socket.on("startTimer", () => {
+	socket.on("startTimer", () => {
 		showTimer = true;
 	});
 
-	$User.socket.on("collision", (newVel) => {
+	socket.on("collision", (newVel) => {
 		if (newVel[1] == false) {
 			timer = 0;
 		}
 		ball.new(newVel[0]);
 	});
 
-	$User.socket.on("playerMove", (newDir) => {
+	socket.on("playerMove", (newDir) => {
 		paddle1.dir = newDir[0];
 		paddle2.dir = newDir[1];
 	});
 
-	$User.socket.on("score", (newScore) => {
+	socket.on("score", (newScore) => {
 		game.score = newScore;
 		if (game.score.p1 === 10 || game.score.p2 === 10) {
-			$User.socket.disconnect();
+			socket.disconnect();
 			isPlaying = false;
 		}
 	});
 
-	$User.socket.on("ball", (newBall) => {
+	socket.on("ball", (newBall) => {
 		console.log(newBall);
 		rand.x = newBall[0];
 		rand.y = newBall[1];
 	});
 
-	$User.socket.on("Down", (nb) => {
+	socket.on("Down", (nb) => {
 		if (nb == 1) {
 			paddle1.dir = DIRECTION.IDLE;
 		} else if (nb == 2) {
@@ -118,9 +120,9 @@
 
 		//collision with wall
 		if (ball.y - ball.radius <= 0 && ball.y_vel < 0) {
-			$User.socket.emit("ballCollision", ball, "wall");
+			socket.emit("ballCollision", ball, "wall");
 		} else if (ball.y + ball.radius >= game.height && ball.y_vel > 0) {
-			$User.socket.emit("ballCollision", ball, "wall");
+			socket.emit("ballCollision", ball, "wall");
 		}
 
 		// Collision with paddle 1
@@ -131,7 +133,7 @@
 			ball.x - ball.radius <= paddle1.x + paddle1.player_width &&
 			ball.x_vel < 0
 		) {
-			$User.socket.emit("ballCollision", ball, "paddle");
+			socket.emit("ballCollision", ball, "paddle");
 		}
 
 		// Collision with paddle 2
@@ -142,21 +144,21 @@
 			ball.x - ball.radius <= paddle2.x + paddle2.player_width &&
 			ball.x_vel > 0
 		) {
-			$User.socket.emit("ballCollision", ball, "paddle");
+			socket.emit("ballCollision", ball, "paddle");
 		}
 
 		// check if someone scores
 		if (ball.x < 0 || ball.x > game.width) {
 			if (ball.x < 0) {
-				$User.socket.emit("score", game.score, "p2");
+				socket.emit("score", game.score, "p2");
 			} else if (ball.x > game.width) {
-				$User.socket.emit("score", game.score, "p1");
+				socket.emit("score", game.score, "p1");
 			}
 			//reset the ball and paddles pos
 			paddle1.reset(game, true);
 			paddle2.reset(game, false);
 			ball.reset(game, rand);
-			$User.socket.emit("ball");
+			socket.emit("ball");
 			timer = 0;
 		}
 
@@ -202,14 +204,14 @@
 
 	function handleKeysDown(event) {
 		if (event.key == "w") {
-			$User.socket.emit("playerUp", paddle1.dir, paddle2.dir);
+			socket.emit("playerUp", paddle1.dir, paddle2.dir);
 		} else if (event.key == "s") {
-			$User.socket.emit("playerDown", paddle1.dir, paddle2.dir);
+			socket.emit("playerDown", paddle1.dir, paddle2.dir);
 		}
 	}
 
 	function handleKeysUp() {
-		$User.socket.emit("keyDown");
+		socket.emit("keyDown");
 	}
 </script>
 

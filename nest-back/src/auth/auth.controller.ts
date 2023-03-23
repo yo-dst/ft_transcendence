@@ -15,7 +15,7 @@ export class AuthController {
 	constructor(
 		private authService: AuthService,
 		private usersService: UsersService
-	) {}
+	) { }
 
 	@Get()
 	@UseGuards(JwtAuthGuard)
@@ -35,11 +35,11 @@ export class AuthController {
 		}
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
-    return {
-      url: "http://localhost:5173",
-      statusCode: 302
-    };
-  }
+		return {
+			url: "http://localhost:5173",
+			statusCode: 302
+		};
+	}
 
 	@Get("logout")
 	@UseGuards(JwtTwoFactorAuthGuard)

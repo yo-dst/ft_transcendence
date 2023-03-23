@@ -1,25 +1,27 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { User } from "./user";
+	import { io } from "socket.io-client";
 
 	let selectedGameMode = 0;
 	let isSearching = false;
 
+	let socket = io("localhost:3000/matchmaking");
+
 	function joinQueue() {
-		$User.socket.emit("joinQueue", selectedGameMode);
+		socket.emit("joinQueue", selectedGameMode);
 		isSearching = !isSearching;
 	}
 
 	function leaveQueue() {
-		$User.socket.emit("leaveQueue", selectedGameMode);
+		socket.emit("leaveQueue", selectedGameMode);
 		isSearching = !isSearching;
 	}
 
-	$User.socket.on("game-message", (data) => {
+	socket.on("game-message", (data) => {
 		console.log(data);
 	});
 
-	$User.socket.on("matched", (id) => {
+	socket.on("matched", (id) => {
 		goto("/game/" + id);
 	});
 </script>

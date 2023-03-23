@@ -3,7 +3,7 @@ import { Server, Socket } from "socket.io";
 import { gameRooms } from "src/matchmaking/sharedRooms";
 import { CustomSocket } from "./game.customSocket";
 
-@WebSocketGateway({ cors: { origin: "*", } })
+@WebSocketGateway({ namespace: 'game', cors: { origin: "*", } })
 export class GameGateway {
 	@WebSocketServer() server: Server;
 	private ready: number = 0;
