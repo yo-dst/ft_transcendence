@@ -1,5 +1,6 @@
-import { Controller, Get, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
+import { PostgresErrorCode } from 'src/database/postgresErrorCode.enum';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import JwtAuthGuard from './jwtAuth.guard';
@@ -31,12 +32,19 @@ export class AuthController {
 		const user42 = await this.authService.getUser42Info(accessToken42);
 		let user = await this.usersService.getByEmail(user42?.email);
 		if (!user) {
-			user = await this.authService.register(user42);
+			try {
+				user = await this.authService.register(user42);
+			} catch (error) {
+				if (error?.code === PostgresErrorCode.UniqueViolation) {
+					throw new HttpException('User with that email already exists', HttpStatus.BAD_REQUEST);
+				  }
+				throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 		}
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
     return {
-      url: "http://localhost:5173",
+      url: user.isTwoFactorAuthenticationEnabled ? "http://localhost:5173/2fa/verify" : "http://localhost:5173",
       statusCode: 302
     };
   }

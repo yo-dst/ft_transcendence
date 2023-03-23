@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Drawer from 'svelte-drawer-component';
-    import { user } from "../stores";
+    import { user } from "$lib/stores/user";
     
     export let show: boolean;
     export let setShow: any;
@@ -72,7 +72,7 @@
                     </li>
                     <li>
                         {#if $user}
-                            <a href="/#" role="button" class="contrast outline" on:click={logout}>
+                            <a href="/" role="button" class="contrast outline" on:click={logout}>
                                 <iconify-icon icon="material-symbols:logout"></iconify-icon>
                                 Log Out
                             </a>
