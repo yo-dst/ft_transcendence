@@ -2,7 +2,7 @@
 	import "@picocss/pico";
 	import "../../app.css";
 	import 'iconify-icon';
-	import Navbar from "$lib/Navbar.svelte";
+	import Navbar from "$lib/components/Navbar.svelte";
 </script>
 
 <header>

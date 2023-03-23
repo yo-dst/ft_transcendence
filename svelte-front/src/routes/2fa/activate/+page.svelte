@@ -2,7 +2,7 @@
   import { goto } from "$app/navigation";
   import CanvasQrCode from "$lib/CanvasQrCode.svelte";
   import { onMount } from "svelte";
-  import { user } from "../../../stores";
+  import { user } from "$lib/stores/user"; 
 
 	let qrCodeData = "";
 	let code = "";
@@ -22,6 +22,7 @@
 		if (res.ok) {
 			// try to delete these 2 lines to see if user get fetched after goto()
 			if ($user) {
+				// set secret too?
 				$user.isTwoFactorAuthenticationEnabled = true;
 			}
 			goto("/2fa/verify");

@@ -1,11 +1,11 @@
 import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PostgresErrorCode } from 'src/database/postgresErrorCode.enum';
 import User from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import TokenPayload from './tokenPayload.interface';
+import { uniqueNamesGenerator, adjectives } from 'unique-names-generator';
 
 /*
 	notes
@@ -25,7 +25,7 @@ export class AuthService {
 		const res = await this.httpService.axiosRef.post("https://api.intra.42.fr/oauth/token", {
 			grant_type: "authorization_code",
 			client_id: "u-s4t2ud-7470221ce45a9a6950c2b7324e6e5a9a069460af572ce5daa2a0fb547a3d5fda",
-			client_secret: "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",
+			client_secret: "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",
 			code: code,
 			redirect_uri: "http://localhost:3000/auth/login"
 		});
@@ -53,18 +53,19 @@ export class AuthService {
 	// try to throw outside service
 	async register(user42: any): Promise<User> {
 		const { email, login, ...rest } = user42;
-		try {
-			const newUser = await this.usersService.create({
-				email: email,
-				username: login
-			});
-			return newUser;
-		} catch (error) {
-			if (error?.code === PostgresErrorCode.UniqueViolation) {
-				throw new HttpException('User with that email already exists', HttpStatus.BAD_REQUEST);
-			}
-			throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
+		let randomAdjdective = uniqueNamesGenerator({ dictionaries: [adjectives] });
+		let username = login + "-" + randomAdjdective;
+		let user = await this.usersService.getByUsername(username);
+		while (user) {
+			randomAdjdective = uniqueNamesGenerator({ dictionaries: [adjectives] });
+			username = login + "-" + randomAdjdective;
+			user = await this.usersService.getByUsername(username);
 		}
+		const newUser = await this.usersService.create({
+			email: email,
+			username: username
+		});
+		return newUser;
 	}
 
 	getCookieWithJwtAccessToken(userId: number, isTwoFactorAuthenticated = false) {

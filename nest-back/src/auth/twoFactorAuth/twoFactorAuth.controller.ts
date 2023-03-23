@@ -16,6 +16,12 @@ export class TwoFactorAuthController {
 		private authService: AuthService
 	) {}
 
+	@Get("test")
+	@UseGuards(JwtTwoFactorAuthGuard)
+	test() {
+		return "test";
+	}
+
 	@Get()
 	@UseGuards(JwtTwoFactorAuthGuard)
 	authenticate(@Req() req: RequestWithUser) {
@@ -41,6 +47,13 @@ export class TwoFactorAuthController {
 			throw new UnauthorizedException('Wrong authentication code');
 		}
 		await this.usersService.turnOnTwoFactorAuthentication(req.user.id);
+	}
+
+	@Post("turn-off")
+	@UseGuards(JwtTwoFactorAuthGuard)
+	@HttpCode(200)
+	async turnOffTwoFactorAuthentication(@Req() req: RequestWithUser) {
+		await this.usersService.turnOffTwoFactorAuthentication(req.user.id);
 	}
 
 	@Post("login")
