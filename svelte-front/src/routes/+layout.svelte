@@ -31,7 +31,7 @@
 			const data = await res.json();
 			$user = data;
 		} else {
-			goto("/");
+			goto("/login");
 		}
 		hasMounted = true;
 	});

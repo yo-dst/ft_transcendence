@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getIcon } from "iconify-icon";
 	import { onDestroy } from "svelte";
 
 	export function toggleOff();
