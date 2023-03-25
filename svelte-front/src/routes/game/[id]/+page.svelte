@@ -34,7 +34,7 @@
 
 	<button
 		on:click={() => {
-			goto("/");
+			goto("/login");
 		}}>Go back home</button
 	>
 {/if}

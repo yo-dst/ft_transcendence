@@ -48,7 +48,7 @@
 	onMount(() => {
 		console.log("param page mounting...");
 		if (!$user) {
-			goto("/");
+			goto("/login");
 		} else {
 			username = $user.username;
 			isTwoFactorAuthenticationEnabled =
