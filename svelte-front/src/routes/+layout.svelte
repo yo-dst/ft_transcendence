@@ -30,7 +30,6 @@
 		if (res.ok) {
 			const data = await res.json();
 			$user = data;
-			console.log($user);
 		} else {
 			goto("/");
 		}

@@ -9,7 +9,7 @@ class User {
 	email: string;
 
 	@Column({ unique: true })
-  username: string;
+	username: string;
 
 	@Column({ nullable: true })
 	twoFactorAuthenticationSecret: string;

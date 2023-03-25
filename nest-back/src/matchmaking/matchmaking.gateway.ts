@@ -3,6 +3,7 @@ import { Socket, Server } from 'socket.io';
 import { v4 } from 'uuid';
 import { gameRooms } from './sharedRooms';
 import { GameRoom } from './gameRoom';
+import { CustomSocket } from 'src/game/game.customSocket';
 
 @WebSocketGateway({
 	namespace: 'matchmaking',
@@ -10,26 +11,26 @@ import { GameRoom } from './gameRoom';
 })
 export class MatchmakingGateway {
 	@WebSocketServer() server: Server;
-	private masterQueue: Socket[][] = [[], [], []];
-
+	private masterQueue: CustomSocket[][] = [[], [], []];
 
 	@SubscribeMessage('connection')
-	handleConnection(client: Socket) {
-		this.server.emit('game-message', "you joined !");
+	handleConnection(client: CustomSocket) {
+		client.email = client.handshake.query.email as string;
 
 		client.on('disconnect', () => {
+			//remove from the queue if disconnect
 			console.log("Disconncted !!");
 		})
 	}
 
 	@SubscribeMessage('joinQueue')
-	joinQueue(client: Socket, gameMode: number) {
+	joinQueue(client: CustomSocket, gameMode: number) {
 		this.masterQueue[gameMode].push(client);
 		this.matchPlayers(gameMode);
 	}
 
 	@SubscribeMessage('leaveQueue')
-	leaveQueue(client: Socket, gameMode: number) {
+	leaveQueue(client: CustomSocket, gameMode: number) {
 		const index = this.masterQueue[gameMode].indexOf(client);
 		this.masterQueue[gameMode].splice(index, 1);
 	}
@@ -42,7 +43,7 @@ export class MatchmakingGateway {
 			const roomId = v4();
 
 			// create a new room in the shared instance of GameRooms
-			const room = new GameRoom(roomId, gameMode, p1, p2);
+			const room = new GameRoom(roomId, gameMode, p1.email, p2.email);
 			gameRooms.push(room);
 			console.log('players matched');
 

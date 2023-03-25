@@ -1,27 +1,11 @@
-<script>
-	import { onMount, onDestroy } from "svelte";
+<script lang="ts">
+	export function toggleOff();
+	export let socket;
 
 	let timeLeft = 6;
-	/**
-	 * @type {string | number | NodeJS.Timer | undefined}
-	 */
-	let timer;
 
-	function startTimer() {
-		timer = setInterval(() => {
-			timeLeft--;
-			if (timeLeft === 0) {
-				clearInterval(timer);
-			}
-		}, 1000);
-	}
-
-	onMount(() => {
-		startTimer();
-	});
-
-	onDestroy(() => {
-		clearInterval(timer);
+	socket.on("decrTimer", (counter: any) => {
+		timeLeft = counter;
 	});
 </script>
 

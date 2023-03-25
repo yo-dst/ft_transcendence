@@ -24,7 +24,6 @@ export class gameInfo {
 		context.closePath();
 		context.stroke();
 	}
-
 }
 
 export class paddle {
@@ -84,9 +83,9 @@ export class ball {
 		this.y_vel = -4 * rand.y;
 	}
 
-	update() {
-		this.x += this.x_vel;
-		this.y += this.y_vel;
+	update(elapsedTime) {
+		this.x += this.x_vel * (elapsedTime / 1.2);
+		this.y += this.y_vel * (elapsedTime / 1.2);
 	}
 
 	newCollision(new_x_vel, new_y_vel) {
@@ -99,4 +98,15 @@ export class ball {
 		context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
 		context.fill();
 	}
+}
+
+export function waitFlip() {
+	return new Promise(resolve => {
+		if (window.innerHeight > window.innerWidth) {
+			setTimeout(function () { resolve(waitFlip()) }, 500);
+		}
+		else {
+			resolve(false);
+		}
+	});
 }
