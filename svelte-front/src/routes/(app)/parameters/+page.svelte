@@ -1,23 +1,22 @@
 <script lang="ts">
 	import { user } from "$lib/stores/user";
-	import { test as test2 } from "$lib/stores/test";
 	import { goto } from "$app/navigation";
-    import { onMount } from "svelte";
+	import { onMount } from "svelte";
 
 	let username: string;
 	let usernameError: any;
 	let isTwoFactorAuthenticationEnabled: boolean;
-	
+
 	async function updateUsername() {
 		const res = await fetch("http://localhost:3000/users/1/username", {
 			method: "PATCH",
 			credentials: "include",
 			headers: {
-				'Content-Type': 'application/json'
+				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
-				newUsername: username
-			})
+				newUsername: username,
+			}),
 		});
 		if (res.ok) {
 			$user.username = username;
@@ -27,14 +26,14 @@
 			usernameError = data;
 		}
 	}
-	
+
 	async function toggleTwoFactorAuthentication() {
 		if (isTwoFactorAuthenticationEnabled) {
 			goto("/2fa/activate");
 		} else {
 			const res = await fetch("http://localhost:3000/2fa/turn-off", {
 				method: "POST",
-				credentials: "include"
+				credentials: "include",
 			});
 			if (res.ok) {
 				$user.isTwoFactorAuthenticationEnabled = false;
@@ -52,19 +51,18 @@
 			goto("/");
 		} else {
 			username = $user.username;
-			isTwoFactorAuthenticationEnabled = $user.isTwoFactorAuthenticationEnabled;
+			isTwoFactorAuthenticationEnabled =
+				$user.isTwoFactorAuthenticationEnabled;
 		}
-	})
+	});
 </script>
 
 <section>
 	<h1>Modify your account</h1>
 
-	<label for="username">
-		Username
-	</label>
+	<label for="username"> Username </label>
 	<div>
-		<input name="username" bind:value={username}/>
+		<input name="username" bind:value={username} />
 		<button on:click={updateUsername}>Submit</button>
 	</div>
 	{#if usernameError}
@@ -73,17 +71,18 @@
 
 	<label for="profile-picture">Profile picture</label>
 	<div>
-		<input name="profile-picture" type="file"/>
+		<input name="profile-picture" type="file" />
 		<button>Submit</button>
 	</div>
 
 	<label for="isTwoFactorAuthenticationEnabled">
-		<input type="checkbox" 
+		<input
+			type="checkbox"
 			name="isTwoFactorAuthenticationEnabled"
 			role="switch"
 			bind:checked={isTwoFactorAuthenticationEnabled}
 			on:change={toggleTwoFactorAuthentication}
-		>
+		/>
 		{#if isTwoFactorAuthenticationEnabled}
 			Disable two factor authentication
 		{:else}
@@ -103,4 +102,3 @@
 		width: auto;
 	}
 </style>
-

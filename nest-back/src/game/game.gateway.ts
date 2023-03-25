@@ -11,18 +11,15 @@ export class GameGateway {
 	@SubscribeMessage('connection')
 	handleConnection(@ConnectedSocket() client: CustomSocket) {
 		client.email = client.handshake.query.email as string;
-		console.log("email : ", client.email);
-		// verify if the room exist
 
 		client.on('disconnect', () => {
-			console.log("Disconncted !!");
 		})
 	}
 
+	// verify if the room with id exist
 	@SubscribeMessage('checkId')
 	roomExist(client: CustomSocket, id: string) {
 		const room = gameRooms.find((room) => (room.id === id));
-		console.log('enter checkid')
 		if (room) {
 			client.emit("found");
 			client.join(id);
@@ -45,7 +42,6 @@ export class GameGateway {
 				const intervalId = setInterval(() => {
 					this.server.to(client.roomId).emit('decrTimer', counter);
 					counter--;
-					console.log("nb :", counter);
 					if (counter <= -1) {
 						clearInterval(intervalId); // stop the interval after 5 seconds
 						this.server.to(client.roomId).emit('startGame');

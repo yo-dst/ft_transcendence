@@ -19,7 +19,6 @@ export class MatchmakingGateway {
 
 		client.on('disconnect', () => {
 			//remove from the queue if disconnect
-			console.log("Disconncted !!");
 		})
 	}
 
@@ -45,7 +44,6 @@ export class MatchmakingGateway {
 			// create a new room in the shared instance of GameRooms
 			const room = new GameRoom(roomId, gameMode, p1.email, p2.email);
 			gameRooms.push(room);
-			console.log('players matched');
 
 			// send roomId to players
 			p2.emit('matched', roomId);
