@@ -141,4 +141,9 @@ export class GameGateway {
 		}
 	}
 
+	@SubscribeMessage('destroyTimer')
+	handleTimer(client: CustomSocket, ball: any) {
+		this.server.to(client.roomId).emit('destroyTimer');
+	}
+
 }

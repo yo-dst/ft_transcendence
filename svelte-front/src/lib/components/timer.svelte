@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { getIcon } from "iconify-icon";
+	import { onDestroy } from "svelte";
+
 	export function toggleOff();
 	export let socket;
 
@@ -6,6 +9,10 @@
 
 	socket.on("decrTimer", (counter: any) => {
 		timeLeft = counter;
+	});
+
+	onDestroy(() => {
+		socket.emit("destroyTimer");
 	});
 </script>
 

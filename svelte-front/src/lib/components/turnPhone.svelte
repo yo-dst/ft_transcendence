@@ -1,3 +1,11 @@
+<script>
+	import { onDestroy } from "svelte";
+
+	onDestroy(() => {
+		console.log("Fw");
+	});
+</script>
+
 <body>
 	<h1>Turn the phone</h1>
 	<iconify-icon icon="mdi:phone-rotate-landscape" />
@@ -5,11 +13,14 @@
 
 <style>
 	body {
+		position: absolute;
+		z-index: 1;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		height: 100vh;
+		background-color: black;
 	}
 
 	h1 {

@@ -85,6 +85,10 @@
 		showTimer = true;
 	});
 
+	socket.on("destroyTimer", () => {
+		showTimer = false;
+	});
+
 	socket.on("collision", (newVel) => {
 		if (newVel[1] == false) {
 			timer = 0;
@@ -239,15 +243,10 @@
 </script>
 
 <svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} />
-{#if isPlaying && !turnPhone}
+{#if isPlaying}
 	<main>
 		{#if showTimer}
-			<Timer
-				toggleOff={(showTimer) => {
-					showTimer = false;
-				}}
-				{socket}
-			/>
+			<Timer {socket} />
 		{/if}
 		<div class="score">
 			<strong>
@@ -270,13 +269,19 @@
 			id="pong"
 		/>
 	</main>
-{:else if turnPhone}
-	<TurnPhone />
 {:else}
 	<PostGameLobby />
 {/if}
 
+{#if turnPhone}
+	<TurnPhone />
+{/if}
+
 <style>
+	canvas {
+		position: absolute;
+		z-index: 0;
+	}
 	strong {
 		padding: 5vw;
 		z-index: 5;
@@ -286,7 +291,7 @@
 	.score {
 		display: flex;
 		position: absolute;
-		z-index: 5;
+		z-index: 0;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
