@@ -17,6 +17,7 @@
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import { user } from "$lib/stores/user";
+	import { io } from "socket.io-client";
 
 	$: console.log("user logged in", $user);
 
@@ -30,6 +31,7 @@
 		if (res.ok) {
 			const data = await res.json();
 			$user = data;
+			$user.socket = io("localhost:3000");
 		} else {
 			goto("/login");
 		}

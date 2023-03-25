@@ -9,7 +9,7 @@ const State = {
 
 export type UserType = undefined | {
 	id?: number,
-	socket: Socket,
+	socket?: Socket,
 	state: number,
 	email?: string;
 	username?: string;
@@ -18,7 +18,7 @@ export type UserType = undefined | {
 }
 
 const user: UserType = {
-	socket: io("localhost:3000"),
+	socket: undefined,
 	state: State.offline,
 	id: undefined,
 	email: undefined,
