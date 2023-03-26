@@ -1,9 +1,16 @@
 <script lang="ts">
 	import type { PageData } from "./$types";
+	// import { user } from "/stores/user";
 
 	export let data: PageData;
 
 	let friends = data.friends;
+
+	let username: string;
+
+	// function addFriend() {
+
+	// }
 </script>
 
 <section>
@@ -23,13 +30,13 @@
 			<li>
 				<div class="friend-right">
 					<img
-						src="https://picsum.photos/200"
+						frien
 						alt="friend"
 						class="friend-img"
 					/>
 					<span>{friend.username}</span>
 				</div>
-				<div class="friend-left">
+				<!-- <div class="friend-left">
 					{#if friend.inGame}
 						<button class="spec-button"
 							><iconify-icon
@@ -54,7 +61,7 @@
 					<button class="del-button"
 						><iconify-icon icon="charm:cross" /></button
 					>
-				</div>
+				</div> -->
 			</li>
 		{/each}
 	</ul>

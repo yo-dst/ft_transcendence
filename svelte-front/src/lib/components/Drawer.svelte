@@ -124,8 +124,10 @@
 
     img {
         border-radius: 50%;
-        width: 60px;
-        height: 60px;
+        /* width: 35%; */
+        /* aspect-ratio: 1/1; */
+        height: auto;
+        object-fit: cover;
     }
 
 	iconify-icon {
