@@ -10,16 +10,19 @@
 	let isTwoFactorAuthenticationEnabled: boolean;
 
 	async function updateUsername() {
-		const res = await fetch(`http://localhost:3000/users/${$user.id}/username`, {
-			method: "PATCH",
-			credentials: "include",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				newUsername: username,
-			}),
-		});
+		const res = await fetch(
+			`http://localhost:3000/users/${$user.id}/username`,
+			{
+				method: "PATCH",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					newUsername: username,
+				}),
+			}
+		);
 		if (res.ok) {
 			$user.username = username;
 			usernameError = null;
@@ -33,16 +36,19 @@
 		const reader = new FileReader();
 		reader.addEventListener("load", async () => {
 			let avatar: string = reader.result;
-			const res = await fetch(`http://localhost:3000/users/${$user.id}/avatar`, {
-				method: "PATCH",
-				credentials: "include",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					newAvatar: avatar
-				})
-			});
+			const res = await fetch(
+				`http://localhost:3000/users/${$user.id}/avatar`,
+				{
+					method: "PATCH",
+					credentials: "include",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						newAvatar: avatar,
+					}),
+				}
+			);
 			if (res.ok) {
 				$user.avatar = avatar;
 				avatarError = null;
@@ -55,7 +61,7 @@
 			reader.readAsDataURL(files[0]);
 		}
 	}
-	
+
 	async function toggleTwoFactorAuthentication() {
 		if (isTwoFactorAuthenticationEnabled) {
 			goto("/2fa/activate");
@@ -83,7 +89,6 @@
 				$user.isTwoFactorAuthenticationEnabled;
 		}
 	});
-	});
 </script>
 
 <section>
@@ -91,17 +96,21 @@
 
 	<label for="username"> Username </label>
 	<div>
-		<input name="username" bind:value={username}/>
+		<input name="username" bind:value={username} />
 		<button on:click={updateUsername}>Update</button>
 	</div>
 	{#if usernameError}
 		<pre>{JSON.stringify(usernameError, undefined, 2)}</pre>
 	{/if}
 
-	<label for="avatar">Avatar
-	</label>
+	<label for="avatar">Avatar </label>
 	<div>
-		<input name="avatar" type="file" bind:files accept="image/png image/jpeg image/jpg"/>
+		<input
+			name="avatar"
+			type="file"
+			bind:files
+			accept="image/png image/jpeg image/jpg"
+		/>
 		<button on:click={updateAvatar}>Update</button>
 	</div>
 
