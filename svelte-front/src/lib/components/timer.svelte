@@ -4,18 +4,19 @@
 	export function toggleOff();
 	export let socket;
 
+	let showTimer = false;
 	let timeLeft = 6;
+
+	socket.on("startTimer", () => {
+		showTimer = true;
+	});
 
 	socket.on("decrTimer", (counter: any) => {
 		timeLeft = counter;
 	});
-
-	onDestroy(() => {
-		socket.emit("destroyTimer");
-	});
 </script>
 
-{#if timeLeft > 0}
+{#if timeLeft > 0 && showTimer}
 	<div>
 		{timeLeft > 1 ? timeLeft - 1 : "GO!"}
 	</div>

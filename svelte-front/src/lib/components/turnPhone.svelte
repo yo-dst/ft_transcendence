@@ -1,11 +1,3 @@
-<script>
-	import { onDestroy } from "svelte";
-
-	onDestroy(() => {
-		console.log("Fw");
-	});
-</script>
-
 <body>
 	<h1>Turn the phone</h1>
 	<iconify-icon icon="mdi:phone-rotate-landscape" />

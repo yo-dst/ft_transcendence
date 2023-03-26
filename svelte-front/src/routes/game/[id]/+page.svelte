@@ -10,14 +10,15 @@
 	let turnPhone = true;
 	let id = $page.params.id;
 	let roomExist: boolean = false;
+	let gameMode = 0;
 	let socket = io("localhost:3000/game", { query: { email: $user.email } });
-	console.log($user);
 
 	// verify that room Exist
 	socket.emit("checkId", id);
 
-	socket.on("found", () => {
+	socket.on("found", (gamemode) => {
 		roomExist = true;
+		gameMode = gamemode;
 	});
 
 	waitFlip().then((newTurnPhone) => {
@@ -26,7 +27,7 @@
 </script>
 
 {#if roomExist && !turnPhone}
-	<Pong gameMode={0} {socket} />
+	<Pong {gameMode} {socket} />
 {:else if turnPhone}
 	<TurnPhone />
 {:else}

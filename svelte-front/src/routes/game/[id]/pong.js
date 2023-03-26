@@ -1,5 +1,6 @@
 export class gameInfo {
-	constructor(width, heigth) {
+	constructor(width, heigth, gameMode) {
+		this.gameMode = gameMode;
 		this.canvasWidth = 1100;
 		this.canvasHeight = 500;
 		this.width = 1100;
@@ -61,9 +62,9 @@ export class ball {
 		this.x = game.width / 2;
 		this.y = game.height / 2;
 
-		this.radius = 5;
-		this.x_vel = 0 * rand.x;
-		this.y_vel = 0 * rand.y;
+		this.radius = game.gameMode == 1 ? 3 : 7;
+		this.x_vel = 0;
+		this.y_vel = 0;
 	}
 
 	new(ball) {
@@ -78,9 +79,8 @@ export class ball {
 	reset(game, rand) {
 		this.x = game.width / 2;
 		this.y = game.height / 2;
-		this.radius = 5;
-		this.x_vel = -4 * rand.x;
-		this.y_vel = -4 * rand.y;
+		this.x_vel = game.gameMode == 1 ? -6 : -4 * rand.x;
+		this.y_vel = game.gameMode == 1 ? -6 : -4 * rand.y;
 	}
 
 	update(elapsedTime) {
