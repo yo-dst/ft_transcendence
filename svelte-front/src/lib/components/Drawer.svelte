@@ -36,7 +36,7 @@
 	<div class="drawer-container">
 		{#if $user}
 			<div class="profile-wrapper">
-				<img src={$user?.avatar} alt="avatar" />
+				<img src={$user?.avatar?.url} alt="avatar" />
 				<span>{$user.username}</span>
 			</div>
 		{/if}
