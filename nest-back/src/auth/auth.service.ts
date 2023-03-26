@@ -50,9 +50,11 @@ export class AuthService {
 		return res.data;
   	}
 
+	
+
 	// try to throw outside service
 	async register(user42: any): Promise<User> {
-		const { email, login, ...rest } = user42;
+		const { email, login, image, ...rest } = user42;
 		let randomAdjdective = uniqueNamesGenerator({ dictionaries: [adjectives] });
 		let username = login + "-" + randomAdjdective;
 		let user = await this.usersService.getByUsername(username);
@@ -63,7 +65,8 @@ export class AuthService {
 		}
 		const newUser = await this.usersService.create({
 			email: email,
-			username: username
+			username: username,
+			avatarUrl: image.versions.medium
 		});
 		return newUser;
   	}

@@ -4,4 +4,5 @@ export type UserType = undefined | {
 	username: string;
 	twoFactorAuthenticationSecret: string | null;
 	isTwoFactorAuthenticationEnabled: boolean;
+	avatar: string;
 }

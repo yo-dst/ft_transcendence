@@ -21,7 +21,7 @@
             elements[i].addEventListener("click", () => {
                 setShow(false);
             });
-        }            
+        }
     });
 </script>
 
@@ -29,7 +29,7 @@
     <div class="drawer-container">
         {#if $user}
             <div class="profile-wrapper">
-                <img src="https://picsum.photos/200" alt="profile" class="header-profile-img"/>
+                <img src={$user?.avatar} alt="avatar"/>
                 <span>{$user.username}</span>
             </div>
         {/if}
@@ -122,8 +122,8 @@
 
     img {
         border-radius: 50%;
-        width: 35%;
-        height: auto;
+        width: 60px;
+        height: 60px;
     }
 
     iconify-icon {

@@ -7,7 +7,11 @@ class CreateUserDto {
 
 	@IsString()
 	@IsNotEmpty()
-  username: string;
+  	username: string;
+
+	@IsString()
+	@IsNotEmpty()
+	avatarUrl: string;
 }
 
 export default CreateUserDto;
