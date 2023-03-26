@@ -83,7 +83,6 @@
 				$user.isTwoFactorAuthenticationEnabled;
 		}
 	});
-	});
 </script>
 
 <section>
