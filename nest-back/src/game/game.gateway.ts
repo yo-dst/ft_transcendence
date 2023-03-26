@@ -1,5 +1,4 @@
 import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Socket } from "dgram";
 import { Server } from "socket.io";
 import { gameRooms } from "src/matchmaking/sharedRooms";
 import { CustomSocket } from "./game.customSocket";
@@ -21,7 +20,7 @@ export class GameGateway {
 	roomExist(client: CustomSocket, id: string) {
 		const room = gameRooms.find((room) => (room.id === id));
 		if (room) {
-			client.emit("found");
+			client.emit("found", room.gameMode);
 			client.join(id);
 			client.roomId = id;
 			client.isPlayer = room.isPlayer(client.email);
@@ -45,6 +44,7 @@ export class GameGateway {
 					if (counter <= -1) {
 						clearInterval(intervalId); // stop the interval after 5 seconds
 						this.server.to(client.roomId).emit('startGame');
+						room.startGame(this.server);
 					}
 				}, 1000); // emit 'decrTimer' event every 1 second
 			}
@@ -53,12 +53,15 @@ export class GameGateway {
 
 	@SubscribeMessage('playerUp')
 	up(client: CustomSocket, y: number) {
-		if (client.isPlayer) {
+		const room = gameRooms.find((room) => (room.id === client.roomId));
+		if (client.isPlayer && room.gameInfo != undefined) {
 			if (client.playerIndex === 1) {
 				//check player index to determine which player should move
+				room.paddle1.dir = 1;
 				this.server.to(client.roomId).emit('playerMove', [y[0] = 1, y[1]]);
 			}
 			else if (client.playerIndex == 2) {
+				room.paddle2.dir = 1;
 				this.server.to(client.roomId).emit('playerMove', [y[0], y[1] = 1]);
 			}
 		}
@@ -66,80 +69,36 @@ export class GameGateway {
 
 	@SubscribeMessage('playerDown')
 	down(client: CustomSocket, y: number) {
-		if (client.isPlayer === true) {
+		const room = gameRooms.find((room) => (room.id === client.roomId));
+		if (client.isPlayer === true && room.gameInfo != undefined) {
 			//check player index to determine which player should move
 			if (client.playerIndex === 1) {
+				room.paddle1.dir = 2;
 				this.server.to(client.roomId).emit('playerMove', [y[0] = 2, y[1]]);
 			}
 			else if (client.playerIndex === 2) {
+				room.paddle2.dir = 2;
 				this.server.to(client.roomId).emit('playerMove', [y[0], y[1] = 2]);
 			}
 		}
 	}
 
 	@SubscribeMessage('keyReleased')
-	HandleKeyDown(client: CustomSocket, paddle: any) {
-		if (client.isPlayer === true) {
-			if (client.playerIndex === 1) {
-				this.server.to(client.roomId).emit('Down', 1, paddle);
-			}
-			else {
-				this.server.to(client.roomId).emit('Down', 2, paddle);
-			}
-		}
-	}
-
-	@SubscribeMessage('score')
-	handleScore(client: CustomSocket, player: string) {
+	HandleKeyDown(client: CustomSocket) {
 		const room = gameRooms.find((room) => (room.id === client.roomId));
-		if (client.isPlayer) {
-			if (player == "p1" && room.ready) {
-				room.score[0]++;
-				room.ready = !room.ready;
-				this.server.to(client.roomId).emit('scoreInc', "p1");
-			}
-			else if (player == "p2") {
-				if (room.ready) {
-					room.score[1]++;
-					room.ready = !room.ready;
-					this.server.to(client.roomId).emit('scoreInc', "p2");
-				}
-			}
-			if (room.score[0] == 10 || room.score[1] == 10) this.server.to(client.roomId).emit('endGame');
+		if (client.isPlayer === true && room.gameInfo != undefined) {
+			if (client.playerIndex === 1) room.paddle1.dir = 0;
+			else if (client.playerIndex === 2) room.paddle2.dir = 0;
+			this.server.to(client.roomId).emit('Down', [{ x: room.paddle1.x, y: room.paddle1.y, dir: room.paddle1.dir }, { x: room.paddle2.x, y: room.paddle2.y, dir: room.paddle2.dir }]);
 		}
 	}
 
-	@SubscribeMessage('ballCollision')
-	handleCollision(client: CustomSocket, ball: any) {
-		if (client.isPlayer) {
-			let isWall = false;
-			if (ball[1] == "wall") {
-				ball[0].y_vel *= -1;
-				isWall = true;
-			}
-			else if (ball[1] == "paddle") {
-				ball[0].x_vel *= -1.1;
-				ball[0].y_vel *= 1.1;
-			}
-			this.server.to(client.roomId).emit('collision', [ball[0], isWall]);
+	@SubscribeMessage('destroyGame')
+	handleGameEnd(client: CustomSocket) {
+		const room = gameRooms.findIndex((room) => (room.id === client.roomId));
+		if (client.isPlayer === true && room != -1) {
+			gameRooms.splice(room, 1);
 		}
-	}
-
-	@SubscribeMessage('reset')
-	handleReset(client: CustomSocket, ball: any) {
-		const room = gameRooms.find((room) => (room.id === client.roomId));
-		if (client.isPlayer) {
-			room.nbPlayerRdy++;
-			if (room.nbPlayerRdy >= 2) {
-				room.ready = true;
-				this.server.to(client.roomId).emit('resetBall', [Math.random() < 0.5 ? 1 : -1, Math.random() < 0.5 ? 1 : -1]);
-			}
-		}
-	}
-
-	@SubscribeMessage('destroyTimer')
-	handleTimer(client: CustomSocket, ball: any) {
-		this.server.to(client.roomId).emit('destroyTimer');
 	}
 
 }

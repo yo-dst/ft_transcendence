@@ -16,7 +16,6 @@
 
 	let isPlaying = true;
 	let isMobile = false;
-	let showTimer = false;
 	let turnPhone = false;
 	if (
 		/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -32,8 +31,6 @@
 		DOWN: 2,
 	};
 	let timer = 0;
-	let timestamp = Date.now();
-	let lastDrawTime;
 
 	/**
 	 * @type {Ball}
@@ -56,7 +53,7 @@
 	 * @type {HTMLCanvasElement}
 	 */
 	let canvas;
-	let game = new gameInfo(window.innerWidth, window.innerHeight);
+	let game = new gameInfo(window.innerWidth, window.innerHeight, gameMode);
 
 	let rand = { x: 1, y: 1 };
 	onMount(() => {
@@ -78,22 +75,7 @@
 	});
 
 	socket.on("startGame", () => {
-		ball.reset(game, rand);
-	});
-
-	socket.on("startTimer", () => {
-		showTimer = true;
-	});
-
-	socket.on("destroyTimer", () => {
-		showTimer = false;
-	});
-
-	socket.on("collision", (newVel) => {
-		if (newVel[1] == false) {
-			timer = 0;
-		}
-		ball.new(newVel[0]);
+		timer = 0;
 	});
 
 	socket.on("playerMove", (newDir) => {
@@ -101,96 +83,34 @@
 		paddle2.dir = newDir[1];
 	});
 
-	socket.on("scoreInc", (player) => {
-		if (player == "p1") game.score.p1++;
-		else if (player == "p2") game.score.p2++;
-		socket.emit("reset");
-	});
-
 	socket.on("endGame", () => {
+		socket.emit("destroyGame");
 		isPlaying = false;
 	});
 
-	socket.on("resetBall", (newBall) => {
-		console.log(newBall);
-		rand.x = newBall[0];
-		rand.y = newBall[1];
+	socket.on("updateBall", (newBallPos) => {
+		ball.x = newBallPos[0];
+		ball.y = newBallPos[1];
 	});
 
-	socket.on("Down", (/** @type {number} */ nb, /** @type {any} */ paddle) => {
-		paddle1.x = paddle[0].x;
-		paddle1.y = paddle[0].y;
-		paddle2.x = paddle[1].x;
-		paddle2.y = paddle[1].y;
-		if (nb == 1) {
-			paddle1.dir = DIRECTION.IDLE;
-		} else if (nb == 2) {
-			paddle2.dir = DIRECTION.IDLE;
-		}
+	socket.on("updateScore", (newScore) => {
+		game.score.p1 = newScore[0];
+		game.score.p2 = newScore[1];
+	});
+
+	socket.on("Down", (/** @type {any} */ paddles) => {
+		paddle1.x = paddles[0].x;
+		paddle1.y = paddles[0].y;
+		paddle1.dir = paddles[0].dir;
+		paddle2.x = paddles[1].x;
+		paddle2.y = paddles[1].y;
+		paddle2.dir = paddles[1].dir;
 	});
 
 	const draw = () => {
 		if (window.innerHeight > window.innerWidth) turnPhone = true;
 		else turnPhone = false;
 		timer++;
-		// context.clearRect(0, 0, game.width, game.height);
-
-		//collision with wall
-		if (ball.y - ball.radius <= 0 && ball.y_vel < 0) {
-			socket.emit("ballCollision", ball, "wall");
-		} else if (ball.y + ball.radius >= game.height && ball.y_vel > 0) {
-			socket.emit("ballCollision", ball, "wall");
-		}
-
-		// Collision with paddle 1
-		if (
-			ball.y + ball.radius >= paddle1.y &&
-			ball.y - ball.radius <= paddle1.y + paddle1.player_height &&
-			ball.x + ball.radius >= paddle1.x &&
-			ball.x - ball.radius <= paddle1.x + paddle1.player_width &&
-			ball.x_vel < 0
-		) {
-			socket.emit("ballCollision", ball, "paddle");
-		}
-
-		// Collision with paddle 2
-		if (
-			ball.y + ball.radius >= paddle2.y &&
-			ball.y - ball.radius <= paddle2.y + paddle2.player_height &&
-			ball.x + ball.radius >= paddle2.x &&
-			ball.x - ball.radius <= paddle2.x + paddle2.player_width &&
-			ball.x_vel > 0
-		) {
-			socket.emit("ballCollision", ball, "paddle");
-		}
-
-		// check if someone scores
-		if (ball.x < 0 || ball.x > game.width) {
-			if (ball.x < 0) {
-				socket.emit("score", "p2");
-			} else if (ball.x > game.width) {
-				socket.emit("score", "p1");
-			}
-			//reset the ball and paddles pos
-			paddle1.reset(game, true);
-			paddle2.reset(game, false);
-			ball.reset(game, rand);
-			socket.emit("ball");
-			timer = 0;
-		}
-
-		//update ball pos
-		if (!lastDrawTime) {
-			lastDrawTime = timestamp;
-		}
-
-		// Calculate elapsed time since the last draw
-		timestamp = Date.now();
-		const elapsedTime = timestamp - lastDrawTime;
-		lastDrawTime = timestamp;
-
-		// Calculate the new position of the ball based on elapsed time
-		ball.update(elapsedTime / 16);
 
 		//draw map
 		game.drawMap(context);
@@ -238,16 +158,14 @@
 	}
 
 	function handleKeysUp() {
-		socket.emit("keyReleased", paddle1, paddle2);
+		socket.emit("keyReleased");
 	}
 </script>
 
 <svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} />
 {#if isPlaying}
 	<main>
-		{#if showTimer}
-			<Timer {socket} />
-		{/if}
+		<Timer {socket} />
 		<div class="score">
 			<strong>
 				{game.score.p1}
