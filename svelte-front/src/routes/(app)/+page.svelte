@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { io } from "socket.io-client";
-	import { User } from "$lib/types/user";
+	import { user } from "$lib/stores/user";
 
 	let selectedGameMode = 0;
 	let isSearching = false;
 
 	let socket = io("localhost:3000/matchmaking", {
-		query: { email: $User.email },
+		query: { email: $user?.email },
 	});
 
 	function joinQueue() {
