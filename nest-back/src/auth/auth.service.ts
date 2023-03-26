@@ -19,7 +19,7 @@ export class AuthService {
 		private httpService: HttpService,
 		private jwtService: JwtService,
 		private configService: ConfigService
-	) {}
+	) { }
 
 	async getAccessToken42(code: string): Promise<string> {
 		const res = await this.httpService.axiosRef.post("https://api.intra.42.fr/oauth/token", {
@@ -39,7 +39,7 @@ export class AuthService {
 			}
 		});
 		return res.data;
-  	}
+	}
 
 	async getUser42Info(accessToken42: string): Promise<any> {
 		const res = await this.httpService.axiosRef.get("https://api.intra.42.fr/v2/me", {
@@ -48,7 +48,7 @@ export class AuthService {
 			}
 		});
 		return res.data;
-  	}
+	}
 
 	
 
@@ -69,18 +69,18 @@ export class AuthService {
 			avatarUrl: image.versions.medium
 		});
 		return newUser;
-  	}
+	}
 
 	getCookieWithJwtAccessToken(userId: number, isTwoFactorAuthenticated = false) {
 		const payload: TokenPayload = {
 			userId,
 			isTwoFactorAuthenticated
-    	};
+		};
 		const token = this.jwtService.sign(payload);
-    	return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRATION_TIME')}`;
-  	}
+		return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRATION_TIME')}`;
+	}
 
 	getCookieForLogOut() {
-    	return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
-  	}
+		return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+	}
 }

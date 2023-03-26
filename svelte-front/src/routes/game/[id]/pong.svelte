@@ -1,17 +1,23 @@
 <script>
 	import { paddle, gameInfo, ball as Ball } from "./pong";
 	import { onMount } from "svelte";
-	import { User } from "../../(app)/user";
-	import Timer from "$lib/timer.svelte";
+	import Timer from "$lib/components/timer.svelte";
+	import TurnPhone from "$lib/components/turnPhone.svelte";
+	import PostGameLobby from "$lib/components/PostGameLobby.svelte";
 
 	/**
 	 * @type {number}
 	 */
 	export let gameMode;
+	/**
+	 * @type {{ emit: (arg0: string, arg1: number | Ball | undefined, arg2: string | number | undefined) => void; on: (arg0: string, arg1: { (): void; (): void; (newVel: any): void; (newDir: any): void; (newScore: any): void; (newBall: any): void; (nb: any): void; }) => void; disconnect: () => void; }}
+	 */
+	export let socket;
 
 	let isPlaying = true;
 	let isMobile = false;
 	let showTimer = false;
+	let turnPhone = false;
 	if (
 		/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
 			navigator.userAgent
@@ -25,8 +31,9 @@
 		UP: 1,
 		DOWN: 2,
 	};
-	//connect to backend
 	let timer = 0;
+	let timestamp = Date.now();
+	let lastDrawTime;
 
 	/**
 	 * @type {Ball}
@@ -66,45 +73,55 @@
 		} else
 			canvas.style.cssText =
 				"position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);color: #b6b6f2;";
-		$User.socket.emit("ready");
+		socket.emit("ready");
 		requestAnimationFrame(draw);
 	});
 
-	$User.socket.on("startGame", () => {
-		// ball.reset(game, rand);
+	socket.on("startGame", () => {
+		ball.reset(game, rand);
 	});
 
-	$User.socket.on("startTimer", () => {
+	socket.on("startTimer", () => {
 		showTimer = true;
 	});
 
-	$User.socket.on("collision", (newVel) => {
+	socket.on("destroyTimer", () => {
+		showTimer = false;
+	});
+
+	socket.on("collision", (newVel) => {
 		if (newVel[1] == false) {
 			timer = 0;
 		}
 		ball.new(newVel[0]);
 	});
 
-	$User.socket.on("playerMove", (newDir) => {
+	socket.on("playerMove", (newDir) => {
 		paddle1.dir = newDir[0];
 		paddle2.dir = newDir[1];
 	});
 
-	$User.socket.on("score", (newScore) => {
-		game.score = newScore;
-		if (game.score.p1 === 10 || game.score.p2 === 10) {
-			$User.socket.disconnect();
-			isPlaying = false;
-		}
+	socket.on("scoreInc", (player) => {
+		if (player == "p1") game.score.p1++;
+		else if (player == "p2") game.score.p2++;
+		socket.emit("reset");
 	});
 
-	$User.socket.on("ball", (newBall) => {
+	socket.on("endGame", () => {
+		isPlaying = false;
+	});
+
+	socket.on("resetBall", (newBall) => {
 		console.log(newBall);
 		rand.x = newBall[0];
 		rand.y = newBall[1];
 	});
 
-	$User.socket.on("Down", (nb) => {
+	socket.on("Down", (/** @type {number} */ nb, /** @type {any} */ paddle) => {
+		paddle1.x = paddle[0].x;
+		paddle1.y = paddle[0].y;
+		paddle2.x = paddle[1].x;
+		paddle2.y = paddle[1].y;
 		if (nb == 1) {
 			paddle1.dir = DIRECTION.IDLE;
 		} else if (nb == 2) {
@@ -113,14 +130,16 @@
 	});
 
 	const draw = () => {
+		if (window.innerHeight > window.innerWidth) turnPhone = true;
+		else turnPhone = false;
 		timer++;
 		// context.clearRect(0, 0, game.width, game.height);
 
 		//collision with wall
 		if (ball.y - ball.radius <= 0 && ball.y_vel < 0) {
-			$User.socket.emit("ballCollision", ball, "wall");
+			socket.emit("ballCollision", ball, "wall");
 		} else if (ball.y + ball.radius >= game.height && ball.y_vel > 0) {
-			$User.socket.emit("ballCollision", ball, "wall");
+			socket.emit("ballCollision", ball, "wall");
 		}
 
 		// Collision with paddle 1
@@ -131,7 +150,7 @@
 			ball.x - ball.radius <= paddle1.x + paddle1.player_width &&
 			ball.x_vel < 0
 		) {
-			$User.socket.emit("ballCollision", ball, "paddle");
+			socket.emit("ballCollision", ball, "paddle");
 		}
 
 		// Collision with paddle 2
@@ -142,26 +161,36 @@
 			ball.x - ball.radius <= paddle2.x + paddle2.player_width &&
 			ball.x_vel > 0
 		) {
-			$User.socket.emit("ballCollision", ball, "paddle");
+			socket.emit("ballCollision", ball, "paddle");
 		}
 
 		// check if someone scores
 		if (ball.x < 0 || ball.x > game.width) {
 			if (ball.x < 0) {
-				$User.socket.emit("score", game.score, "p2");
+				socket.emit("score", "p2");
 			} else if (ball.x > game.width) {
-				$User.socket.emit("score", game.score, "p1");
+				socket.emit("score", "p1");
 			}
 			//reset the ball and paddles pos
 			paddle1.reset(game, true);
 			paddle2.reset(game, false);
 			ball.reset(game, rand);
-			$User.socket.emit("ball");
+			socket.emit("ball");
 			timer = 0;
 		}
 
 		//update ball pos
-		ball.update();
+		if (!lastDrawTime) {
+			lastDrawTime = timestamp;
+		}
+
+		// Calculate elapsed time since the last draw
+		timestamp = Date.now();
+		const elapsedTime = timestamp - lastDrawTime;
+		lastDrawTime = timestamp;
+
+		// Calculate the new position of the ball based on elapsed time
+		ball.update(elapsedTime / 16);
 
 		//draw map
 		game.drawMap(context);
@@ -202,14 +231,14 @@
 
 	function handleKeysDown(event) {
 		if (event.key == "w") {
-			$User.socket.emit("playerUp", paddle1.dir, paddle2.dir);
+			socket.emit("playerUp", paddle1.dir, paddle2.dir);
 		} else if (event.key == "s") {
-			$User.socket.emit("playerDown", paddle1.dir, paddle2.dir);
+			socket.emit("playerDown", paddle1.dir, paddle2.dir);
 		}
 	}
 
 	function handleKeysUp() {
-		$User.socket.emit("keyDown");
+		socket.emit("keyReleased", paddle1, paddle2);
 	}
 </script>
 
@@ -217,7 +246,7 @@
 {#if isPlaying}
 	<main>
 		{#if showTimer}
-			<Timer />
+			<Timer {socket} />
 		{/if}
 		<div class="score">
 			<strong>
@@ -244,7 +273,15 @@
 	<PostGameLobby />
 {/if}
 
+{#if turnPhone}
+	<TurnPhone />
+{/if}
+
 <style>
+	canvas {
+		position: absolute;
+		z-index: 0;
+	}
 	strong {
 		padding: 5vw;
 		z-index: 5;
@@ -254,7 +291,7 @@
 	.score {
 		display: flex;
 		position: absolute;
-		z-index: 5;
+		z-index: 1;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);

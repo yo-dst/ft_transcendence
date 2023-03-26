@@ -1,24 +1,24 @@
 <script lang="ts">
 	import { user } from "$lib/stores/user";
 	import { goto } from "$app/navigation";
-    import { onMount } from "svelte";
+	import { onMount } from "svelte";
 
 	let username: string;
 	let usernameError: any;
 	let files: any;
 	let avatarError: any;
 	let isTwoFactorAuthenticationEnabled: boolean;
-	
+
 	async function updateUsername() {
 		const res = await fetch(`http://localhost:3000/users/${$user.id}/username`, {
 			method: "PATCH",
 			credentials: "include",
 			headers: {
-				'Content-Type': 'application/json'
+				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
-				newUsername: username
-			})
+				newUsername: username,
+			}),
 		});
 		if (res.ok) {
 			$user.username = username;
@@ -62,7 +62,7 @@
 		} else {
 			const res = await fetch("http://localhost:3000/2fa/turn-off", {
 				method: "POST",
-				credentials: "include"
+				credentials: "include",
 			});
 			if (res.ok) {
 				$user.isTwoFactorAuthenticationEnabled = false;
@@ -76,20 +76,20 @@
 
 	onMount(() => {
 		if (!$user) {
-			goto("/");
+			goto("/login");
 		} else {
 			username = $user.username;
-			isTwoFactorAuthenticationEnabled = $user.isTwoFactorAuthenticationEnabled;
+			isTwoFactorAuthenticationEnabled =
+				$user.isTwoFactorAuthenticationEnabled;
 		}
+	});
 	});
 </script>
 
 <section>
 	<h1>Modify your account</h1>
 
-	<label for="username">
-		Username
-	</label>
+	<label for="username"> Username </label>
 	<div>
 		<input name="username" bind:value={username}/>
 		<button on:click={updateUsername}>Update</button>
@@ -106,12 +106,13 @@
 	</div>
 
 	<label for="isTwoFactorAuthenticationEnabled">
-		<input type="checkbox" 
+		<input
+			type="checkbox"
 			name="isTwoFactorAuthenticationEnabled"
 			role="switch"
 			bind:checked={isTwoFactorAuthenticationEnabled}
 			on:change={toggleTwoFactorAuthentication}
-		>
+		/>
 		{#if isTwoFactorAuthenticationEnabled}
 			Disable two factor authentication
 		{:else}
@@ -131,4 +132,3 @@
 		width: auto;
 	}
 </style>
-

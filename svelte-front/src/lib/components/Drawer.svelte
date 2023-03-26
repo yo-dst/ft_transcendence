@@ -1,19 +1,21 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import Drawer from 'svelte-drawer-component';
-    import { user } from "$lib/stores/user";
-    
-    export let show: boolean;
-    export let setShow: any;
+	import { onMount } from "svelte";
+	import Drawer from "svelte-drawer-component";
+	import { user } from "$lib/stores/user";
+	import { goto } from "$app/navigation";
 
-    async function logout() {
-        const res = await fetch("http://localhost:3000/auth/logout", {
-            credentials: "include"
-        });
-        if (res.ok) {
-            $user = undefined;
-        }
-    }
+	export let show: boolean;
+	export let setShow: any;
+
+	async function logout() {
+		const res = await fetch("http://localhost:3000/auth/logout", {
+			credentials: "include",
+		});
+		if (res.ok) {
+			$user = undefined;
+			goto("/login");
+		}
+	}
 
     onMount(() => {
         const elements = document.getElementsByTagName("a");
@@ -90,35 +92,35 @@
 </Drawer>
 
 <style>
-    .drawer-container {
-        background-color: var(--background-color);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
+	.drawer-container {
+		background-color: var(--background-color);
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+	}
 
-    .profile-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
-        padding: 1rem 1rem;
-        border-bottom: 0.05rem solid var(--contrast);
-    }
+	.profile-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		padding: 1rem 1rem;
+		border-bottom: 0.05rem solid var(--contrast);
+	}
 
-    .nav-wrapper {
-        padding: 1rem 1rem;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
+	.nav-wrapper {
+		padding: 1rem 1rem;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
 
-    .drawer-container a {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
+	.drawer-container a {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
 
     img {
         border-radius: 50%;
@@ -126,7 +128,7 @@
         height: 60px;
     }
 
-    iconify-icon {
-        font-size: 1.5rem;
-    }
+	iconify-icon {
+		font-size: 1.5rem;
+	}
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
+	import { goto } from "$app/navigation";
 
 	let code = "";
 	let err: any;
@@ -9,14 +9,14 @@
 			method: "post",
 			credentials: "include",
 			headers: {
-				'Content-Type': 'application/json'
+				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
-				twoFactorAuthenticationCode: code
-			})
+				twoFactorAuthenticationCode: code,
+			}),
 		});
 		if (res.ok) {
-			goto("/");
+			goto("/login");
 		} else {
 			const data = await res.json();
 			err = data;
@@ -25,8 +25,8 @@
 </script>
 
 <label for="code">Google Authenticator code</label>
-<input name="code" bind:value={code}/>
+<input name="code" bind:value={code} />
 <button on:click={verifyCode}>Verify</button>
 {#if err}
-		<pre>{JSON.stringify(err, undefined, 2)}</pre>
+	<pre>{JSON.stringify(err, undefined, 2)}</pre>
 {/if}

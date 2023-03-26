@@ -16,7 +16,7 @@ export class AuthController {
 	constructor(
 		private authService: AuthService,
 		private usersService: UsersService
-	) {}
+	) { }
 
 	@Get()
 	@UseGuards(JwtAuthGuard)
@@ -37,17 +37,17 @@ export class AuthController {
 			} catch (error) {
 				if (error?.code === PostgresErrorCode.UniqueViolation) {
 					throw new HttpException('User with that email already exists', HttpStatus.BAD_REQUEST);
-				  }
+				}
 				throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
-    return {
-      url: user.isTwoFactorAuthenticationEnabled ? "http://localhost:5173/2fa/verify" : "http://localhost:5173",
-      statusCode: 302
-    };
-  }
+		return {
+			url: user.isTwoFactorAuthenticationEnabled ? "http://localhost:5173/2fa/verify" : "http://localhost:5173",
+			statusCode: 302
+		};
+	}
 
 	@Get("logout")
 	@UseGuards(JwtTwoFactorAuthGuard)

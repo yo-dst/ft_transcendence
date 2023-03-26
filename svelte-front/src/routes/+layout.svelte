@@ -13,11 +13,11 @@
 		<slot></slot>
 	{/if}
 -->
-
 <script lang="ts">
-  	import { goto } from "$app/navigation";
-  	import { onMount } from "svelte";
+	import { goto } from "$app/navigation";
+	import { onMount } from "svelte";
 	import { user } from "$lib/stores/user";
+	import { io } from "socket.io-client";
 
 	$: console.log("user logged in", $user);
 
@@ -26,18 +26,19 @@
 	onMount(async () => {
 		console.log("main layout mounting...");
 		const res = await fetch("http://localhost:3000/auth", {
-			credentials: "include"
+			credentials: "include",
 		});
 		if (res.ok) {
 			const data = await res.json();
 			$user = data;
+			$user.socket = io("localhost:3000");
 		} else {
-			goto("/");
+			goto("/login");
 		}
 		hasMounted = true;
 	});
 </script>
 
 {#if hasMounted}
-	<slot></slot>
+	<slot />
 {/if}
