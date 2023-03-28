@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import User from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import TokenPayload from './tokenPayload.interface';
+import { TokenPayload } from './token-payload.interface';
 import { uniqueNamesGenerator, adjectives } from 'unique-names-generator';
 
 /*
@@ -50,9 +50,6 @@ export class AuthService {
 		return res.data;
 	}
 
-	
-
-	// try to throw outside service
 	async register(user42: any): Promise<User> {
 		const { email, login, image, ...rest } = user42;
 		let randomAdjdective = uniqueNamesGenerator({ dictionaries: [adjectives] });
@@ -66,7 +63,7 @@ export class AuthService {
 		const newUser = await this.usersService.create({
 			email: email,
 			username: username,
-			avatarUrl: image.versions.medium
+			avatarUrl: image.versions.large
 		});
 		return newUser;
 	}

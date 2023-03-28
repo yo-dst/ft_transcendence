@@ -1,20 +1,25 @@
 import { BadRequestException, Body, Controller, Delete, Get, HttpException, Param, ParseIntPipe, Post, Req, UseGuards } from "@nestjs/common";
-import RequestWithUser from "src/auth/requestWithUser.interface";
-import JwtTwoFactorAuthGuard from "src/auth/twoFactorAuth/jwtTwoFactorAuth.guard";
+import { RequestWithUser } from "src/auth/request-with-user.interface";
+import JwtTwoFactorAuthGuard from "src/auth/two-factor-auth/jwt-two-factor-auth.guard";
 import { UsersService } from "../users.service";
 import CreateFriendRequestDto from "./dto/create-friend-request.dto";
-import { FriendRequestsService } from "./friend-request.service";
+import { FriendRequestsService } from "./friend-requests.service";
+
+/*
+	notes
+		- remove sensitive returns
+*/
 
 @Controller("friend-request")
-export class FriendRequestController {
+export class FriendRequestsController {
 	constructor(
-		private friendRequestService: FriendRequestsService,
+		private friendRequestsService: FriendRequestsService,
 		private usersService: UsersService
 	) {}
 
 	@Get()
 	async getAll() {
-		return this.friendRequestService.getAll();
+		return this.friendRequestsService.getAll();
 	}
 
 	@Post()
@@ -23,51 +28,51 @@ export class FriendRequestController {
 		@Req() req: RequestWithUser,
 		@Body() { username }: CreateFriendRequestDto
 	) {
-		const creator = req.user;
+		const creator = await this.usersService.getById(req.user.id);
 		const receiver = await this.usersService.getByUsername(username);
 		if (!receiver) {
 			throw new BadRequestException("User with that username doesn't exist");
 		}
-		if (creator.friends.find(friend => friend.id === receiver.id)) {
+		if (!this.usersService.areFriends(creator.id, receiver.id)) {
 			throw new BadRequestException("You are already friend with this user");
 		}
-		const friendRequest = await this.friendRequestService.getOneBy({ creator, receiver });
+		const friendRequest = await this.friendRequestsService.getOneBy({ creator, receiver });
 		if (friendRequest) {
 			throw new BadRequestException("Friend request already exists");
 		}
-		return this.friendRequestService.create(creator, receiver)
+		return this.friendRequestsService.create(creator, receiver)
 	}
 
 	@Post("accept/:id")
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async accept(
-		@Param("id", ParseIntPipe) id: number,
 		@Req() req: RequestWithUser,
+		@Param("id", ParseIntPipe) id: number
 	) {
-		const friendRequestToBeAccepted = await this.friendRequestService.getById(id);
+		const friendRequestToBeAccepted = await this.friendRequestsService.getById(id);
 		if (!friendRequestToBeAccepted) {
 			throw new BadRequestException("Friend request with that id doesn't exist");
 		}
 		if (req.user.id !== friendRequestToBeAccepted.receiver.id) {
 			throw new BadRequestException("You can't accept someone's else friend request");
 		}
-		await this.usersService.addFriend(friendRequestToBeAccepted.receiver, friendRequestToBeAccepted.creator);
-		return this.friendRequestService.remove(friendRequestToBeAccepted);
+		await this.usersService.makeFriends(friendRequestToBeAccepted.receiver.id, friendRequestToBeAccepted.creator.id);
+		return this.friendRequestsService.remove(friendRequestToBeAccepted);
 	}
 
 	@Post("decline/:id")
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async decline(
-		@Param("id", ParseIntPipe) id: number,
-		@Req() req: RequestWithUser
+		@Req() req: RequestWithUser,
+		@Param("id", ParseIntPipe) id: number
 	) {
-		const friendRequestToBeRemoved = await this.friendRequestService.getById(id);
+		const friendRequestToBeRemoved = await this.friendRequestsService.getById(id);
 		if (!friendRequestToBeRemoved) {
 			throw new BadRequestException("Friend request with that id doesn't exist");
 		}
 		if (req.user.id !== friendRequestToBeRemoved.receiver.id) {
 			throw new BadRequestException("You can't decline someone's else friend request");
 		}
-		return this.friendRequestService.remove(friendRequestToBeRemoved);
+		return this.friendRequestsService.remove(friendRequestToBeRemoved);
 	}
 }

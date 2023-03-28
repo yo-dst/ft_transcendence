@@ -2,11 +2,11 @@ import { Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException,
 import { Response } from "express";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "../auth.service";
-import JwtAuthGuard from "../jwtAuth.guard";
-import RequestWithUser from "../requestWithUser.interface";
-import TwoFactorAuthCodeDto from "./dto/twoFactorAuthCode.dto";
-import JwtTwoFactorAuthGuard from "./jwtTwoFactorAuth.guard";
-import { TwoFactorAuthService } from "./twoFactorAuth.service";
+import JwtAuthGuard from "../jwt-auth.guard";
+import { RequestWithUser } from "../request-with-user.interface";
+import TwoFactorAuthCodeDto from "./dto/two-factor-auth-code.dto";
+import JwtTwoFactorAuthGuard from "./jwt-two-factor-auth.guard";
+import { TwoFactorAuthService } from "./two-factor-auth.service";
 
 @Controller("2fa")
 export class TwoFactorAuthController {
@@ -16,24 +16,12 @@ export class TwoFactorAuthController {
 		private authService: AuthService
 	) {}
 
-	@Get("test")
-	@UseGuards(JwtTwoFactorAuthGuard)
-	test() {
-		return "test";
-	}
-
-	@Get()
-	@UseGuards(JwtTwoFactorAuthGuard)
-	authenticate(@Req() req: RequestWithUser) {
-		return req.user;
-	}
-
 	@Post("generate")
 	@UseGuards(JwtAuthGuard)
-  async register(@Req() request: RequestWithUser) {
-    const { otpauthUrl } = await this.twoFactorAuthService.generateTwoFactorAuthenticationSecret(request.user);
-    return this.twoFactorAuthService.generateQrCodeDataURL(otpauthUrl);
-  }
+  	async register(@Req() req: RequestWithUser) {
+		const { otpauthUrl } = await this.twoFactorAuthService.generateTwoFactorAuthenticationSecret(req.user.id, req.user.email);
+		return this.twoFactorAuthService.generateQrCodeDataURL(otpauthUrl);
+  	}
 
 	@Post("turn-on")
 	@UseGuards(JwtAuthGuard)
@@ -42,7 +30,7 @@ export class TwoFactorAuthController {
 		@Req() req: RequestWithUser,
 		@Body() { twoFactorAuthenticationCode }: TwoFactorAuthCodeDto
 	) {
-		const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, req.user);
+		const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, req.user.twoFactorAuthenticationSecret);
 		if (!isCodeValid) {
 			throw new UnauthorizedException('Wrong authentication code');
 		}
@@ -64,7 +52,7 @@ export class TwoFactorAuthController {
 		@Res({ passthrough: true }) res: Response,
 		@Body() { twoFactorAuthenticationCode }: TwoFactorAuthCodeDto
 	) {
-		const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, req.user);
+		const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, req.user.twoFactorAuthenticationSecret);
 		if (!isCodeValid) {
 			throw new UnauthorizedException("Wrong authentication code");
 		}
