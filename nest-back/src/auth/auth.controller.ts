@@ -49,6 +49,11 @@ export class AuthController {
 		};
 	}
 
+	@Get("fakeUser")
+	async fakeUser() {
+		return { id: "4325325", state: 1, email: "email@mossad-co.il", username: "larry silverstein" }
+	}
+
 	@Get("logout")
 	@UseGuards(JwtTwoFactorAuthGuard)
 	logout(@Res({ passthrough: true }) res: Response) {

@@ -1,14 +1,12 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { io } from "socket.io-client";
+	import { io, Socket } from "socket.io-client";
 	import { user } from "$lib/stores/user";
+	import { onMount } from "svelte";
 
 	let selectedGameMode = 0;
 	let isSearching = false;
-
-	let socket = io("localhost:3000/matchmaking", {
-		query: { email: $user?.email },
-	});
+	let socket = io("localhost:3000/matchmaking");
 
 	function joinQueue() {
 		socket.emit("joinQueue", selectedGameMode);
@@ -20,8 +18,15 @@
 		isSearching = !isSearching;
 	}
 
-	socket.on("matched", (id) => {
-		goto("/game/" + id);
+	onMount(() => {
+		if (!$user) {
+			goto("/login");
+		} else {
+			socket.emit("email", $user.email);
+			socket.on("matched", (id) => {
+				goto("/game/" + id);
+			});
+		}
 	});
 </script>
 

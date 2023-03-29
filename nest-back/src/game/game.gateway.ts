@@ -17,14 +17,14 @@ export class GameGateway {
 
 	// verify if the room with id exist
 	@SubscribeMessage('checkId')
-	roomExist(client: CustomSocket, id: string) {
-		const room = gameRooms.find((room) => (room.id === id));
+	roomExist(client: CustomSocket, info: string) {
+		const room = gameRooms.find((room) => (room.id === info[0]));
 		if (room) {
 			client.emit("found", room.gameMode);
-			client.join(id);
-			client.roomId = id;
-			client.isPlayer = room.isPlayer(client.email);
-			client.isSpectator = room.isSpecator(client.email);
+			client.join(info[0]);
+			client.roomId = info[0];
+			client.isPlayer = room.isPlayer(info[1]);
+			client.isSpectator = room.isSpecator(info[1]);
 		}
 	}
 

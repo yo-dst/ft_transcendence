@@ -1,5 +1,5 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Server } from 'socket.io';
 import { v4 } from 'uuid';
 import { gameRooms } from './sharedRooms';
 import { GameRoom } from './gameRoom';
@@ -24,14 +24,23 @@ export class MatchmakingGateway {
 
 	@SubscribeMessage('joinQueue')
 	joinQueue(client: CustomSocket, gameMode: number) {
-		this.masterQueue[gameMode].push(client);
-		this.matchPlayers(gameMode);
+		if (!this.masterQueue[gameMode].find((c) => (c.email === client.email))) {
+			this.masterQueue[gameMode].push(client);
+			this.matchPlayers(gameMode);
+		}
 	}
 
 	@SubscribeMessage('leaveQueue')
 	leaveQueue(client: CustomSocket, gameMode: number) {
-		const index = this.masterQueue[gameMode].indexOf(client);
-		this.masterQueue[gameMode].splice(index, 1);
+		const index = this.masterQueue[gameMode].findIndex((c) => (c.email === client.email));
+		if (index) {
+			this.masterQueue[gameMode].splice(index, 1);
+		}
+	}
+
+	@SubscribeMessage('email')
+	setEmail(client: CustomSocket, email: string) {
+		client.email = email;
 	}
 
 	// if 2 players in the array, match them and create a new room

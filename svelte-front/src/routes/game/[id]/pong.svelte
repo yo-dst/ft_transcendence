@@ -17,6 +17,7 @@
 	let isPlaying = true;
 	let isMobile = false;
 	let turnPhone = false;
+	let lastY = 0;
 	if (
 		/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
 			navigator.userAgent
@@ -145,6 +146,10 @@
 		}
 		//draw elements
 		ball.draw(context);
+		if (lastY != ball.x_vel) {
+			timer = 0;
+			lastY = ball.x_vel;
+		}
 		context.globalAlpha = 1;
 		requestAnimationFrame(draw);
 	};

@@ -1,4 +1,15 @@
 <script lang="ts">
+	import { user } from "$lib/stores/user";
+	import { onMount } from "svelte";
+
+	async function getFakeUser() {
+		const response = await fetch("http://localhost:3000/auth/fakeUser");
+		$user = await response.json();
+	}
+
+	onMount(() => {
+		console.log("login page mounting...");
+	});
 </script>
 
 <a
@@ -9,6 +20,8 @@
 	<iconify-icon icon="material-symbols:login" />
 	Log In
 </a>
+
+<button on:click={getFakeUser}>get fake user</button>
 
 <style>
 	a {
