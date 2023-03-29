@@ -1,35 +1,87 @@
 <script lang="ts">
-	import type { PageData } from "./$types";
+    import { goto } from "$app/navigation";
+	import { user } from "$lib/stores/user";
+    import type { UserType } from "$lib/types/user";
+    import { onMount } from "svelte";
 
-	export let data: PageData;
+	let username: string;
+	let friendRequestError: any;
+	let friends: UserType[] = [];
+	let friendRequests: any[] = [];
 
-	let friends = data.friends;
+	async function sendFriendRequest() {
+		const res = await fetch("http://localhost:3000/friend-request", {
+			method: "POST",
+			credentials: "include",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ username })
+		});
+		if (res.ok) {
+			friendRequestError = null;
+		} else {
+			friendRequestError = await res.json();
+		}
+	}
+	
+	async function acceptFriendRequest(friendRequest: any) {
+		const res = await fetch(`http://localhost:3000/friend-request/accept/${friendRequest.id}`, { credentials: "include" });
+		const data = await res.json();
+		if (res.ok) {
+			friendRequests = friendRequests.filter(request  => request.id !== friendRequest.id);
+		} else {
+			console.log(data);
+		}
+	}
+
+	async function declineFriendRequest(friendRequest: any) {
+		const res = await fetch(`http://localhost:3000/friend-request/decline/${friendRequest.id}`, { credentials: "include" });
+		const data = await res.json();
+		if (res.ok) {
+			friendRequests = friendRequests.filter(request  => request.id !== friendRequest.id);
+		} else {
+			console.log(data);
+		}
+	}
+
+	onMount(async () => {
+		if (!$user) {
+			goto("/login");
+		}
+	});
 </script>
 
 <section>
 	<div class="title">Add a friend</div>
 	<div class="add-friend">
-		<input type="text" placeholder="Username" />
-		<button style="background-color: var(--ins-color); border:none;"
-			><iconify-icon
+		<input type="text" placeholder="Username" bind:value={username} />
+		<button 
+			style="background-color: var(--ins-color); border:none;"
+			on:click={sendFriendRequest}
+		>
+			<iconify-icon
 				icon="fluent-mdl2:add-friend"
 				style="font-size: 1.5rem"
-			/></button
-		>
+			/>
+		</button>
 	</div>
+	{#if friendRequestError}
+		<pre>{JSON.stringify(friendRequestError, undefined, 2)}</pre>
+	{/if}
 	<div class="friends-title">Friends</div>
 	<ul>
 		{#each friends as friend}
 			<li>
 				<div class="friend-right">
 					<img
-						src="https://picsum.photos/200"
+						src={friend.avatar.url}
 						alt="friend"
 						class="friend-img"
 					/>
 					<span>{friend.username}</span>
 				</div>
-				<div class="friend-left">
+				<!-- <div class="friend-left">
 					{#if friend.inGame}
 						<button class="spec-button"
 							><iconify-icon
@@ -54,8 +106,16 @@
 					<button class="del-button"
 						><iconify-icon icon="charm:cross" /></button
 					>
-				</div>
+				</div> -->
 			</li>
+		{/each}
+	</ul>
+	<div class="friends-title">Friend requests received</div>
+	<ul>
+		{#each friendRequests as friendRequest}
+			<pre>{JSON.stringify(friendRequest, undefined, 2)}</pre>
+			<button on:click={() => acceptFriendRequest(friendRequest)}>accept</button>
+			<button on:click={() => declineFriendRequest(friendRequest)}>decline</button>
 		{/each}
 	</ul>
 </section>

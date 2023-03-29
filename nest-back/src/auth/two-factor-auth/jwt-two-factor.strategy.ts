@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import TokenPayload from '../tokenPayload.interface';
+import { TokenPayload } from '../token-payload.interface';
 import { UsersService } from 'src/users/users.service';
  
 @Injectable()
@@ -26,12 +26,9 @@ export class JwtTwoFactorStrategy extends PassportStrategy(Strategy, "jwtTwoFact
     if (!user) {
       throw new UnauthorizedException();
     }
-    if (!user.isTwoFactorAuthenticationEnabled) {
-      return user;
+    if (user.isTwoFactorAuthenticationEnabled && !payload.isTwoFactorAuthenticated) {
+      throw new UnauthorizedException();
     }
-		if (payload.isTwoFactorAuthenticated) {
-			return user;
-		}
-    throw new UnauthorizedException();
+    return user;
   }
 }

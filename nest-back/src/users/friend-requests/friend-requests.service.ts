@@ -26,6 +26,7 @@ export class FriendRequestsService {
 		const newFriendRequest = new FriendRequest();
 		newFriendRequest.creator = creator;
 		newFriendRequest.receiver = receiver;
+		
 		return this.friendRequestRepository.save(newFriendRequest);
 	}
 

@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import CreateUserDto from './dto/create-user.dto';
 import Avatar from './entities/avatar.entity';
+import { Profile } from './entities/profile.entity';
 import User from './entities/user.entity';
 
 @Injectable()
@@ -11,89 +12,161 @@ export class UsersService {
 		@InjectRepository(User) private usersRepository: Repository<User>
 	) {}
 
-	getAll(): Promise<User[]> {
+  // --- begin testing ---
+	getAll() {
 		return this.usersRepository.find({
-      relations: ["friends", "friendRequestCreated", "friendRequestReceived"]
+      relations: {
+        profile: true,
+        friends: {
+          profile: true
+        },
+        friendRequestsCreated: true,
+        friendRequestsReceived: true
+      }
     });
 	}
 
-  remove(id: number) {
-    return this.usersRepository.delete(id);
+  async remove(id: number) {
+    const user = await this.getById(id);
+    return this.usersRepository.remove(user);
+  }
+  // --- end testing ---
+  
+  async getBy(options: FindOneOptions<User>) {
+    return this.usersRepository.findOne({ ...options });
   }
 
-	async getByEmail(email: string): Promise<User | null> {
+	async getByEmail(email: string) {
     return this.usersRepository.findOneBy({ email });
   }
 
-	async getById(id: number, relations?: string[]): Promise<User | null> {
+	async getById(id: number) {
+    return this.usersRepository.findOneBy({ id });
+  }
+
+  async getByUsername(username: string) {
     return this.usersRepository.findOne({
-      where: { id },
-      relations: relations
+      where: {
+        profile: { username }
+      }
     });
   }
 
-  async getByUsername(username: string, relations?: string[]): Promise<User | null> {
-    return this.usersRepository.findOne({
-      where: { username },
-      relations: relations
-    });
-  }
-
-	async create(userData: CreateUserDto): Promise<User> {
-    const newUser = new User();
-    newUser.email = userData.email;
-    newUser.username = userData.username;
+	async create(userData: CreateUserDto) {
     const newAvatar = new Avatar();
     newAvatar.url = userData.avatarUrl;
-    newUser.avatar = newAvatar;
-    await this.usersRepository.save(newUser);
-    return newUser;
+
+    const newProfile = new Profile();
+    newProfile.username = userData.username;
+    newProfile.avatar = newAvatar;
+
+    const newUser = new User();
+    newUser.email = userData.email;
+    newUser.profile = newProfile;
+    
+    return this.usersRepository.save(newUser);
   }
 
-  async setUsername(newUsername: string, userId: number) {
-    return this.usersRepository.update(userId, {
-      username: newUsername
+  async areFriends(userId1: number, userId2: number) {
+    const user1 = await this.usersRepository.findOne({
+      relations: { friends: true },
+      where: { id: userId1 }
     });
+    return user1.friends.find(friend => friend.id === userId2) ? true : false;
   }
 
-  async setAvatar(newAvatarUrl: string, userId: number) {
-    const newAvatar = new Avatar();
-    newAvatar.url = newAvatarUrl;
-    return this.usersRepository.update(userId, {
-      avatar: newAvatar
+  async makeFriends(userId1: number, userId2: number) {
+    const user1 = await this.usersRepository.findOne({
+      relations: { friends: true },
+      where: { id: userId1 }
     });
-  }
-
-  async setTwoFactorAuthenticationSecret(secret: string | null, userId: number) {
-    return this.usersRepository.update(userId, {
-      twoFactorAuthenticationSecret: secret
+    const user2 = await this.usersRepository.findOne({
+      relations: { friends: true },
+      where: { id: userId2 }
     });
+    user1.friends.push(user2);
+    user2.friends.push(user1);
+    await this.usersRepository.save(user1);
+    await this.usersRepository.save(user2);
   }
 
-  async turnOnTwoFactorAuthentication(userId: number) {
-    return this.usersRepository.update(userId, {
-      isTwoFactorAuthenticationEnabled: true
+  async removeFriends(userId1: number, userId2: number) {
+    const user1 = await this.usersRepository.findOne({
+      relations: { friends: true },
+      where: { id: userId1 }
     });
-  }
-
-  async turnOffTwoFactorAuthentication(userId: number) {
-    await this.setTwoFactorAuthenticationSecret(null, userId);
-    return this.usersRepository.update(userId, {
-      isTwoFactorAuthenticationEnabled: false
+    const user2 = await this.usersRepository.findOne({
+      relations: { friends: true },
+      where: { id: userId2 }
     });
+    user1.friends = user1.friends.filter(friend => friend.id !== user2.id);
+    user2.friends = user2.friends.filter(friend => friend.id !== user1.id);
+    await this.usersRepository.save(user1);
+    await this.usersRepository.save(user2);
   }
 
-  async addFriend(user: User, newFriend: User) {
-    user.friends.push(newFriend);
-    await this.usersRepository.save(user);
-    newFriend.friends.push(user);
-    await this.usersRepository.save(newFriend);
+  async setUsername(userId: number, newUsername: string) {
+		const user = await this.usersRepository.findOne({
+			relations: { profile: true },
+			where: { id: userId }
+		});
+		user.profile.username = newUsername;
+		return this.usersRepository.save(user);
+	}
+	
+	async setAvatar(userId: number, newAvatarUrl: string) {
+		const user = await this.usersRepository.findOne({
+			relations: {
+			profile: { avatar: true }
+			},
+			where: { id: userId }
+		});
+		user.profile.avatar.url = newAvatarUrl;
+		return this.usersRepository.save(user);
+	}
+
+	async setTwoFactorAuthenticationSecret(secret: string | null, userId: number) {
+		return this.usersRepository.update(userId, {
+		  	twoFactorAuthenticationSecret: secret
+		});
+	}
+	
+	async turnOnTwoFactorAuthentication(userId: number) {
+		return this.usersRepository.update(userId, {
+			isTwoFactorAuthenticationEnabled: true
+		});
+	}
+	
+	async turnOffTwoFactorAuthentication(userId: number) {
+		await this.setTwoFactorAuthenticationSecret(null, userId);
+		return this.usersRepository.update(userId, {
+			isTwoFactorAuthenticationEnabled: false
+		});
+	}
+
+  async getFriends(userId: number) {
+    const userWithFriends = await this.usersRepository.findOne({
+      relations: {
+        friends: true
+      },
+      where: {
+        id: userId
+      }
+    });
+    return userWithFriends.friends;
   }
 
-  async removeFriend(user: User, friendToRemove: User) {
-    user.friends = user.friends.filter(friend => friend.username !== friendToRemove.username);
-    await this.usersRepository.save(user);
-    friendToRemove.friends = friendToRemove.friends.filter(friend => friend.username !== user.username);
-    await this.usersRepository.save(friendToRemove);
+  async getFriendRequestsReceived(userId: number) {
+    const userWithFriends = await this.usersRepository.findOne({
+      relations: {
+        friendRequestsReceived: true
+      },
+      where: {
+        id: userId
+      }
+    });
+    return userWithFriends.friendRequestsReceived;
   }
 }
+
+

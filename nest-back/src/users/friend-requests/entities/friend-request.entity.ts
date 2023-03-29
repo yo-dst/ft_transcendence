@@ -11,12 +11,12 @@ class FriendRequest {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(type => User, user => user.friendRequestCreated, {
+	@ManyToOne(type => User, user => user.friendRequestsCreated, {
 		eager: true
 	})
 	creator: User;
 
-	@ManyToOne(type => User, user => user.friendRequestReceived, {
+	@ManyToOne(type => User, user => user.friendRequestsReceived, {
 		eager: true
 	})
 	receiver: User;

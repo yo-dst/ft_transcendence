@@ -3,21 +3,24 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import User from './entities/user.entity';
-import FriendRequest from './friend-request/entities/friend-request.entity';
+import FriendRequest from './friend-requests/entities/friend-request.entity';
 import Avatar from './entities/avatar.entity';
-import { FriendRequestController } from './friend-request/friend-request.controller';
-import { FriendRequestsService } from './friend-request/friend-request.service';
+import { FriendRequestsController } from './friend-requests/friend-requests.controller';
+import { FriendRequestsService } from './friend-requests/friend-requests.service';
+import { Profile } from './entities/profile.entity';
+import { UserController } from './user/user.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, FriendRequest, Avatar])],
+  imports: [TypeOrmModule.forFeature([User, FriendRequest, Avatar, Profile])],
   providers: [
     UsersService,
-    FriendRequestsService
+    FriendRequestsService,
   ],
-  exports: [UsersService],
   controllers: [
     UsersController,
-    FriendRequestController
-  ]
+    FriendRequestsController,
+    UserController
+  ],
+  exports: [UsersService]
 })
 export class UsersModule {}

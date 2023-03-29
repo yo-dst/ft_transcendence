@@ -6,9 +6,9 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
-import { TwoFactorAuthService } from './twoFactorAuth/twoFactorAuth.service';
-import { TwoFactorAuthController } from './twoFactorAuth/twoFactorAuth.controller';
-import { JwtTwoFactorStrategy } from './twoFactorAuth/jwtTwoFactor.strategy';
+import { TwoFactorAuthService } from './two-factor-auth/two-factor-auth.service';
+import { TwoFactorAuthController } from './two-factor-auth/two-factor-auth.controller';
+import { JwtTwoFactorStrategy } from './two-factor-auth/jwt-two-factor.strategy';
 
 @Module({
   imports: [

@@ -1,6 +1,13 @@
 import type { Socket } from "socket.io-client";
+import type { AvatarType } from "./avatar";
 
-export type UserType = undefined | {
+const State = {
+	offline: 0,
+	online: 1,
+	inGame: 2
+}
+
+export type UserType = {
 	id?: number;
 	socket?: Socket,
 	state?: number,
@@ -8,5 +15,6 @@ export type UserType = undefined | {
 	username?: string;
 	twoFactorAuthenticationSecret?: string;
 	isTwoFactorAuthenticationEnabled: boolean;
-	avatar?: string;
+	avatar?: AvatarType;
+	friends?: UserType[];
 }

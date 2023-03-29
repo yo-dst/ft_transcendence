@@ -18,6 +18,7 @@
 	}
 
 	onMount(() => {
+		console.log("drawer mounting...");
 		const elements = document.getElementsByTagName("a");
 		for (let i = 0; i < elements.length; ++i) {
 			elements[i].addEventListener("click", () => {
@@ -140,11 +141,13 @@
 		gap: 1rem;
 	}
 
-	img {
-		border-radius: 50%;
-		width: 60px;
-		height: 60px;
-	}
+    img {
+        border-radius: 50%;
+        width: 35%;
+        height: auto;
+        object-fit: cover;
+        aspect-ratio: 1/1;
+    }
 
 	iconify-icon {
 		font-size: 1.5rem;
