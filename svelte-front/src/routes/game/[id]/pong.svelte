@@ -4,6 +4,7 @@
 	import Timer from "$lib/components/timer.svelte";
 	import TurnPhone from "$lib/components/turnPhone.svelte";
 	import PostGameLobby from "$lib/components/PostGameLobby.svelte";
+	import DecoTimer from "$lib/components/decoTimer.svelte";
 
 	/**
 	 * @type {number}
@@ -15,7 +16,6 @@
 	export let socket;
 
 	let isPlaying = true;
-	let isMobile = false;
 	let turnPhone = false;
 	let lastY = 0;
 	if (
@@ -77,6 +77,10 @@
 
 	socket.on("startGame", () => {
 		timer = 0;
+	});
+
+	socket.on("deco", () => {
+		isPlaying = false;
 	});
 
 	socket.on("playerMove", (newDir) => {
@@ -171,6 +175,7 @@
 {#if isPlaying}
 	<main>
 		<Timer {socket} />
+		<DecoTimer {socket} />
 		<div class="score">
 			<strong>
 				{game.score.p1}

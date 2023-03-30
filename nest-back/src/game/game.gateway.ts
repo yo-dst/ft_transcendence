@@ -1,5 +1,4 @@
 import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Socket } from "dgram";
 import { Server } from "socket.io";
 import { gameRooms } from "src/matchmaking/sharedRooms";
 import { CustomSocket } from "./game.customSocket";
@@ -24,7 +23,8 @@ export class GameGateway {
 							setTimeout(() => {
 								if (room.playersMap.get(client.email)) {
 									const index = gameRooms.findIndex((room) => room.id === client.roomId);
-									if (index !== -1) {
+									if (room.playersMap.get(client.email)) {
+										this.server.to(client.roomId).emit('deco');
 										clearInterval(room.intervalId);
 										gameRooms.splice(index, 1);
 									}
@@ -49,7 +49,6 @@ export class GameGateway {
 			client.email = info[1];
 			if (!room.playersMap.get(client.email)) {
 				room.player[room.index++] = client.email;
-				console.log(room.player[room.index - 1]);
 			}
 			else
 				room.playersMap.set(client.email, false);
