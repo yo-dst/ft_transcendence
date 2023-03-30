@@ -32,7 +32,7 @@
 		left: 0;
 		bottom: 0;
 		width: 100%;
-		background-color: #090D10;
+		background-color: #161b22;
 		display: flex;
 		justify-content: center;
 		align-items: center;

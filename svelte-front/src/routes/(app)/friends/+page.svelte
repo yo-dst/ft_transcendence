@@ -30,6 +30,32 @@
 		username: ""
 	}
 
+	var countFakeFriend = 0;
+	function addFakeFriend() {
+		const fakeFriend = {
+			username: `fake${countFakeFriend}`,
+			avatar: {
+				url: "https://picsum.photos/200"
+			}
+		}
+		friendsData.friends = [...friendsData.friends, fakeFriend];
+		countFakeFriend++;
+	}
+
+	var countFakeFriendRequest = 0;
+	function addFakeFriendRequest() {
+		const fakeFriendRequest = {
+			creator: {
+				username: `fake${countFakeFriendRequest}`,
+				avatar: {
+					url: "https://picsum.photos/200"
+				}
+			}
+		}
+		friendRequestsData.friendRequests = [...friendRequestsData.friendRequests, fakeFriendRequest];
+		countFakeFriendRequest++;
+	}
+
 	async function fetchFriends() {
 		friendsData.loading = true;
 		const res = await fetch("http://localhost:3000/user/friends", { credentials: "include" });
@@ -135,132 +161,113 @@
 	{#if addFriendData.error}
 		<pre>{JSON.stringify(addFriendData.error, undefined, 2)}</pre>
 	{/if}
+</section>
 
-	<div class="list-container">
+<section>
+	<div class="list-container bg-light-dark">
 		<h3>Friends</h3>
+		<div class="center-container">
+		{#if friendsData.loading}
+			<Loading/>
+		{:else if friendsData.error}
+			<pre>{JSON.stringify(friendsData.error, undefined, 2)}</pre>
+		{:else if friendsData.friends}
+			<ul>
+			{#each friendsData.friends as friend}
+				<li class="li-friend">
+					<div>
+						<img src={friend.avatar.url} alt="friend"/>
+						<span>{friend.username}</span>
+					</div>
+					<div>
+						<button on:click={() => removeFriend(friend.username)} style="background-color: var(--del-color);">
+							<iconify-icon icon="charm:cross" style="font-size: 1.7rem;"/>
+						</button>
+					</div>
+				</li>
+			{/each}
+			</ul>
+		{/if}
+		</div>
 	</div>
 </section>
 
 <section>
-	<div class="title">Add a friend</div>
-	<div class="add-friend">
-		<input type="text" placeholder="Username" bind:value={addFriendData.username} />
-		<button 
-			style="background-color: var(--ins-color); border:none;"
-			on:click={sendFriendRequest}
-		>
-			<iconify-icon icon="fluent-mdl2:add-friend" style="font-size: 1.5rem"
-			/>
-		</button>
+	<div class="list-container bg-light-dark">
+		<h3>Friend requests received</h3>
+		<div class="center-container">
+			{#if friendRequestsData.loading}
+				<Loading/>
+			{:else if friendRequestsData.error}
+				<pre>{JSON.stringify(friendRequestsData.error, undefined, 2)}</pre>
+			{:else if friendRequestsData.friendRequests}
+				<ul>
+				{#each friendRequestsData.friendRequests as friendRequest}
+					<li>
+						<div>
+							<img src={friendRequest.creator.avatar.url} alt="friend-request-creator"/>
+							<span>{friendRequest.creator.username}</span>
+							<!-- <pre>{JSON.stringify(friendRequest, undefined, 2)}</pre> -->
+						</div>
+						<div>
+							<button on:click={() => acceptFriendRequest(friendRequest)}>accept</button>
+							<button on:click={() => declineFriendRequest(friendRequest)}>decline</button>
+						</div>
+					</li>
+				{/each}
+				</ul>
+			{/if}
+		</div>
 	</div>
-	{#if addFriendData.error}
-		<pre>{JSON.stringify(addFriendData.error, undefined, 2)}</pre>
-	{/if}
-
-	<div class="friends-title">Friends</div>
-	{#if friendsData.loading}
-		<Loading/>
-	{:else if friendsData.error}
-		<pre>{JSON.stringify(friendsData.error, undefined, 2)}</pre>
-	{:else if friendsData.friends}
-		<ul>
-		{#each friendsData.friends as friend}
-			<li>
-				<div class="friend-right">
-					<img
-						src={friend.avatar.url}
-						alt="friend"
-						class="friend-img"
-					/>
-					<span>{friend.username}</span>
-				</div>
-				<div class="friend-left">
-					<button on:click={() => removeFriend(friend.username)}>Remove</button>
-				</div>
-			</li>
-		{/each}
-		</ul>
-	{/if}
-	
-	<div class="friends-title">Friend requests received</div>
-	{#if friendRequestsData.loading}
-		<Loading/>
-	{:else if friendRequestsData.error}
-		<pre>{JSON.stringify(friendRequestsData.error, undefined, 2)}</pre>
-	{:else if friendRequestsData.friendRequests}
-		<ul>
-		{#each friendRequestsData.friendRequests as friendRequest}
-			<li>
-				<pre>{JSON.stringify(friendRequest, undefined, 2)}</pre>
-				<button on:click={() => acceptFriendRequest(friendRequest)}>accept</button>
-				<button on:click={() => declineFriendRequest(friendRequest)}>decline</button>
-			</li>
-		{/each}
-		</ul>
-	{/if}
-
 </section>
 
-<!-- was in friend <li>
-<div class="friend-left">
-	{#if friend.inGame}
-		<button class="spec-button"
-			><iconify-icon
-				icon="ic:baseline-remove-red-eye"
-			/></button
-		>
-	{/if}
-	{#if friend.inChannel}
-		<button class="secondary"
-			><iconify-icon
-				icon="material-symbols:open-in-browser"
-			/></button
-		>
-	{/if}
-	{#if friend.online}
-		<button class="invite-button"
-			><iconify-icon
-				icon="material-symbols:auto-read-play-outline-sharp"
-			/></button
-		>
-	{/if}
-	<button class="del-button"
-		><iconify-icon icon="charm:cross" /></button
-	>
-</div> -->
+<section>
+	<button on:click={addFakeFriend}>Add fake friend</button>
+	<button on:click={addFakeFriendRequest} style="margin-bottom: 2rem;">Add fake friend request</button>
+</section>
 
 <style>
-	img {
-		height: 3rem;
-		width: auto;
-		object-fit: cover;
-		aspect-ratio: 1/1;
-		border-radius: 50%;
-		margin-right: 0.5rem;
-	}
-
 	h3 {
 		margin-bottom: 1rem;
 		font-weight: normal;
+		margin-left: 0.5rem;
 	}
 
 	ul {
-		background-color: #090d10;
-		padding: 0.5rem 1rem 0.5rem 0.5rem;
-		border-radius: 0 0 5px 5px;
+		padding: 0;
+		margin: 0;
+		width: 100%;
 	}
 
 	ul > li {
-		background-color: var(--background-color);
+		background-color: #0d1117;
 		list-style-type: none;
 		padding: 0.5rem 1rem;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		border-radius: 5px;
+		margin-bottom: 0.7rem;
 	}
 
-	ul > :last-child {
-		margin-bottom: 0.5rem;
+	ul > li > :first-child {
+		display: flex;
+		align-items: center;
+	}
+
+	ul > li > :last-child {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+
+	ul > li img {
+		height: 3.5rem;
+		width: auto;
+		object-fit: cover;
+		aspect-ratio: 1/1;
+		border-radius: 50%;
+		margin-right: 0.7rem;
 	}
 
 	ul > li button {
@@ -268,47 +275,25 @@
 		height: auto;
 		margin-bottom: 0;
 		display: flex;
+		justify-content: center;
 		align-items: center;
-		padding: 0.5rem;
-	}
-
-	.title {
-		padding-left: 0.5rem;
-		font-size: 1.5rem;
-		color: var(--h3-color);
-		margin-bottom: 0.5rem;
-	}
-
-	.friends-title {
-		padding-left: 0.5rem;
-		font-size: 1.5rem;
-		color: var(--h3-color);
-		padding-top: 0.2rem;
-		border-radius: 5px 5px 0 0;
-		background-color: #090d10;
-	}
-
-	.friend-left {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	.invite-button {
-		background-color: var(--ins-color);
 		border: none;
 	}
 
-	.del-button {
-		background-color: var(--del-color);
+	.li-friend button {
+		display: none;
 	}
 
-	.spec-button {
-		background-color: hsl(195deg, 85%, 41%);
-		border: none;
+	.li-friend:hover {
+		background-color: #33383E;
+		cursor: pointer;
 	}
 
-	.friend-right {
+	.li-friend:hover button {
 		display: flex;
-		align-items: center;
+	}
+
+	.li-friend button:hover {
+		opacity: 0.9;
 	}
 </style>

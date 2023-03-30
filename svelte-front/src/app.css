@@ -26,6 +26,7 @@
   --primary-hover: #e91e63;
   --primary-focus: rgba(216, 27, 96, 0.25);
   --primary-inverse: #FFF;
+  --background-color: #0d1117;
 }
 
 /* Pink (Common styles) */
@@ -35,6 +36,17 @@
   --switch-color: var(--primary-inverse);
   --switch-checked-background-color: var(--primary);
 }
+
+/*
+  me first try
+  dark -> #090D10
+  light dark -> #11191f
+
+  github
+  light -> #f0f6fc
+  dark -> #0d1117
+  ligth dark -> #161b22
+*/
 
 html {
   position: relative;
@@ -59,7 +71,23 @@ html {
 }
 
 .list-container {
-  background-color: #090d10;
-	padding: 0.5rem 1rem 0.5rem 0.5rem;
+	padding: 0.5rem 1rem 1rem 0.5rem;
   border-radius: 0 0 5px 5px;
+  margin-bottom: 1.5rem;
 }
+
+.center-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-light-dark {
+  background-color: #161b22;
+}
+
+.safe-words {
+  word-break: break-all;
+}
+
+

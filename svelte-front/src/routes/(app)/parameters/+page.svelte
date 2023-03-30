@@ -3,15 +3,15 @@
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 
-	let username: string;
-	let usernameError: any;
+	let username: string | undefined;
+	let updateUsernameError: any;
 	let files: any;
-	let avatarError: any;
+	let updateAvatarError: any;
 	let isTwoFactorAuthenticationEnabled: boolean;
 
 	async function updateUsername() {
 		const res = await fetch(
-			`http://localhost:3000/users/${$user.id}/username`,
+			`http://localhost:3000/user/username`,
 			{
 				method: "PATCH",
 				credentials: "include",
@@ -23,12 +23,12 @@
 				}),
 			}
 		);
+		const data = await res.json();
 		if (res.ok) {
-			$user.username = username;
-			usernameError = null;
+			$user.profile.username = username;
+			updateUsernameError = undefined;
 		} else {
-			const data = await res.json();
-			usernameError = data;
+			updateUsernameError = data;
 		}
 	}
 
@@ -37,7 +37,7 @@
 		reader.addEventListener("load", async () => {
 			let avatar: string = reader.result;
 			const res = await fetch(
-				`http://localhost:3000/users/${$user.id}/avatar`,
+				`http://localhost:3000/user/avatar`,
 				{
 					method: "PATCH",
 					credentials: "include",
@@ -49,12 +49,12 @@
 					}),
 				}
 			);
+			const data = await res.json();
 			if (res.ok) {
-				$user.avatar = avatar;
-				avatarError = null;
+				$user.profile.avatar.url = avatar;
+				updateAvatarError = undefined;
 			} else {
-				const data = await res.json();
-				avatarError = data;
+				updateAvatarError = data;
 			}
 		});
 		if (files && files[0]) {
@@ -72,8 +72,6 @@
 			});
 			if (res.ok) {
 				$user.isTwoFactorAuthenticationEnabled = false;
-				// we must delete this line because we wont share 2fa secret on client side
-				$user.twoFactorAuthenticationSecret = null;
 			} else {
 				isTwoFactorAuthenticationEnabled = true;
 			}
@@ -81,30 +79,29 @@
 	}
 
 	onMount(() => {
-		if (!$user) {
+		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
-			username = $user.username;
-			isTwoFactorAuthenticationEnabled =
-				$user.isTwoFactorAuthenticationEnabled;
+			username = $user.profile?.username;
+			isTwoFactorAuthenticationEnabled = $user.isTwoFactorAuthenticationEnabled;
 		}
 	});
 </script>
 
 <section>
-	<h1>Modify your account</h1>
+	<h3>Modify your account</h3>
 
-	<label for="username"> Username </label>
-	<div>
+	<label for="username">Username</label>
+	<div class="input-button-container">
 		<input name="username" bind:value={username} />
 		<button on:click={updateUsername}>Update</button>
 	</div>
-	{#if usernameError}
-		<pre>{JSON.stringify(usernameError, undefined, 2)}</pre>
+	{#if updateUsernameError}
+		<pre class="error">{JSON.stringify(updateUsernameError, undefined, 2)}</pre>
 	{/if}
 
 	<label for="avatar">Avatar </label>
-	<div>
+	<div class="input-button-container">
 		<input
 			name="avatar"
 			type="file"
@@ -113,6 +110,9 @@
 		/>
 		<button on:click={updateAvatar}>Update</button>
 	</div>
+	{#if updateAvatarError}
+		<pre class="error">{JSON.stringify(updateAvatarError, undefined, 2)}</pre>
+	{/if}
 
 	<label for="isTwoFactorAuthenticationEnabled">
 		<input
@@ -131,13 +131,12 @@
 </section>
 
 <style>
-	div {
-		display: flex;
-		gap: 1rem;
+	h3 {
 		margin-bottom: 1rem;
+		font-weight: normal;
 	}
 
-	div > button {
-		width: auto;
+	.error {
+		margin-top: -1.5rem;
 	}
 </style>
