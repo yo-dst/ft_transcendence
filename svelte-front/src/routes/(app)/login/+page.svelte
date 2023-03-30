@@ -1,4 +1,12 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
+
+	let username: string;
+	let loginError: any;
+
+	function loginWithUsername() {
+		goto(`http://localhost:3000/auth/username?username=${username}`);
+	}
 </script>
 
 <a
@@ -10,9 +18,16 @@
 	Log In
 </a>
 
+<input bind:value={username}/>
+<button on:click={loginWithUsername}>Login with username</button>
+{#if loginError}
+	<pre>{JSON.stringify(loginError, undefined, 2)}</pre>
+{/if}
+
 <style>
 	a {
 		display: flex;
 		justify-content: center;
+		margin-bottom: 5rem;
 	}
 </style>

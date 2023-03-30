@@ -1,14 +1,15 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
+    import { onMount } from 'svelte';
 	import type { PageData } from './$types';
+	import { user } from '$lib/stores/user';
 
 	export let data: PageData;
 
 	const matchHistory = data.matchHistory;
-	let username = "Walachnibar";
 	let nbWin = 3;
 	let nbLose = 2;
 	let nbTie = 1;
-	
 	let matchShowed = matchHistory.slice(0, 5);
 
 	function loadMore() {
@@ -17,12 +18,18 @@
 			matchShowed = [...matchShowed, ...matchAdded]
 		}
 	}
+
+	onMount(async () => {
+		if (!$user.isLoggedIn) {
+			goto("/login");
+		}
+	});
 </script>
 
 <section class="first-section">
-	<img src="https://picsum.photos/500/500" alt="profile" class="first-section-img"/>
+	<img src={$user.profile?.avatar?.url} alt="profile" class="user-img"/>
 	<div class="first-section-stats">
-		<span>{username}</span>
+		<span>{$user.profile?.username}</span>
 		<div>
 			<span style="color: var(--ins-color);;">{nbWin}</span>
 			/
@@ -39,7 +46,7 @@
 		<table>
 			<thead>
 				<tr>
-					<th>Players</th>
+					<th>Opponent</th>
 					<th>Result</th>
 					<th>Date</th>
 				</tr>
@@ -48,8 +55,7 @@
 				{#each matchShowed as match (match.id)}
 					<tr>
 						<td>
-							<div class="players-cell">
-								<span>{username}</span>
+							<div class="opponent-cell">
 								<span>{match.opponent}</span>
 							</div>
 						</td>
@@ -102,10 +108,12 @@
 		gap: 2.5rem;
 	}
 
-	.first-section-img {
+	.user-img {
 		width: 100%;
 		height: auto;
 		border-radius: 50%;
+		object-fit: cover;
+		aspect-ratio: 1/1;
 	}
 
 	.first-section-stats {
@@ -114,7 +122,7 @@
 		align-items: center;
 	}
 
-	.players-cell {
+	.opponent-cell {
 		display: flex;
 		flex-direction: column;
 	}
@@ -149,7 +157,7 @@
 			gap: 1rem;
 		}
 
-		.first-section-img {
+		.user-img {
 			width: 50%;
 		}
 	}

@@ -10,17 +10,28 @@ import { FriendRequestsService } from "./friend-requests.service";
 		- remove sensitive returns
 */
 
-@Controller("friend-request")
+@Controller("friend-requests")
 export class FriendRequestsController {
 	constructor(
 		private friendRequestsService: FriendRequestsService,
 		private usersService: UsersService
 	) {}
 
+	// --- begin testing ---
 	@Get()
 	async getAll() {
 		return this.friendRequestsService.getAll();
 	}
+
+	@Delete(":id")
+	async remove(@Param("id", ParseIntPipe) id: number) {
+		const fr = await this.friendRequestsService.getById(id);
+		if (!fr) {
+			throw new BadRequestException();
+		}
+		return this.friendRequestsService.remove(fr);
+	}
+	// --- end testing ---
 
 	@Post()
 	@UseGuards(JwtTwoFactorAuthGuard)
@@ -28,12 +39,12 @@ export class FriendRequestsController {
 		@Req() req: RequestWithUser,
 		@Body() { username }: CreateFriendRequestDto
 	) {
-		const creator = await this.usersService.getById(req.user.id);
+		const creator = req.user;
 		const receiver = await this.usersService.getByUsername(username);
 		if (!receiver) {
 			throw new BadRequestException("User with that username doesn't exist");
 		}
-		if (!this.usersService.areFriends(creator.id, receiver.id)) {
+		if (await this.usersService.areFriends(creator.id, receiver.id)) {
 			throw new BadRequestException("You are already friend with this user");
 		}
 		const friendRequest = await this.friendRequestsService.getOneBy({ creator, receiver });
@@ -57,7 +68,8 @@ export class FriendRequestsController {
 			throw new BadRequestException("You can't accept someone's else friend request");
 		}
 		await this.usersService.makeFriends(friendRequestToBeAccepted.receiver.id, friendRequestToBeAccepted.creator.id);
-		return this.friendRequestsService.remove(friendRequestToBeAccepted);
+		await this.friendRequestsService.remove(friendRequestToBeAccepted);
+		return this.usersService.getProfile(friendRequestToBeAccepted.creator.id);
 	}
 
 	@Post("decline/:id")
@@ -73,6 +85,6 @@ export class FriendRequestsController {
 		if (req.user.id !== friendRequestToBeRemoved.receiver.id) {
 			throw new BadRequestException("You can't decline someone's else friend request");
 		}
-		return this.friendRequestsService.remove(friendRequestToBeRemoved);
+		await this.friendRequestsService.remove(friendRequestToBeRemoved);
 	}
 }

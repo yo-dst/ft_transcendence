@@ -3,28 +3,54 @@
 	import Drawer from "svelte-drawer-component";
 	import { user } from "$lib/stores/user";
 	import { goto } from "$app/navigation";
+    import Loading from "./Loading.svelte";
+	import type { Profile } from "../types/profile";
+    import type { Error } from "$lib/types/error";
 
 	export let show: boolean;
 	export let setShow: any;
+
+	// let profileData: {
+	// 	profile?: Profile,
+	// 	error?: Error,
+	// 	loading: boolean
+	// } = {
+	// 	loading: false
+	// };
 
 	async function logout() {
 		const res = await fetch("http://localhost:3000/auth/logout", {
 			credentials: "include",
 		});
 		if (res.ok) {
-			$user = undefined;
+			$user.isLoggedIn = false;
+			$user.profile = undefined;
 			goto("/login");
 		}
 	}
 
-	onMount(() => {
+	// async function fetchUserProfile() {
+	// 	profileData.loading = true;
+	// 	const res = await fetch("http://localhost:3000/user/profile", { credentials: "include" });
+	// 	const data = await res.json();
+	// 	if (res.ok) {
+	// 		profileData.profile = data;
+	// 	} else {
+	// 		profileData.error = data;
+	// 	}
+	// 	profileData.loading = false;
+	// }
+
+	onMount(async () => {
 		console.log("drawer mounting...");
+		
 		const elements = document.getElementsByTagName("a");
 		for (let i = 0; i < elements.length; ++i) {
 			elements[i].addEventListener("click", () => {
 				setShow(false);
 			});
 		}
+		// await fetchUserProfile();
 	});
 </script>
 
@@ -37,8 +63,16 @@
 	<div class="drawer-container">
 		{#if $user}
 			<div class="profile-wrapper">
-				<img src={$user?.avatar?.url} alt="avatar" />
-				<span>{$user.username}</span>
+				<img src={$user.profile?.avatar?.url} alt="avatar" />
+				<span>{$user.profile?.username}</span>
+				<!-- {#if profileData.loading}
+					<Loading />
+				{:else if profileData.error}
+					<pre>{JSON.stringify(profileData.error, undefined, 2)}</pre>
+				{:else if profileData.profile}
+					<img src={profileData.profile.avatar.url} alt="avatar" />
+					<span>{profileData.profile.username}</span>
+				{/if} -->
 			</div>
 		{/if}
 		<div class="nav-wrapper">
@@ -97,7 +131,7 @@
 							<a
 								role="button"
 								class="contrast outline"
-								href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-7470221ce45a9a6950c2b7324e6e5a9a069460af572ce5daa2a0fb547a3d5fda&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Flogin&response_type=code"
+								href="/login"
 							>
 								<iconify-icon icon="material-symbols:login" />
 								Log In

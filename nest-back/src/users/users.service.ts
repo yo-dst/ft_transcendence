@@ -45,11 +45,20 @@ export class UsersService {
   }
 
   async getByUsername(username: string) {
-    return this.usersRepository.findOne({
+    if (!username) {
+      return null;
+    }
+    const user = await this.usersRepository.findOne({
+      relations: {
+        profile: true
+      },
       where: {
-        profile: { username }
+        profile: {
+          username: username
+        }
       }
     });
+    return user;
   }
 
 	async create(userData: CreateUserDto) {
@@ -145,7 +154,7 @@ export class UsersService {
 	}
 
   async getFriends(userId: number) {
-    const userWithFriends = await this.usersRepository.findOne({
+    const user = await this.usersRepository.findOne({
       relations: {
         friends: true
       },
@@ -153,11 +162,23 @@ export class UsersService {
         id: userId
       }
     });
-    return userWithFriends.friends;
+    return user.friends;
+  }
+
+  async getFriendRequestsCreated(userId: number) {
+    const user = await this.usersRepository.findOne({
+      relations: {
+        friendRequestsCreated: true
+      },
+      where: {
+        id: userId
+      }
+    });
+    return user.friendRequestsCreated;
   }
 
   async getFriendRequestsReceived(userId: number) {
-    const userWithFriends = await this.usersRepository.findOne({
+    const user = await this.usersRepository.findOne({
       relations: {
         friendRequestsReceived: true
       },
@@ -165,7 +186,19 @@ export class UsersService {
         id: userId
       }
     });
-    return userWithFriends.friendRequestsReceived;
+    return user.friendRequestsReceived;
+  }
+
+  async getProfile(userId: number) {
+    const user = await this.usersRepository.findOne({
+      relations: {
+        profile: true
+      },
+      where: {
+        id: userId
+      }
+    });
+    return user.profile;
   }
 }
 

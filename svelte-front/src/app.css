@@ -40,3 +40,26 @@ html {
   position: relative;
   min-height: 100%;
 }
+
+.input-button-container {
+  display: flex;
+  gap: 1rem;
+  max-width: 450px;
+  margin-bottom: 1.5rem;
+}
+
+.input-button-container > input {
+  width: 80%;
+  height: 3rem;
+}
+
+.input-button-container > button {
+  width: auto;
+  height: 3rem;
+}
+
+.list-container {
+  background-color: #090d10;
+	padding: 0.5rem 1rem 0.5rem 0.5rem;
+  border-radius: 0 0 5px 5px;
+}

@@ -1,3 +1,3 @@
-export type AvatarType = {
+export type Avatar = {
 	url: string;
 }

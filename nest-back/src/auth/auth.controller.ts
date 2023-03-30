@@ -1,9 +1,8 @@
-import { Controller, Get, HttpException, HttpStatus, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, NotFoundException, Query, Redirect, Req, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { PostgresErrorCode } from 'src/database/postges-error-code';
 import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
-import JwtAuthGuard from './jwt-auth.guard';
 import { RequestWithUser } from './request-with-user.interface';
 import JwtTwoFactorAuthGuard from './two-factor-auth/jwt-two-factor-auth.guard';
 
@@ -17,6 +16,26 @@ export class AuthController {
 		private authService: AuthService,
 		private usersService: UsersService
 	) { }
+
+	// --- begin testing ---
+	@Get("username")
+	@Redirect()
+	async loginWithUsername(
+		@Res({ passthrough: true }) res: Response,
+		@Query("username") username: string
+	) {
+		let user = await this.usersService.getByUsername(username);
+		if (!user) {
+			throw new NotFoundException();
+		}
+		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
+		res.setHeader("Set-Cookie", cookie);
+		return {
+			url: "http://localhost:5173",
+			statusCode: 302
+		}
+	}
+	// --- end testing ---
 
 	// retrieve sensitive data
 	@Get()
