@@ -4,12 +4,17 @@ import { v4 } from 'uuid';
 import { gameRooms } from './sharedRooms';
 import { GameRoom } from './gameRoom';
 import { CustomSocket } from 'src/game/game.customSocket';
+import { GameService } from 'src/game/game.service';
 
 @WebSocketGateway({
 	namespace: 'matchmaking',
 	cors: { origin: '*' }
 })
 export class MatchmakingGateway {
+	constructor(
+		private gameService: GameService
+	) { }
+
 	@WebSocketServer() server: Server;
 	private masterQueue: CustomSocket[][] = [[], [], []];
 
@@ -51,7 +56,7 @@ export class MatchmakingGateway {
 			const roomId = v4();
 
 			// create a new room in the shared instance of GameRooms
-			const room = new GameRoom(roomId, gameMode, p1.email, p2.email);
+			const room = new GameRoom(this.gameService, roomId, gameMode, p1.email, p2.email);
 			gameRooms.push(room);
 
 			// send roomId to players

@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 import Avatar from "./avatar.entity";
 import FriendRequest from "../friend-requests/entities/friend-request.entity";
 import { Profile } from "./profile.entity";
+import { Match } from "../../game/entity/match.entity";
 
 @Entity()
 class User {
@@ -32,6 +33,13 @@ class User {
 
 	@OneToMany(type => FriendRequest, friendRequest => friendRequest.receiver)
 	friendRequestsReceived: FriendRequest[];
+
+	@OneToMany(type => Match, match => match.winner)
+	matchesWon: Match[];
+
+	@OneToMany(type => Match, match => match.loser)
+	matchesLost: Match[];
+
 }
 
 export default User;

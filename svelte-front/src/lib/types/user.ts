@@ -12,5 +12,6 @@ export type UserType = {
 	isTwoFactorAuthenticationEnabled: boolean,
 	profile?: Profile,
 	socket?: Socket,
-	state?: number
+	state?: number,
+	email?: string
 }

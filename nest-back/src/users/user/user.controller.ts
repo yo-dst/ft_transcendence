@@ -10,14 +10,17 @@ import UpdateUsernameDto from "./dto/update-username.dto";
 export class UserController {
 	constructor(
 		private usersService: UsersService
-	) {}
-a
+	) { }
+	a
 	// returns what must be returned of user for frontend
 	@Get()
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async getUser(@Req() req: RequestWithUser) {
 		const profile = await this.usersService.getProfile(req.user.id);
-		return { profile }
+		return {
+			profile,
+			email: req.user.email
+		}
 	}
 
 	@Patch("username")
@@ -45,7 +48,7 @@ a
 	@Patch("remove-friend")
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async removeFriends(
-		@Req() req: RequestWithUser, 
+		@Req() req: RequestWithUser,
 		@Body() { username }: RemoveFriendDto
 	) {
 		const friendToBeRemoved = await this.usersService.getByUsername(username);

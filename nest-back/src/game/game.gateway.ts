@@ -2,9 +2,13 @@ import { ConnectedSocket, SubscribeMessage, WebSocketGateway, WebSocketServer } 
 import { Server } from "socket.io";
 import { gameRooms } from "src/matchmaking/sharedRooms";
 import { CustomSocket } from "./game.customSocket";
+import { GameService } from "./game.service";
 
 @WebSocketGateway({ namespace: 'game', cors: { origin: "*", } })
 export class GameGateway {
+	constructor(
+		private gameService: GameService
+	) { }
 	@WebSocketServer() server: Server;
 
 	@SubscribeMessage('connection')
@@ -25,6 +29,7 @@ export class GameGateway {
 									const index = gameRooms.findIndex((room) => room.id === client.roomId);
 									if (room.playersMap.get(client.email)) {
 										this.server.to(client.roomId).emit('deco');
+										this.gameService.save(room.score, room.player);
 										clearInterval(room.intervalId);
 										gameRooms.splice(index, 1);
 									}

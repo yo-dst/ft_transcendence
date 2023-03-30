@@ -4,7 +4,7 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-	constructor(private usersService: UsersService) {}
+	constructor(private usersService: UsersService) { }
 
 	// --- begin testing ---
 	countFakeUser = 0;
