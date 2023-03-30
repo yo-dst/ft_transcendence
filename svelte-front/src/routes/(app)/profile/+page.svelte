@@ -14,8 +14,11 @@
 
 	function loadMore() {
 		if (matchShowed.length < matchHistory.length) {
-			const matchAdded = matchHistory.slice(matchShowed.length, matchShowed.length + 5)
-			matchShowed = [...matchShowed, ...matchAdded]
+			const matchAdded = matchHistory.slice(
+				matchShowed.length,
+				matchShowed.length + 5
+			);
+			matchShowed = [...matchShowed, ...matchAdded];
 		}
 	}
 
@@ -37,7 +40,6 @@
 			/
 			<span style="color: var(--del-color);;">{nbLose}</span>
 		</div>
-		
 	</div>
 </section>
 <section class="second-section">
@@ -60,20 +62,33 @@
 							</div>
 						</td>
 						<td class="result-cell">
-							<div style="display: flex; flex-direction: column; min-width: 1.5em">
+							<div
+								style="display: flex; flex-direction: column; min-width: 1.5em"
+							>
 								<span>{match.result.myPoints}</span>
 								<span>{match.result.opponnentPoints}</span>
 							</div>
 							{#if match.result.myPoints > match.result.opponnentPoints}
-								<iconify-icon icon="material-symbols:check-small-rounded" style="color: var(--ins-color); font-size: 2rem;"></iconify-icon>
+								<iconify-icon
+									icon="material-symbols:check-small-rounded"
+									style="color: var(--ins-color); font-size: 2rem;"
+								/>
 							{:else if match.result.myPoints < match.result.opponnentPoints}
-								<iconify-icon icon="ic:round-close" style="color: var(--del-color); font-size: 1.5rem; margin-left: 0.3rem;"></iconify-icon>
+								<iconify-icon
+									icon="ic:round-close"
+									style="color: var(--del-color); font-size: 1.5rem; margin-left: 0.3rem;"
+								/>
 							{:else}
-								<iconify-icon icon="ic:round-minus" style="color: var(--color); font-size: 1.5rem; margin-left: 0.3rem;"></iconify-icon>
+								<iconify-icon
+									icon="ic:round-minus"
+									style="color: var(--color); font-size: 1.5rem; margin-left: 0.3rem;"
+								/>
 							{/if}
 						</td>
 						<td>
-							<span style="white-space: nowrap;">{match.date.toDateString()}</span>
+							<span style="white-space: nowrap;"
+								>{match.date.toDateString()}</span
+							>
 						</td>
 					</tr>
 				{/each}
@@ -83,7 +98,7 @@
 	{#if matchShowed.length < matchHistory.length}
 		<div style="display: flex; justify-content: center;">
 			<button on:click={loadMore} class="secondary load-more-button">
-				<iconify-icon icon="ic:round-plus" style="font-size: 1rem;"></iconify-icon>
+				<iconify-icon icon="ic:round-plus" style="font-size: 1rem;" />
 			</button>
 		</div>
 	{/if}
@@ -93,7 +108,7 @@
 	figure {
 		margin-bottom: -0.5rem;
 		border-radius: 0 0 5px 5px;
-		background-color: #090D10;
+		background-color: #090d10;
 		padding: 0.5rem 1rem 0.5rem 0.5rem;
 	}
 
@@ -148,7 +163,7 @@
 		color: var(--h3-color);
 		padding-top: 0.2rem;
 		border-radius: 5px 5px 0 0;
-		background-color: #090D10;
+		background-color: #090d10;
 	}
 
 	@media (max-width: 576px) {

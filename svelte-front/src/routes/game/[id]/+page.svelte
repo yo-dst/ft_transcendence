@@ -11,10 +11,10 @@
 	let id = $page.params.id;
 	let roomExist: boolean = false;
 	let gameMode = 0;
-	let socket = io("localhost:3000/game", { query: { email: $user.email } });
+	let socket = io("localhost:3000/game");
 
 	// verify that room Exist
-	socket.emit("checkId", id);
+	socket.emit("checkId", id, $user?.email);
 
 	socket.on("found", (gamemode) => {
 		roomExist = true;

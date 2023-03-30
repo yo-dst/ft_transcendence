@@ -1,26 +1,28 @@
 import { Injectable } from "@nestjs/common";
-import { Socket } from "socket.io";
 import { ball, paddle, gameInfo } from "./pong";
 
 @Injectable()
 export class GameRoom {
 	public id: string;
-	public players: string[] = new Array(2);
+	public playersMap: Map<string, boolean> = new Map<string, boolean>();
+	public player: string[] = new Array(2);
 	public spectators: string[] = [];
 	public gameMode: number;
 	public score: number[] = [0, 0];
 	public ready: Boolean = true;
 	public nbPlayerRdy: number = 0;
+	public index: number = 0;
 	public ball: ball;
 	public paddle1: paddle;
 	public paddle2: paddle;
 	public gameInfo: gameInfo;
+	public intervalId: NodeJS.Timer;
 
 	constructor(id: string, gameMode: number, player1: string, player2: string) {
 		this.id = id;
 		this.gameMode = gameMode;
-		this.players[0] = player1;
-		this.players[1] = player2;
+		this.playersMap.set(player1, false);
+		this.playersMap.set(player2, false);
 	}
 
 	startGame(server) {
@@ -37,7 +39,7 @@ export class GameRoom {
 
 		// main loop that run every updateInterval (30 * per sec)
 		this.ball.reset([Math.random() < 0.5 ? 1 : -1, Math.random() < 0.5 ? 1 : -1])
-		const id = setInterval(() => {
+		this.intervalId = setInterval(() => {
 			if (this.ball.y - this.ball.radius <= 0 && this.ball.y_vel < 0) {
 				this.ball.y_vel *= -1;
 			} else if (this.ball.y + this.ball.radius >= this.gameInfo.height && this.ball.y_vel > 0) {
@@ -78,7 +80,7 @@ export class GameRoom {
 				}
 				if (this.score[0] >= 10 || this.score[1] >= 10) {
 					server.to(this.id).emit('endGame');
-					clearInterval(id);
+					clearInterval(this.intervalId);
 					return true;
 				}
 				//reset the ball
@@ -111,19 +113,11 @@ export class GameRoom {
 	}
 
 	isPlayer(client: string) {
-		return this.players.includes(client);
+		return this.playersMap.has(client);
 	}
 
 	isSpecator(client: string) {
 		return this.spectators.includes(client);
-	}
-
-	isPlayer1(client: string) {
-		return this.players[0] == client;
-	}
-
-	isPlayer2(client: string) {
-		return this.players[1] == client;
 	}
 
 }

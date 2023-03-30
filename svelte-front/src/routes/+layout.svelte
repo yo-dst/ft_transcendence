@@ -26,6 +26,7 @@
 			$user.profile = data.profile;
 			$user.socket = io("localhost:3000");
 		} else {
+			console.log("b4 goto login");
 			goto("/login");
 		}
 		
