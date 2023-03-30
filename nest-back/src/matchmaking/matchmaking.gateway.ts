@@ -41,6 +41,7 @@ export class MatchmakingGateway {
 	@SubscribeMessage('email')
 	setEmail(client: CustomSocket, email: string) {
 		client.email = email;
+		console.log(client.email);
 	}
 
 	// if 2 players in the array, match them and create a new room

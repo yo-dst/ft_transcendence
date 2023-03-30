@@ -1,11 +1,20 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
+	import { goto } from "$app/navigation";
 
 	let username: string;
 	let loginError: any;
 
 	function loginWithUsername() {
 		goto(`http://localhost:3000/auth/username?username=${username}`);
+	}
+
+	async function createFakeUser() {
+		await fetch("http://localhost:3000/users/fake", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
 	}
 </script>
 
@@ -18,7 +27,9 @@
 	Log In
 </a>
 
-<input bind:value={username}/>
+<button on:click={createFakeUser}>create fake user</button>
+
+<input bind:value={username} />
 <button on:click={loginWithUsername}>Login with username</button>
 {#if loginError}
 	<pre>{JSON.stringify(loginError, undefined, 2)}</pre>
