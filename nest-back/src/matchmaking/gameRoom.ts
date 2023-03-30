@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
 import { ball, paddle, gameInfo } from "./pong";
+import { Match } from "src/game/entity/match.entity";
+import { UsersService } from "src/users/users.service";
+import { GameService } from "src/game/game.service";
 
-@Injectable()
 export class GameRoom {
 	public id: string;
 	public playersMap: Map<string, boolean> = new Map<string, boolean>();
@@ -18,7 +19,7 @@ export class GameRoom {
 	public gameInfo: gameInfo;
 	public intervalId: NodeJS.Timer;
 
-	constructor(id: string, gameMode: number, player1: string, player2: string) {
+	constructor(private gameService: GameService, id: string, gameMode: number, player1: string, player2: string) {
 		this.id = id;
 		this.gameMode = gameMode;
 		this.playersMap.set(player1, false);
@@ -39,7 +40,7 @@ export class GameRoom {
 
 		// main loop that run every updateInterval (30 * per sec)
 		this.ball.reset([Math.random() < 0.5 ? 1 : -1, Math.random() < 0.5 ? 1 : -1])
-		this.intervalId = setInterval(() => {
+		this.intervalId = setInterval(async () => {
 			if (this.ball.y - this.ball.radius <= 0 && this.ball.y_vel < 0) {
 				this.ball.y_vel *= -1;
 			} else if (this.ball.y + this.ball.radius >= this.gameInfo.height && this.ball.y_vel > 0) {
@@ -79,6 +80,7 @@ export class GameRoom {
 					this.score[0]++;
 				}
 				if (this.score[0] >= 10 || this.score[1] >= 10) {
+					this.gameService.save(this.score, this.player);
 					server.to(this.id).emit('endGame');
 					clearInterval(this.intervalId);
 					return true;
