@@ -12,18 +12,18 @@ export class GameService {
 		private usersService: UsersService
 	) { }
 
-	async save(score: number[], player: string[]) {
+	async save(score: number[], player: number[]) {
 		const match = new Match();
 		match.scoreWinner = Math.max(...score);
 		match.scoreLoser = Math.min(...score);
-		match.winner = score[0] > score[1] ? await this.usersService.getByEmail(player[0]) : await this.usersService.getByEmail(player[1]);
-		match.loser = score[0] > score[1] ? await this.usersService.getByEmail(player[1]) : await this.usersService.getByEmail(player[0]);
+		match.winner = score[0] > score[1] ? await this.usersService.getById(player[0]) : await this.usersService.getById(player[1]);
+		match.loser = score[0] > score[1] ? await this.usersService.getById(player[1]) : await this.usersService.getById(player[0]);
 		console.log(match.winner);
 		console.log(match.loser);
 		this.matchRepository.save(match);
 	}
 
-	async findMatches(pageNumber: number, pageSize: number, userEmail: string) {
+	async findMatches(pageNumber: number, pageSize: number, userId: number) {
 		const matches = await this.matchRepository.find({
 			relations: {
 				winner: {
@@ -33,7 +33,7 @@ export class GameService {
 					profile: true
 				}
 			},
-			where: [{ winner: { email: userEmail } }, { loser: { email: userEmail } }],
+			where: [{ winner: { id: userId } }, { loser: { id: userId } }],
 			take: pageSize,
 			skip: pageNumber,
 			order: { id: "DESC" }

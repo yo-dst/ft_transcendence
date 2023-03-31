@@ -9,7 +9,7 @@ export class GameController {
 	) { }
 
 	@Get()
-	findmatchPage(@Query('startIndex') startIndex: number, @Query('pageSize') pageSize: number, @Query('email') email: string) {
-		return this.gameService.findMatches(startIndex, pageSize, email);
+	findmatchPage(@Query('startIndex') startIndex: number, @Query('pageSize') pageSize: number, @Query('id') id: number) {
+		return this.gameService.findMatches(startIndex, pageSize, id);
 	}
 }

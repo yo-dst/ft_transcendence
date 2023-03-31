@@ -5,8 +5,6 @@
 	import { user } from "$lib/stores/user";
 	import type { Match } from "$lib/types/match";
 
-	export let data: PageData;
-
 	let nbWin = 3;
 	let nbLose = 2;
 	let m: Match[] = [];
@@ -26,8 +24,8 @@
 			goto("/login");
 		}
 		let res = await fetch(
-			`http://localhost:3000/game?startIndex=${0}&pageSize=${5}&email=${
-				$user.email
+			`http://localhost:3000/game?startIndex=${0}&pageSize=${5}&id=${
+				$user.id
 			}`
 		);
 		let data = await res.json();
@@ -65,7 +63,7 @@
 						<td>
 							<div class="opponent-cell">
 								<span
-									>{match.winner.email != $user.email
+									>{match.winner.id != $user.id
 										? match.winner.profile.username
 										: match.loser.profile.username}</span
 								>
@@ -76,22 +74,22 @@
 								style="display: flex; flex-direction: column; min-width: 1.5em"
 							>
 								<span
-									>{match.winner.email == $user.email
+									>{match.winner.id == $user.id
 										? match.scoreWinner
 										: match.scoreLoser}</span
 								>
 								<span
-									>{match.winner.email != $user.email
+									>{match.winner.id != $user.id
 										? match.scoreWinner
 										: match.scoreLoser}</span
 								>
 							</div>
-							{#if (match.winner.email == $user.email ? match.scoreWinner : match.scoreLoser) > (match.winner.email != $user.email ? match.scoreWinner : match.scoreLoser)}
+							{#if (match.winner.id == $user.id ? match.scoreWinner : match.scoreLoser) > (match.winner.id != $user.id ? match.scoreWinner : match.scoreLoser)}
 								<iconify-icon
 									icon="material-symbols:check-small-rounded"
 									style="color: var(--ins-color); font-size: 2rem;"
 								/>
-							{:else if (match.winner.email == $user.email ? match.scoreWinner : match.scoreLoser) < (match.winner.email != $user.email ? match.scoreWinner : match.scoreLoser)}
+							{:else if (match.winner.id == $user.id ? match.scoreWinner : match.scoreLoser) < (match.winner.id != $user.id ? match.scoreWinner : match.scoreLoser)}
 								<iconify-icon
 									icon="ic:round-close"
 									style="color: var(--del-color); font-size: 1.5rem; margin-left: 0.3rem;"
