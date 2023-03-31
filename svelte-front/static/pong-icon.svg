@@ -57,7 +57,7 @@
       />
       <stop
           id="stop611"
-          style="stop-color:#000000;stop-opacity:.29839"
+          style="stop-color:#ffffffff;stop-opacity:.29839"
           offset="1"
       />
     </linearGradient
@@ -70,7 +70,8 @@
     >
     <rect
         id="rect621"
-        style="stroke:#000000;stroke-width:1pt;fill-rule:evenodd"
+		fill="#ffffffff"
+        style="stroke:#ffffffff;stroke-width:1pt;fill-rule:evenodd"
         rx="5.0896"
         height="203.59"
         width="50.896"
@@ -79,7 +80,8 @@
     />
     <rect
         id="rect622"
-        style="stroke:#000000;stroke-width:1pt;fill-rule:evenodd"
+		fill="#ffffffff"
+        style="stroke:#ffffffff;stroke-width:1pt;fill-rule:evenodd"
         rx="5.0896"
         height="203.59"
         width="50.896"
@@ -88,7 +90,8 @@
     />
     <rect
         id="rect623"
-        style="stroke:#000000;stroke-width:1pt;fill-rule:evenodd"
+		fill="#ffffffff"
+        style="stroke:#ffffffff;stroke-width:1pt;fill-rule:evenodd"
         rx="5.0896"
         height="50.896"
         width="50.896"
@@ -97,6 +100,7 @@
     />
     <rect
         id="rect628"
+		fill="#ffffffff"
         style="fill-rule:evenodd;stroke-width:1pt;fill:url(#linearGradient629);stroke-opacity:.5"
         height="50.896"
         width="215.8"
