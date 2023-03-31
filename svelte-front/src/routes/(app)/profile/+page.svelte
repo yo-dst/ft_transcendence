@@ -56,7 +56,7 @@
 <section>
 	<div class="table-match-history bg-light-dark">
 		<h3>Match history</h3>
-		<figure>
+		<figure style="overflow: hidden;">
 			<table>
 				<thead>
 					<tr>
@@ -161,9 +161,6 @@
 
 	thead {
 		border: none;
-	}
-
-	.opponent-cell {
 	}
 
 	.result-cell {
