@@ -46,7 +46,7 @@
 	</nav>
 	<div>
 		<button class="ring-wrapper" on:click={() => showNotif = !showNotif}>
-			<iconify-icon icon="mdi:bell-ring" style="font-size: 40px; color: #f0f6fc;"></iconify-icon>
+			<iconify-icon icon="mdi:bell-ring" style="font-size: 45px; color: #f0f6fc;"></iconify-icon>
 			<span class="ring-notif">{numberNotif}</span>
 		</button>
 	{#if $user.isLoggedIn}
@@ -56,7 +56,7 @@
 			on:keypress
 			class="img-avatar"/>
 	{:else}
-		<iconify-icon icon="mdi:user" style="font-size: 45px; color: #f0f6fc;"></iconify-icon>
+		<iconify-icon icon="mdi:user" style="font-size: 50px; color: #f0f6fc;"></iconify-icon>
 	{/if}
 	</div>
 </div>
@@ -80,7 +80,7 @@
 	}
 
 	.pong-icon {
-        height: 40px;
+        height: 45px;
         width: auto;
 		cursor: pointer;
     }
@@ -125,8 +125,8 @@
 
 	.img-avatar {
 		cursor: pointer;
-		height: 40px;
-		width: 40px;
+		height: 45px;
+		width: 45px;
 		border-radius: 50%;
 		object-fit: cover;
 		aspect-ratio: 1/1;
