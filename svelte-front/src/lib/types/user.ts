@@ -9,6 +9,7 @@ const State = {
 
 export type UserType = {
 	isLoggedIn: boolean,
+	isTwoFactorAuthenticationEnabled: boolean,
 	profile?: Profile,
 	socket?: Socket,
 	state?: number,

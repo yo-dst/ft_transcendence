@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 import Avatar from "./avatar.entity";
 import FriendRequest from "../friend-requests/entities/friend-request.entity";
 import { Profile } from "./profile.entity";
-import { Match } from "../../game/entity/match.entity";
+import { Match } from "../../game/entities/match.entity";
 
 @Entity()
 class User {

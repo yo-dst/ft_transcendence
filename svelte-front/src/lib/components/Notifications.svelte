@@ -1,5 +1,11 @@
 <script lang="ts">
+    import type { FriendRequest } from "$lib/types/friend-request";
+    import type { GameInvation } from "$lib/types/game-invitation";
+
 	export let show: boolean;
+	export let top: number;
+
+	// let notif: (FriendRequest | GameInvation)[];
 
 	let notifications = [
 		{
@@ -14,46 +20,43 @@
 </script>
 
 {#if show}
-	<ul>
-		{#each notifications as notif}
+	<div class="notifications-container" style="--top:{top}px">
+		<ul>
+		{#each notifications as notification}
 			<li>
-				<div>
-					{notif.type}
-					{notif.user}
-				</div>
-				<div class="button-wrapper">
-					<button class="accept-button">
-						<iconify-icon icon="fluent-mdl2:accept-medium"></iconify-icon>
-					</button>
-					<button class="decline-button">
-						<iconify-icon icon="radix-icons:cross-2"></iconify-icon>
-					</button>
-				</div>
+				<pre>{JSON.stringify(notification, undefined, 2)}</pre>
 			</li>
 		{/each}
-	</ul>
+		</ul>
+	</div>
 {/if}
 
+<!-- <div class="button-wrapper">
+	<button class="accept-button">
+		<iconify-icon icon="fluent-mdl2:accept-medium"></iconify-icon>
+	</button>
+	<button class="decline-button">
+		<iconify-icon icon="radix-icons:cross-2"></iconify-icon>
+	</button>
+</div> -->
+
 <style>
-	ul {
+	.notifications-container {
 		position: absolute;
-		top: 50px;
-		right: 0;
-		background-color: #090D10;
-		width: 200px;
-		padding: 0;
-		margin: 0;
+		top: var(--top);
+		right: 5px;
+		background-color: #161b22;
+		box-shadow: -5px 5px 5px #0d1117;
 	}
 
-	li {
-		padding: 1rem;
+	ul {
 		margin: 0;
-		border-left: 0.05rem solid var(--contrast);
-		list-style-type: none;
-		border-bottom: 0.05rem solid var(--contrast);
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
+		padding: 0;
+	}
+
+	ul li {
+		list-style: none;
+		margin-bottom: 0.5rem;
 	}
 
 	button {

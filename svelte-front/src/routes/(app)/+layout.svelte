@@ -2,11 +2,17 @@
 	import "@picocss/pico";
 	import "../../app.css";
 	import 'iconify-icon';
-	import Navbar from "$lib/components/Navbar.svelte";
+	import NavbarMobile from "$lib/components/NavbarMobile.svelte";
+    import Navbar from "$lib/components/Navbar.svelte";
 </script>
 
 <header>
-	<Navbar/>
+	<div class="navbar-mobile">
+		<NavbarMobile/>
+	</div>
+	<div class="navbar">
+		<Navbar/>
+	</div>
 </header>
 <main class="container">
 	<slot/>
@@ -24,6 +30,15 @@
 
 	main {
 		margin-bottom: 100px;
+		max-width: 500px;
+	}
+
+	.navbar-mobile {
+		display: none;
+	}
+
+	.navbar {
+		display: block;
 	}
 
 	footer {
@@ -32,10 +47,20 @@
 		left: 0;
 		bottom: 0;
 		width: 100%;
-		background-color: #090D10;
+		background-color: #161b22;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		color: var(--color);
+	}
+
+	@media (max-width: 700px) {
+		.navbar-mobile {
+			display: block;
+		}
+
+		.navbar {
+			display: none;
+		}
 	}
 </style>
