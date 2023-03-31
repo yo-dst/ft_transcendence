@@ -37,12 +37,12 @@
 	on:clickAway={() => setShow(false)}
 >
 	<div class="drawer-container">
-		{#if $user.isLoggedIn}
-			<div class="profile-wrapper">
-				<img src={$user.profile?.avatar?.url} alt="avatar" />
-				<span class="safe-words">{$user.profile?.username}</span>
-			</div>
-		{/if}
+	{#if $user.isLoggedIn}
+		<div class="profile-wrapper">
+			<img src={$user.profile?.avatar?.url} alt="avatar" />
+			<span class="safe-words">{$user.profile?.username}</span>
+		</div>
+	{/if}
 		<div class="nav-wrapper">
 			<nav>
 				<ul>
@@ -80,14 +80,14 @@
 							Parameters
 						</a>
 					</li>
-					{#if $user.isLoggedIn}
-						<li>
-							<a href="/" role="button" on:click={logout} class="contrast outline">
-								<iconify-icon icon="material-symbols:logout" />
-								Log Out
-							</a>
-						</li>
-					{/if}
+				{#if $user.isLoggedIn}
+					<li>
+						<a href="/" role="button" on:click={logout} class="contrast outline">
+							<iconify-icon icon="material-symbols:logout" />
+							Log out
+						</a>
+					</li>
+				{/if}
 				</ul>
 			</nav>
 		</div>
@@ -123,6 +123,12 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
+		cursor: pointer;
+	}
+
+	.drawer-container a:hover iconify-icon {
+		transform: translateX(0.15rem);
+		transition: all 0.2s;
 	}
 
     img {

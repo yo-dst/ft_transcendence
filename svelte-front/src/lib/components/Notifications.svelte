@@ -3,6 +3,7 @@
     import type { GameInvation } from "$lib/types/game-invitation";
 
 	export let show: boolean;
+	export let top: number;
 
 	// let notif: (FriendRequest | GameInvation)[];
 
@@ -19,7 +20,7 @@
 </script>
 
 {#if show}
-	<div class="notifications-container">
+	<div class="notifications-container" style="--top:{top}px">
 		<ul>
 		{#each notifications as notification}
 			<li>
@@ -41,11 +42,10 @@
 
 <style>
 	.notifications-container {
-		/* border: 1px solid white; */
-		background-color: #161b22;
 		position: absolute;
-		top: 55px;
+		top: var(--top);
 		right: 5px;
+		background-color: #161b22;
 		box-shadow: -5px 5px 5px #0d1117;
 	}
 

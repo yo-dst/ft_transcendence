@@ -25,6 +25,8 @@
 	onMount(async () => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
+		} else {
+			
 		}
 	});
 </script>

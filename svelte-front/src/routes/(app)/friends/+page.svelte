@@ -158,36 +158,36 @@
 			<iconify-icon icon="fluent-mdl2:add-friend" style="font-size: 1.5rem"/>
 		</button>
 	</div>
-	{#if addFriendData.error}
-		<pre>{JSON.stringify(addFriendData.error, undefined, 2)}</pre>
-	{/if}
+{#if addFriendData.error}
+	<pre>{JSON.stringify(addFriendData.error, undefined, 2)}</pre>
+{/if}
 </section>
 
 <section>
 	<div class="list-container bg-light-dark">
 		<h3>Friends</h3>
 		<div class="center-container">
-		{#if friendsData.loading}
-			<Loading/>
-		{:else if friendsData.error}
-			<pre>{JSON.stringify(friendsData.error, undefined, 2)}</pre>
-		{:else if friendsData.friends}
-			<ul>
-			{#each friendsData.friends as friend}
-				<li class="li-friend">
-					<div>
-						<img src={friend.avatar.url} alt="friend"/>
-						<span>{friend.username}</span>
-					</div>
-					<div>
-						<button on:click={() => removeFriend(friend.username)} style="background-color: var(--del-color);">
-							<iconify-icon icon="charm:cross" style="font-size: 1.7rem;"/>
-						</button>
-					</div>
-				</li>
-			{/each}
-			</ul>
-		{/if}
+	{#if friendsData.loading}
+		<Loading/>
+	{:else if friendsData.error}
+		<pre>{JSON.stringify(friendsData.error, undefined, 2)}</pre>
+	{:else if friendsData.friends}
+		<ul>
+		{#each friendsData.friends as friend}
+			<li class="li-friend">
+				<div>
+					<img src={friend.avatar.url} alt="friend"/>
+					<span>{friend.username}</span>
+				</div>
+				<div>
+					<button on:click={() => removeFriend(friend.username)} style="background-color: var(--del-color);">
+						<iconify-icon icon="charm:cross" style="font-size: 1.7rem;"/>
+					</button>
+				</div>
+			</li>
+		{/each}
+		</ul>
+	{/if}
 		</div>
 	</div>
 </section>
@@ -196,27 +196,27 @@
 	<div class="list-container bg-light-dark">
 		<h3>Friend requests received</h3>
 		<div class="center-container">
-			{#if friendRequestsData.loading}
-				<Loading/>
-			{:else if friendRequestsData.error}
-				<pre>{JSON.stringify(friendRequestsData.error, undefined, 2)}</pre>
-			{:else if friendRequestsData.friendRequests}
-				<ul>
-				{#each friendRequestsData.friendRequests as friendRequest}
-					<li>
-						<div>
-							<img src={friendRequest.creator.avatar.url} alt="friend-request-creator"/>
-							<span>{friendRequest.creator.username}</span>
-							<!-- <pre>{JSON.stringify(friendRequest, undefined, 2)}</pre> -->
-						</div>
-						<div>
-							<button on:click={() => acceptFriendRequest(friendRequest)}>accept</button>
-							<button on:click={() => declineFriendRequest(friendRequest)}>decline</button>
-						</div>
-					</li>
-				{/each}
-				</ul>
-			{/if}
+	{#if friendRequestsData.loading}
+		<Loading/>
+	{:else if friendRequestsData.error}
+		<pre>{JSON.stringify(friendRequestsData.error, undefined, 2)}</pre>
+	{:else if friendRequestsData.friendRequests}
+		<ul>
+		{#each friendRequestsData.friendRequests as friendRequest}
+			<li>
+				<div>
+					<img src={friendRequest.creator.avatar.url} alt="friend-request-creator"/>
+					<span>{friendRequest.creator.username}</span>
+					<!-- <pre>{JSON.stringify(friendRequest, undefined, 2)}</pre> -->
+				</div>
+				<div>
+					<button on:click={() => acceptFriendRequest(friendRequest)}>accept</button>
+					<button on:click={() => declineFriendRequest(friendRequest)}>decline</button>
+				</div>
+			</li>
+		{/each}
+		</ul>
+	{/if}
 		</div>
 	</div>
 </section>

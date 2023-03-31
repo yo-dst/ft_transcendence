@@ -56,12 +56,11 @@ html {
 .input-button-container {
   display: flex;
   gap: 1rem;
-  max-width: 450px;
+  width: 100%;
   margin-bottom: 1.5rem;
 }
 
 .input-button-container > input {
-  width: 80%;
   height: 3rem;
 }
 
@@ -88,6 +87,10 @@ html {
 
 .safe-words {
   word-break: break-all;
+}
+
+a:focus {
+  background-color: transparent;
 }
 
 

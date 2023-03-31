@@ -1,87 +1,113 @@
 <script lang="ts">
-    import Drawer from "./Drawer.svelte";
     import Notifications from "./Notifications.svelte";
+	import { user } from "$lib/stores/user";
+    import { goto } from "$app/navigation";
+	import { page } from "$app/stores";
 
-    let showDrawer = false;
-    function setShowDrawer(val: boolean) {
-        showDrawer = val;
-    }
-
-    let showNotif = false;
-    let userLoggedIn = false;
+	let showNotif = false;
     let numberNotif = 2;
+
+	const links = [
+		{
+			name: "Play",
+			path: "/"
+		},
+		{
+			name: "Channels",
+			path: "/channels"
+		},
+		{
+			name: "Profile",
+			path: "/profile"
+		},
+		{
+			name: "Friends",
+			path: "/friends"
+		}
+	];
 </script>
 
 <div class="header">
-    <button class="hamburger-button" on:click={() => setShowDrawer(true)}>
-        <iconify-icon icon="charm:menu-hamburger" style="font-size: 50px; color: #f0f6fc;"></iconify-icon>
-    </button>
-    <a href="/">
-        <img src="pong-icon.svg" alt="icon pong" class="pong-icon"/>
-    </a>
-    <div class="header-profile">
-    {#if userLoggedIn}
-        <img src="https://picsum.photos/200" alt="profile" class="header-profile-img"/>
-    {:else}
-        <!-- <iconify-icon icon="mdi:user" style="font-size: 50px; color: var(--contrast);"></iconify-icon> -->
-        <button class="ring-wrapper" on:click={() => showNotif = !showNotif}>
-            <iconify-icon icon="mdi:bell-ring" style="font-size: 40px; color: #f0f6fc;"></iconify-icon>
-            <span class="ring-notif">{numberNotif}</span>
-        </button>
-    {/if}
-    </div>
+    <img src="pong-icon.svg" 
+		alt="icon pong"
+		on:click={() => goto("/")}
+		on:keypress
+		class="pong-icon"/>
+	<nav>
+		<ul>
+		{#each links as link}
+			<li>
+				<a href={link.path} class:active={$page.url.pathname === link.path}>
+					{link.name}
+				</a>
+			</li>
+		{/each}
+		</ul>
+	</nav>
+	<div>
+		<button class="ring-wrapper" on:click={() => showNotif = !showNotif}>
+			<iconify-icon icon="mdi:bell-ring" style="font-size: 40px; color: #f0f6fc;"></iconify-icon>
+			<span class="ring-notif">{numberNotif}</span>
+		</button>
+	{#if $user.isLoggedIn}
+		<img src={$user.profile?.avatar?.url}
+			alt="avatar"
+			on:click={() => goto("/parameters")}
+			on:keypress
+			class="img-avatar"/>
+	{:else}
+		<iconify-icon icon="mdi:user" style="font-size: 45px; color: #f0f6fc;"></iconify-icon>
+	{/if}
+	</div>
 </div>
-<Drawer show={showDrawer} setShow={setShowDrawer}/>
-<Notifications show={showNotif}/>
+<Notifications show={showNotif} top={70}/>
 
 <style>
-    button:focus {
-        --primary-focus: transparent;
-    }
+	.header {
+		background-color: #161b22;
+		height: 65px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		padding: 0 2rem;
+	}
 
-    .header {
-        background-color: #161b22;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 50px;
-        padding: 0 0.3rem;
-    }
+	.header > :last-child {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+	}
 
-    .pong-icon {
-        height: 30px;
+	.pong-icon {
+        height: 40px;
         width: auto;
+		cursor: pointer;
     }
 
-    .hamburger-button {
-        background-color: transparent;
-        width: 45px;
-        height: 45px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 0;
-        border: none;
-    }
+	nav ul li a {
+		color: #f0f6fc;
+	}
 
-    .header-profile {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+	.active {
+		text-decoration: underline;
+		text-underline-offset: 0.3rem;
+	}
 
-    .header-profile-img {
-        height: 45px;
-        width: auto;
-        border-radius: 50%;
-    }
+	nav ul li a:hover {
+		transform: scale(1.1);
+	}
 
-    .ring-wrapper {
+	.ring-wrapper {
+		display: flex;
+		align-items: center;
+		justify-content: center;
         position: relative;
         background-color: transparent;
         border: none;
         margin-bottom: 0;
         padding: 0;
+		--primary-focus: transparent;
     }
 
     .ring-notif {
@@ -96,4 +122,13 @@
         right: -1px;
         top: 3px;
     }
+
+	.img-avatar {
+		cursor: pointer;
+		height: 40px;
+		width: 40px;
+		border-radius: 50%;
+		object-fit: cover;
+		aspect-ratio: 1/1;
+	}
 </style>
