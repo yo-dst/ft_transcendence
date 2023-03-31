@@ -1,35 +1,38 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
-	import type { PageData } from "./$types";
 	import { user } from "$lib/stores/user";
 	import type { Match } from "$lib/types/match";
 
-	let nbWin = 3;
-	let nbLose = 2;
-	let m: Match[] = [];
+	let nbWin = 0;
+	let nbLose = 0;
+	let index = 0;
+	let matches: Match[] = [];
 
-	// function loadMore() {
-	// 	if (matchShowed.length < matchHistory.length) {
-	// 		const matchAdded = matchHistory.slice(
-	// 			matchShowed.length,
-	// 			matchShowed.length + 5
-	// 		);
-	// 		matchShowed = [...matchShowed, ...matchAdded];
-	// 	}
-	// }
+	function getStat(matches: Match[]) {
+		matches.forEach((match) => {
+			if (match.winner.id === $user.id) nbWin++;
+			else nbLose++;
+		});
+	}
+
+	async function loadMore() {
+		let res = await fetch(
+			`http://localhost:3000/game?startIndex=${index}&pageSize=${5}&id=${
+				$user.id
+			}`
+		);
+		index += 5;
+		let data = await res.json();
+		matches = [...matches, ...data];
+		getStat(matches);
+	}
 
 	onMount(async () => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		}
-		let res = await fetch(
-			`http://localhost:3000/game?startIndex=${0}&pageSize=${5}&id=${
-				$user.id
-			}`
-		);
-		let data = await res.json();
-		m = data;
+		loadMore();
 	});
 </script>
 
@@ -58,7 +61,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each m as match}
+				{#each matches as match}
 					<tr>
 						<td>
 							<div class="opponent-cell">
@@ -115,13 +118,13 @@
 			</tbody>
 		</table>
 	</figure>
-	<!-- {#if matchShowed.length < matchHistory.length}
+	{#if index === matches.length}
 		<div style="display: flex; justify-content: center;">
 			<button on:click={loadMore} class="secondary load-more-button">
 				<iconify-icon icon="ic:round-plus" style="font-size: 1rem;" />
 			</button>
 		</div>
-	{/if} -->
+	{/if}
 </section>
 
 <style>
