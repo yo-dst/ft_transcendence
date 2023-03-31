@@ -1,42 +1,48 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
-    import { onMount } from 'svelte';
-	import type { PageData } from './$types';
-	import { user } from '$lib/stores/user';
+	import { goto } from "$app/navigation";
+	import { onMount } from "svelte";
+	import type { PageData } from "./$types";
+	import { user } from "$lib/stores/user";
+	import type { Match } from "$lib/types/match";
 
 	export let data: PageData;
 
-	const matchHistory = data.matchHistory;
 	let nbWin = 3;
 	let nbLose = 2;
-	let nbTie = 1;
-	let matchShowed = matchHistory.slice(0, 5);
+	let m: Match[] = [];
 
-	function loadMore() {
-		if (matchShowed.length < matchHistory.length) {
-			const matchAdded = matchHistory.slice(
-				matchShowed.length,
-				matchShowed.length + 5
-			);
-			matchShowed = [...matchShowed, ...matchAdded];
-		}
-	}
+	// function loadMore() {
+	// 	if (matchShowed.length < matchHistory.length) {
+	// 		const matchAdded = matchHistory.slice(
+	// 			matchShowed.length,
+	// 			matchShowed.length + 5
+	// 		);
+	// 		matchShowed = [...matchShowed, ...matchAdded];
+	// 	}
+	// }
 
 	onMount(async () => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		}
+		let res = await fetch(
+			`http://localhost:3000/game?startIndex=${0}&pageSize=${5}&email=${
+				$user.email
+			}`
+		);
+		let data = await res.json();
+		m = data;
 	});
 </script>
 
 <section class="first-section">
-	<img src={$user.profile?.avatar?.url} alt="profile" class="user-img"/>
+	<img src={$user.profile?.avatar?.url} alt="profile" class="user-img" />
 	<div class="first-section-stats">
 		<span>{$user.profile?.username}</span>
 		<div>
 			<span style="color: var(--ins-color);;">{nbWin}</span>
 			/
-			<span style="color: var(--color);">{nbTie}</span>
+			<span style="color: var(--color);">0</span>
 			/
 			<span style="color: var(--del-color);;">{nbLose}</span>
 		</div>
@@ -54,26 +60,38 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each matchShowed as match (match.id)}
+				{#each m as match}
 					<tr>
 						<td>
 							<div class="opponent-cell">
-								<span>{match.opponent}</span>
+								<span
+									>{match.winner.email != $user.email
+										? match.winner.profile.username
+										: match.loser.profile.username}</span
+								>
 							</div>
 						</td>
 						<td class="result-cell">
 							<div
 								style="display: flex; flex-direction: column; min-width: 1.5em"
 							>
-								<span>{match.result.myPoints}</span>
-								<span>{match.result.opponnentPoints}</span>
+								<span
+									>{match.winner.email == $user.email
+										? match.scoreWinner
+										: match.scoreLoser}</span
+								>
+								<span
+									>{match.winner.email != $user.email
+										? match.scoreWinner
+										: match.scoreLoser}</span
+								>
 							</div>
-							{#if match.result.myPoints > match.result.opponnentPoints}
+							{#if (match.winner.email == $user.email ? match.scoreWinner : match.scoreLoser) > (match.winner.email != $user.email ? match.scoreWinner : match.scoreLoser)}
 								<iconify-icon
 									icon="material-symbols:check-small-rounded"
 									style="color: var(--ins-color); font-size: 2rem;"
 								/>
-							{:else if match.result.myPoints < match.result.opponnentPoints}
+							{:else if (match.winner.email == $user.email ? match.scoreWinner : match.scoreLoser) < (match.winner.email != $user.email ? match.scoreWinner : match.scoreLoser)}
 								<iconify-icon
 									icon="ic:round-close"
 									style="color: var(--del-color); font-size: 1.5rem; margin-left: 0.3rem;"
@@ -87,21 +105,25 @@
 						</td>
 						<td>
 							<span style="white-space: nowrap;"
-								>{match.date.toDateString()}</span
-							>
+								>{new Date(match.createdAt).toDateString()}
+								{new Date(
+									new Date(match.createdAt).getTime() +
+										7200000
+								).toLocaleTimeString("fr-MC")}
+							</span>
 						</td>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
 	</figure>
-	{#if matchShowed.length < matchHistory.length}
+	<!-- {#if matchShowed.length < matchHistory.length}
 		<div style="display: flex; justify-content: center;">
 			<button on:click={loadMore} class="secondary load-more-button">
 				<iconify-icon icon="ic:round-plus" style="font-size: 1rem;" />
 			</button>
 		</div>
-	{/if}
+	{/if} -->
 </section>
 
 <style>

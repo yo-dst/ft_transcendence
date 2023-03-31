@@ -87,7 +87,6 @@ export class GameGateway {
 	up(client: CustomSocket, y: number) {
 		const room = gameRooms.find((room) => (room.id === client.roomId));
 		if (client.isPlayer && room.gameInfo != undefined) {
-			console.log(client.email, room.player[0])
 			if (client.email === room.player[0]) {
 				//check player index to determine which player should move
 				room.paddle1.dir = 1;

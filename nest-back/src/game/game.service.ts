@@ -18,11 +18,21 @@ export class GameService {
 		match.scoreLoser = Math.min(...score);
 		match.winner = score[0] > score[1] ? await this.usersService.getByEmail(player[0]) : await this.usersService.getByEmail(player[1]);
 		match.loser = score[0] > score[1] ? await this.usersService.getByEmail(player[1]) : await this.usersService.getByEmail(player[0]);
+		console.log(match.winner);
+		console.log(match.loser);
 		this.matchRepository.save(match);
 	}
 
 	async findMatches(pageNumber: number, pageSize: number, userEmail: string) {
-		const matches = await this.matchRepository.findAndCount({
+		const matches = await this.matchRepository.find({
+			relations: {
+				winner: {
+					profile: true
+				},
+				loser: {
+					profile: true
+				}
+			},
 			where: [{ winner: { email: userEmail } }, { loser: { email: userEmail } }],
 			take: pageSize,
 			skip: pageNumber,
