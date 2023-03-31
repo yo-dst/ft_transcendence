@@ -13,21 +13,20 @@ export class GameGateway {
 
 	@SubscribeMessage('connection')
 	handleConnection(@ConnectedSocket() client: CustomSocket) {
-		client.email = client.handshake.query.email as string;
 
 		client.on('disconnect', () => {
 			const room = gameRooms.find((room) => (room.id === client.roomId));
 			if (room) {
 				if (client.isPlayer) {
-					room.playersMap.set(client.email, true);
+					room.playersMap.set(client.userId, true);
 					client.leave(client.roomId);
 					setTimeout(() => {
-						if (room.playersMap.get(client.email)) {
+						if (room.playersMap.get(client.userId)) {
 							this.server.to(client.roomId).emit('decoTimer');
 							setTimeout(() => {
-								if (room.playersMap.get(client.email)) {
+								if (room.playersMap.get(client.userId)) {
 									const index = gameRooms.findIndex((room) => room.id === client.roomId);
-									if (room.playersMap.get(client.email)) {
+									if (room.playersMap.get(client.userId)) {
 										this.server.to(client.roomId).emit('deco');
 										this.gameService.save(room.score, room.player);
 										clearInterval(room.intervalId);
@@ -44,19 +43,19 @@ export class GameGateway {
 
 	// verify if the room with id exist
 	@SubscribeMessage('checkId')
-	roomExist(client: CustomSocket, info: string) {
+	roomExist(client: CustomSocket, info: number) {
 		const room = gameRooms.find((room) => (room.id === info[0]));
 		if (room) {
 			client.emit("found", room.gameMode);
 			client.join(info[0]);
 			client.roomId = info[0];
 			client.isPlayer = room.isPlayer(info[1]);
-			client.email = info[1];
-			if (!room.playersMap.get(client.email)) {
-				room.player[room.index++] = client.email;
+			client.userId = info[1];
+			if (!room.playersMap.get(client.userId)) {
+				room.player[room.index++] = client.userId;
 			}
 			else
-				room.playersMap.set(client.email, false);
+				room.playersMap.set(client.userId, false);
 			client.isSpectator = room.isSpecator(info[1]);
 		}
 	}
@@ -64,7 +63,7 @@ export class GameGateway {
 	@SubscribeMessage('ready')
 	checkReady(client: CustomSocket) {
 		const room = gameRooms.find((room) => (room.id === client.roomId));
-		if (client.isPlayer && !room.playersMap.get(client.email)) {
+		if (client.isPlayer && !room.playersMap.get(client.userId)) {
 			client.playerIndex = room.nbPlayerRdy++;
 			if (room.nbPlayerRdy == 2) {
 				room.nbPlayerRdy = 0;
@@ -87,13 +86,12 @@ export class GameGateway {
 	up(client: CustomSocket, y: number) {
 		const room = gameRooms.find((room) => (room.id === client.roomId));
 		if (client.isPlayer && room.gameInfo != undefined) {
-			console.log(client.email, room.player[0])
-			if (client.email === room.player[0]) {
+			if (client.userId === room.player[0]) {
 				//check player index to determine which player should move
 				room.paddle1.dir = 1;
 				this.server.to(client.roomId).emit('playerMove', [y[0] = 1, y[1]]);
 			}
-			else if (client.email == room.player[1]) {
+			else if (client.userId == room.player[1]) {
 				room.paddle2.dir = 1;
 				this.server.to(client.roomId).emit('playerMove', [y[0], y[1] = 1]);
 			}
@@ -105,11 +103,11 @@ export class GameGateway {
 		const room = gameRooms.find((room) => (room.id === client.roomId));
 		if (client.isPlayer === true && room.gameInfo != undefined) {
 			//check player index to determine which player should move
-			if (client.email === room.player[0]) {
+			if (client.userId === room.player[0]) {
 				room.paddle1.dir = 2;
 				this.server.to(client.roomId).emit('playerMove', [y[0] = 2, y[1]]);
 			}
-			else if (client.email === room.player[1]) {
+			else if (client.userId === room.player[1]) {
 				room.paddle2.dir = 2;
 				this.server.to(client.roomId).emit('playerMove', [y[0], y[1] = 2]);
 			}
@@ -120,8 +118,8 @@ export class GameGateway {
 	HandleKeyDown(client: CustomSocket) {
 		const room = gameRooms.find((room) => (room.id === client.roomId));
 		if (client.isPlayer === true && room.gameInfo != undefined) {
-			if (client.email === room.player[0]) room.paddle1.dir = 0;
-			else if (client.email === room.player[1]) room.paddle2.dir = 0;
+			if (client.userId === room.player[0]) room.paddle1.dir = 0;
+			else if (client.userId === room.player[1]) room.paddle2.dir = 0;
 			this.server.to(client.roomId).emit('Down', [{ x: room.paddle1.x, y: room.paddle1.y, dir: room.paddle1.dir }, { x: room.paddle2.x, y: room.paddle2.y, dir: room.paddle2.dir }]);
 		}
 	}

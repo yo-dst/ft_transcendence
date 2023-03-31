@@ -14,7 +14,7 @@
 	let socket = io("localhost:3000/game");
 
 	// verify that room Exist
-	socket.emit("checkId", id, $user?.email);
+	socket.emit("checkId", id, $user?.id);
 
 	socket.on("found", (gamemode) => {
 		roomExist = true;

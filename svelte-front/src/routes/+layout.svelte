@@ -24,7 +24,7 @@
 		if (res.ok) {
 			$user.isLoggedIn = true;
 			$user.profile = data.profile;
-			$user.email = data.email;
+			$user.id = data.id;
 			$user.socket = io("localhost:3000");
 		} else {
 			console.log("b4 goto login");

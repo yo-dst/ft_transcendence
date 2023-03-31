@@ -22,7 +22,7 @@
 		if (!$user) {
 			goto("/login");
 		} else {
-			socket.emit("email", $user.email);
+			socket.emit("id", $user.id);
 			socket.on("matched", (id) => {
 				goto("/game/" + id);
 			});

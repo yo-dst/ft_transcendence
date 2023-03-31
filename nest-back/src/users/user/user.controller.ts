@@ -11,7 +11,6 @@ export class UserController {
 	constructor(
 		private usersService: UsersService
 	) { }
-	a
 	// returns what must be returned of user for frontend
 	@Get()
 	@UseGuards(JwtTwoFactorAuthGuard)
@@ -19,7 +18,7 @@ export class UserController {
 		const profile = await this.usersService.getProfile(req.user.id);
 		return {
 			profile,
-			email: req.user.email
+			id: req.user.id
 		}
 	}
 

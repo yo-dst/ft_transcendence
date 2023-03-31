@@ -13,5 +13,5 @@ export type UserType = {
 	profile?: Profile,
 	socket?: Socket,
 	state?: number,
-	email?: string
+	id?: number
 }

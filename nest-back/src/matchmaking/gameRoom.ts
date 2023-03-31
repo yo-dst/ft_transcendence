@@ -5,9 +5,9 @@ import { GameService } from "src/game/game.service";
 
 export class GameRoom {
 	public id: string;
-	public playersMap: Map<string, boolean> = new Map<string, boolean>();
-	public player: string[] = new Array(2);
-	public spectators: string[] = [];
+	public playersMap: Map<number, boolean> = new Map<number, boolean>();
+	public player: number[] = new Array(2);
+	public spectators: number[] = [];
 	public gameMode: number;
 	public score: number[] = [0, 0];
 	public ready: Boolean = true;
@@ -19,7 +19,7 @@ export class GameRoom {
 	public gameInfo: gameInfo;
 	public intervalId: NodeJS.Timer;
 
-	constructor(private gameService: GameService, id: string, gameMode: number, player1: string, player2: string) {
+	constructor(private gameService: GameService, id: string, gameMode: number, player1: number, player2: number) {
 		this.id = id;
 		this.gameMode = gameMode;
 		this.playersMap.set(player1, false);
@@ -114,11 +114,11 @@ export class GameRoom {
 		return false;
 	}
 
-	isPlayer(client: string) {
+	isPlayer(client: number) {
 		return this.playersMap.has(client);
 	}
 
-	isSpecator(client: string) {
+	isSpecator(client: number) {
 		return this.spectators.includes(client);
 	}
 
