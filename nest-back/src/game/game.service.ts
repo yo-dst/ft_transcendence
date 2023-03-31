@@ -18,8 +18,6 @@ export class GameService {
 		match.scoreLoser = Math.min(...score);
 		match.winner = score[0] > score[1] ? await this.usersService.getById(player[0]) : await this.usersService.getById(player[1]);
 		match.loser = score[0] > score[1] ? await this.usersService.getById(player[1]) : await this.usersService.getById(player[0]);
-		console.log(match.winner);
-		console.log(match.loser);
 		this.matchRepository.save(match);
 	}
 
@@ -40,5 +38,4 @@ export class GameService {
 		})
 		return matches;
 	}
-
 }

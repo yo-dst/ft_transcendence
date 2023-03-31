@@ -11,7 +11,7 @@
 
 	function getStat(matches: Match[]) {
 		matches.forEach((match) => {
-			if (match.winner.id === $user.id) nbWin++;
+			if (match.result === "win") nbWin++;
 			else nbLose++;
 		});
 	}
@@ -65,34 +65,22 @@
 					<tr>
 						<td>
 							<div class="opponent-cell">
-								<span
-									>{match.winner.id != $user.id
-										? match.winner.profile.username
-										: match.loser.profile.username}</span
-								>
+								<span>{match.opponentUsername}</span>
 							</div>
 						</td>
 						<td class="result-cell">
 							<div
 								style="display: flex; flex-direction: column; min-width: 1.5em"
 							>
-								<span
-									>{match.winner.id == $user.id
-										? match.scoreWinner
-										: match.scoreLoser}</span
-								>
-								<span
-									>{match.winner.id != $user.id
-										? match.scoreWinner
-										: match.scoreLoser}</span
-								>
+								<span>{match.userScore}</span>
+								<span>{match.opponentScore}</span>
 							</div>
-							{#if (match.winner.id == $user.id ? match.scoreWinner : match.scoreLoser) > (match.winner.id != $user.id ? match.scoreWinner : match.scoreLoser)}
+							{#if match.userScore > match.opponentScore}
 								<iconify-icon
 									icon="material-symbols:check-small-rounded"
 									style="color: var(--ins-color); font-size: 2rem;"
 								/>
-							{:else if (match.winner.id == $user.id ? match.scoreWinner : match.scoreLoser) < (match.winner.id != $user.id ? match.scoreWinner : match.scoreLoser)}
+							{:else if match.userScore < match.opponentScore}
 								<iconify-icon
 									icon="ic:round-close"
 									style="color: var(--del-color); font-size: 1.5rem; margin-left: 0.3rem;"
