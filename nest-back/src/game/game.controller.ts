@@ -13,11 +13,10 @@ export class GameController {
 		const matches = await this.gameService.findMatches(startIndex, pageSize, id);
 		return matches.map(({ scoreWinner, scoreLoser, createdAt, winner, loser }) => ({
 			createdAt,
-			result: winner.profile.id == id ? "win" : "lost",
+			result: winner.profile.id == id ? "won" : "lost",
 			opponentScore: winner.profile.id == id ? scoreLoser : scoreWinner,
 			userScore: winner.profile.id == id ? scoreWinner : scoreLoser,
-			opponentAvatar: winner.profile.id == id ? loser.profile.avatar.url : winner.profile.avatar.url,
-			opponentUsername: winner.profile.id == id ? loser.profile.username : winner.profile.username
+			opponentProfile: winner.profile.id == id ? { avatar: { url: loser.profile.avatar.url }, username: loser.profile.username } : { avatar: { url: winner.profile.avatar.url }, username: winner.profile.username } 
 		}))
 	}
 }

@@ -1,7 +1,8 @@
+import type { Profile } from "./profile";
+
 export interface Match {
 	opponentScore: number;
-	opponentAvatarUrl: string;
-	opponentUsername: string;
+	opponentProfile: Profile;
 	userScore: number;
 	result: string;
 	createdAt: Date;

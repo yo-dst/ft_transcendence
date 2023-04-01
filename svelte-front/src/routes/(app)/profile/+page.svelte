@@ -11,7 +11,7 @@
 
 	function getStat(matches: Match[]) {
 		matches.forEach((match) => {
-			if (match.result === "win") nbWin++;
+			if (match.result === "won") nbWin++;
 			else nbLose++;
 		});
 	}
@@ -25,6 +25,7 @@
 		index += 5;
 		let data = await res.json();
 		matches = [...matches, ...data];
+		console.log(matches);
 		getStat(matches);
 	}
 
@@ -69,7 +70,7 @@
 					{#each matches as match}
 						<tr>
 							<td class="opponent-cell">
-								<span>{match.opponentUsername}</span>
+								<span>{match.opponentProfile.username}</span>
 							</td>
 							<td class="result-cell">
 								<div
@@ -78,12 +79,12 @@
 									<span>{match.userScore}</span>
 									<span>{match.opponentScore}</span>
 								</div>
-								{#if match.userScore > match.opponentScore}
+								{#if match.result == "won"}
 									<iconify-icon
 										icon="material-symbols:check-small-rounded"
 										style="color: var(--ins-color); font-size: 2rem;"
 									/>
-								{:else if match.userScore < match.opponentScore}
+								{:else if match.result == "lost"}
 									<iconify-icon
 										icon="ic:round-close"
 										style="color: var(--del-color); font-size: 1.5rem; margin-left: 0.3rem;"

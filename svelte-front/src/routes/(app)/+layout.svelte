@@ -29,7 +29,7 @@
 	}
 
 	main {
-		margin-bottom: 100px;
+		margin-bottom: 25px;
 		max-width: 500px;
 	}
 
