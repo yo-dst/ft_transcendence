@@ -8,8 +8,8 @@
     import { acceptFriendRequest, declineFriendRequest, fetchFriendRequests, fetchFriendsProfile, fetchProfile, removeFriend, sendFriendRequest } from "$lib/api";
     import { notifications } from "$lib/stores/notifications";
     import type { Profile } from "$lib/types/profile";
+	import { friendsProfile } from "$lib/stores/friends-profile";
 	
-	let friendsProfile: Profile[] = [];
 	let friends: Friend[] = [];
 	let friendRequests: FriendRequest[] = [];
 
@@ -78,10 +78,9 @@
 		});
 	}
 	
-	// remove notif
 	async function acceptRequest(id: number) {
 		const newFriendProfile = await acceptFriendRequest(id);
-		friendsProfile = [...friendsProfile, newFriendProfile];
+		$friendsProfile = [...$friendsProfile, newFriendProfile];
 		friendRequests = friendRequests.filter(request => request.id !== id);
 		$notifications = $notifications.filter(notification => (notification.type !== "friend-request" && notification.data.id === id))
 		$eventsSocket.emit("accept-friend-request", newFriendProfile.username);
@@ -95,17 +94,17 @@
 
 	async function remove(username: string) {
 		await removeFriend(username);
-		friendsProfile = friendsProfile.filter(profile => profile.username !== username);
+		$friendsProfile = $friendsProfile.filter(profile => profile.username !== username);
 		$eventsSocket.emit("remove-friend", username);
 	}
 
-	$: getFriendsStatus(friendsProfile);
+	$: getFriendsStatus($friendsProfile);
 
 	onMount(async () => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
-			friendsProfile = await fetchFriendsProfile();
+			getFriendsStatus($friendsProfile);
 			friendRequests = await fetchFriendRequests();
 
 			$eventsSocket.on("user-connected", (username: string) => {
@@ -128,11 +127,11 @@
 
 			$eventsSocket.on("friend-request-accepted", async (username: string) => {
 				const newFriendProfile = await fetchProfile(username);
-				friendsProfile = [...friendsProfile, newFriendProfile];
+				$friendsProfile = [...$friendsProfile, newFriendProfile];
 			});
 
 			$eventsSocket.on("friend-removed", (username: string) => {
-				friendsProfile = friendsProfile.filter(profile => profile.username !== username);
+				$friendsProfile = $friendsProfile.filter(profile => profile.username !== username);
 			});
 
 			$eventsSocket.on("receive-friend-request", async (friendRequest: any) => {

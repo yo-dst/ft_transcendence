@@ -1,18 +1,15 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import ModalChannels from "$lib/components/ModalChannels.svelte";
+    import { user } from "$lib/stores/user";
     import type { chatRoom } from "$lib/types/chat-rooms";
     import type { Socket } from "socket.io-client";
-    import { getContext } from "svelte";
+    import { getContext, onMount } from "svelte";
     import SocketContext from "./SocketContext.svelte";
 	
-	const socket: Socket = getContext(SocketContext);
+	let socket: Socket; 
 	let rooms: chatRoom[] = [];
 	let isModalShowing = false;
-
-	socket.emit('getRooms', (Rooms: chatRoom[]) => {
-		rooms = Rooms;
-	})
 
 	function joinRoom(id: string) {
 		socket.emit('joinRoom', id, undefined, (found: boolean) => {
@@ -27,6 +24,11 @@
 	onMount(() => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
+		} else {
+			socket = getContext(SocketContext);
+			socket.emit('getRooms', (Rooms: chatRoom[]) => {
+				rooms = Rooms;
+			})
 		}
 	});
 </script>
