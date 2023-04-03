@@ -69,4 +69,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log(room);
 		room.update(info[1], info[2]);
 	}
+
+	@SubscribeMessage('getRoomScope')
+	returnRoomScore(client: Socket, roomId: string) {
+		return this.ChatRooms.find((room) => (room.id === roomId)).isPublic;
+	}
 }

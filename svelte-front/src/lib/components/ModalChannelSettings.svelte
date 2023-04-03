@@ -1,17 +1,17 @@
 <script lang="ts">
-    import type { Socket } from "socket.io-client";
-    import { getContext } from "svelte";
-    import SocketContext from "../../routes/(app)/channels/SocketContext.svelte";
+    import { chatSocket } from "$lib/stores/chat-socket";
 
 	export let closeModal: () => void;
-	export let isPublic: boolean;
 	export let channelId: string | undefined;
 	let password: string = "";
-	let isPrivate: boolean = !isPublic;
-	const socket: Socket = getContext(SocketContext);
+	let isPrivate: boolean;
+
+	$chatSocket.emit('getRoomScope', channelId, (isPublic: boolean) => {
+		isPrivate = !isPublic;
+	})
 
 	function sendChange() {
-		socket.emit('roomUpdate', channelId, isPrivate, password);
+		$chatSocket.emit('roomUpdate', channelId, isPrivate, password);
 		closeModal();
 	}
 </script>

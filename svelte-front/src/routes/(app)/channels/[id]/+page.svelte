@@ -1,22 +1,20 @@
 <script lang="ts">
 	import { user } from "$lib/stores/user";
-    import { afterUpdate, getContext } from "svelte";
-    import type { Socket } from "socket.io-client";
-    import SocketContext from "../SocketContext.svelte";
+    import { afterUpdate } from "svelte";
     import { page } from "$app/stores";
     import ModalChannelSettings from "$lib/components/ModalChannelSettings.svelte";
+    import { chatSocket } from "$lib/stores/chat-socket";
 
 	let messages: string[] = [];
 	let input: string = "";
 	let usernames: string[] = [];
 	let element: any;
-	const socket: Socket = getContext(SocketContext);
 	const channelId: string | undefined = $page.url.href.split('/').pop();
 	let roomName: string;
 	let showSettingsModal:boolean = false;
 	let isPublic: boolean;
 
-	socket.emit('getInfo', channelId, (info: any) => {
+	$chatSocket.emit('getInfo', channelId, (info: any) => {
 		roomName = info.roomName;
 		isPublic = info.isPublic;
 	});
@@ -32,12 +30,12 @@
 
 	function sendMessage() {
 		if (input){
-			socket.emit('newMessage', channelId, input);
+			$chatSocket.emit('newMessage', channelId, input);
 			input = "";
 		}
 	}
 
-	socket.on('newMessage', (Username, newMessage) => {
+	$chatSocket.on('newMessage', (Username, newMessage) => {
 		usernames = [...usernames, Username];
 		messages = [...messages, newMessage];
 	})
@@ -73,7 +71,7 @@
 </article>
 
 {#if showSettingsModal}
-	<ModalChannelSettings closeModal={() => {showSettingsModal = false}} {isPublic} {channelId}/>
+	<ModalChannelSettings closeModal={() => {showSettingsModal = false}} {channelId}/>
 {/if}
 
 <style>
