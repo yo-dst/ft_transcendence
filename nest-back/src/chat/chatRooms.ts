@@ -38,11 +38,14 @@ export class ChatRoom {
 
 	update(isPrivate: boolean, password: string) {
 		this.isPublic = isPrivate === true ? false : true;
+		console.log(password);
 		if (password && password != "") {
 			this.password = password;
 			this.isProtected = true;
 		}
 		else this.isProtected = false;
+		console.log(this.password);
+		console.log(this.isProtected);
 	}
 
 }

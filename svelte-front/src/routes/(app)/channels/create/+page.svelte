@@ -1,17 +1,14 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import type { Socket } from "socket.io-client";
-    import { getContext } from "svelte";
-    import SocketContext from "../SocketContext.svelte";
+    import { chatSocket } from "$lib/stores/chat-socket";
 
 	let isPrivate: boolean = false;
 	let name: string;
 	let password: string;
 	let capacity = 25;
-	const socket: Socket = getContext(SocketContext);
 
 	function createRoom() {
-		socket.emit('createRoom', name, capacity, password, isPrivate, (id: string) => {
+		$chatSocket.emit('createRoom', name, capacity, password, isPrivate, (id: string) => {
 			goto(id);
 		});
 	}

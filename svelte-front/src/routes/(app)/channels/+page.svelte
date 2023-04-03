@@ -3,16 +3,16 @@
     import ModalChannels from "$lib/components/ModalChannels.svelte";
     import { user } from "$lib/stores/user";
     import type { chatRoom } from "$lib/types/chat-rooms";
-    import type { Socket } from "socket.io-client";
-    import { getContext, onMount } from "svelte";
-    import SocketContext from "./SocketContext.svelte";
+    import { io } from "socket.io-client";
+    import { onMount } from "svelte";
+	import { chatSocket } from "$lib/stores/chat-socket";
 	
-	let socket: Socket; 
 	let rooms: chatRoom[] = [];
 	let isModalShowing = false;
 
+	
 	function joinRoom(id: string) {
-		socket.emit('joinRoom', id, undefined, (found: boolean) => {
+		$chatSocket.emit('joinRoom', id, undefined, (found: boolean) => {
 			if (found) goto('/channels/' + id);
 		})
 	}
@@ -25,11 +25,13 @@
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
-			socket = getContext(SocketContext);
-			socket.emit('getRooms', (Rooms: chatRoom[]) => {
+			$chatSocket = io("localhost:3000/chat", {auth: {username: $user.profile?.username}});
+			
+			$chatSocket.emit('getRooms', (Rooms: chatRoom[]) => {
 				rooms = Rooms;
 			})
 		}
+
 	});
 </script>
 
@@ -50,7 +52,7 @@
 					</div>
 				</div>
 				<div class="channel-right">
-					{#if !room.isPublic}
+					{#if room.isProtected}
 						<iconify-icon icon="material-symbols:lock" style="font-size: 1.5rem;"></iconify-icon>
 						<button class="secondary" on:click={() => {isModalShowing = true}}>
 							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
@@ -63,12 +65,11 @@
 					</div>
 				</li>
 				{#if isModalShowing}
-					<ModalChannels {socket} closeModal={closeModal} roomId={room.id}/>
+					<ModalChannels closeModal={closeModal} roomId={room.id}/>
 				{/if}
 		{/each}
 	</ul>
 </section>
-
 
 <style>
 	.title {

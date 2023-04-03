@@ -1,16 +1,15 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import type { Socket } from "socket.io-client";
+    import { chatSocket } from "$lib/stores/chat-socket";
 
 
-	export let socket: Socket;
 	export let closeModal: () => void;
 	export let roomId: string;
 	let password: string;
 	let showError: boolean = false;
 
 	function sendPassword() {
-		socket.emit('joinRoom', roomId, password, (accepted: boolean) => {
+		$chatSocket.emit('joinRoom', roomId, password, (accepted: boolean) => {
 			if (accepted) {
 				closeModal();
 				goto('/channels/' + roomId);
