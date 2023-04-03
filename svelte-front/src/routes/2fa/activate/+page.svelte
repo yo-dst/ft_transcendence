@@ -3,57 +3,47 @@
 	import CanvasQrCode from "$lib/components/CanvasQrCode.svelte";
 	import { onMount } from "svelte";
 	import { user } from "$lib/stores/user";
+    import { generateTwoFactorAuthenticationQrCode, loginUserWithTwoFactorAuthentication, turnOnTwoFactorAuthentication } from "$lib/api";
 
 	let qrCodeData = "";
 	let code = "";
-	let err: any = null;
+	let error = "";
 
 	async function verifyCode() {
-		const res = await fetch("http://localhost:3000/2fa/turn-on", {
-			method: "post",
-			credentials: "include",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				twoFactorAuthenticationCode: code,
-			}),
-		});
-		if (res.ok) {
-			// try to delete these 2 lines to see if user get fetched after goto()
-			if ($user) {
-				// set secret too?
-				$user.isTwoFactorAuthenticationEnabled = true;
-			}
-			goto("/2fa/verify");
-		} else {
-			const data = await res.json();
-			err = data;
+		try {
+			await turnOnTwoFactorAuthentication(code);
+			await loginUserWithTwoFactorAuthentication(code);
+			error = "";
+			goto("/");
+		} catch (err) {
+			error = err;
 		}
 	}
 
 	onMount(async () => {
-		const res = await fetch("http://localhost:3000/2fa/generate", {
-			method: "post",
-			credentials: "include",
-		});
-		if (res.ok) {
-			const data = await res.text();
-			qrCodeData = data;
-		}
+		qrCodeData = await generateTwoFactorAuthenticationQrCode();
 	});
 </script>
 
-<main>
-	<h1>
-		Scan this QR code to add this website to your Google Authenticator
-		application
-	</h1>
-	<CanvasQrCode {qrCodeData} width={300} height={300} />
-	<label for="code">Google Authenticator code</label>
-	<input name="code" bind:value={code} />
-	<button type="submit" on:click={verifyCode}>Verify code</button>
-	{#if err}
-		<pre>{JSON.stringify(err, undefined, 2)}</pre>
-	{/if}
-</main>
+<h3>Scan with Google Authenticator</h3>
+<CanvasQrCode {qrCodeData} width={300} height={300} />
+<input name="code" bind:value={code} />
+{#if error}
+	<span class="error">{error}</span>
+{/if}
+<button type="submit" on:click={verifyCode}>Verify code</button>
+
+<style>
+	h3 {
+		margin-bottom: 1.5rem;
+	}
+
+	input {
+		margin-top: 2rem;
+	}
+
+	.error {
+		margin-top: -0.5rem;
+		margin-bottom: 1.5rem;
+	}
+</style>

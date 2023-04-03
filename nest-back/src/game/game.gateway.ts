@@ -23,12 +23,12 @@ export class GameGateway {
 					setTimeout(() => {
 						if (room.playersMap.get(client.userId)) {
 							this.server.to(client.roomId).emit('decoTimer');
-							setTimeout(() => {
+							setTimeout(async () => {
 								if (room.playersMap.get(client.userId)) {
 									const index = gameRooms.findIndex((room) => room.id === client.roomId);
 									if (room.playersMap.get(client.userId)) {
 										this.server.to(client.roomId).emit('deco');
-										this.gameService.save(room.score, room.player);
+										await this.gameService.save(room.score, room.player);
 										clearInterval(room.intervalId);
 										gameRooms.splice(index, 1);
 									}

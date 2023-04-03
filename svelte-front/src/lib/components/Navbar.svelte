@@ -3,9 +3,9 @@
 	import { user } from "$lib/stores/user";
     import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
+	import { notifications } from "$lib/stores/notifications";
 
 	let showNotif = false;
-    let numberNotif = 2;
 
 	const links = [
 		{
@@ -45,11 +45,11 @@
 		</ul>
 	</nav>
 	<div>
+		{#if $user.isLoggedIn}
 		<button class="ring-wrapper" on:click={() => showNotif = !showNotif}>
 			<iconify-icon icon="mdi:bell-ring" style="font-size: 45px; color: #f0f6fc;"></iconify-icon>
-			<span class="ring-notif">{numberNotif}</span>
+			<span class="ring-notif">{$notifications.length}</span>
 		</button>
-	{#if $user.isLoggedIn}
 		<img src={$user.profile?.avatar?.url}
 			alt="avatar"
 			on:click={() => goto("/parameters")}

@@ -43,10 +43,7 @@ export class AuthController {
 	authenticate(@Req() req: RequestWithUser) {
 		const user = this.usersService.getBy({
 			relations: {
-				profile: true,
-				friends: {
-					profile: true
-				},
+				friends: true,
 				friendRequestsCreated: true,
 				friendRequestsReceived: true
 			},

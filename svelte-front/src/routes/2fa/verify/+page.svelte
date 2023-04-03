@@ -1,32 +1,31 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
+	import { goto, invalidate } from "$app/navigation";
+    import { loginUserWithTwoFactorAuthentication } from "$lib/api";
 
 	let code = "";
-	let err: any;
+	let error = "";
 
 	async function verifyCode() {
-		const res = await fetch("http://localhost:3000/2fa/login", {
-			method: "post",
-			credentials: "include",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				twoFactorAuthenticationCode: code,
-			}),
-		});
-		if (res.ok) {
-			goto("/login");
-		} else {
-			const data = await res.json();
-			err = data;
+		try {
+			await loginUserWithTwoFactorAuthentication(code);
+			error = "";
+			goto("http://localhost:3000/2fa/redirect");
+		} catch (err) {
+			error = err;
 		}
 	}
 </script>
 
-<label for="code">Google Authenticator code</label>
+<h3>Google Authenticator code</h3>
 <input name="code" bind:value={code} />
-<button on:click={verifyCode}>Verify</button>
-{#if err}
-	<pre>{JSON.stringify(err, undefined, 2)}</pre>
+{#if error}
+	<span class="error">{error}</span>
 {/if}
+<button on:click={verifyCode}>Verify</button>
+
+<style>
+	.error {
+		margin-top: -0.5rem;
+		margin-bottom: 1.5rem;
+	}
+</style>

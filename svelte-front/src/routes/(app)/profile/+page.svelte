@@ -3,29 +3,20 @@
 	import { onMount } from "svelte";
 	import { user } from "$lib/stores/user";
 	import type { Match } from "$lib/types/match";
+    import { fetchMatchHistory } from "$lib/api";
 
-	let nbWin = 0;
-	let nbLose = 0;
+	let nbMatchesToLoad = 5;
 	let index = 0;
 	let matches: Match[] = [];
 
-	function getStat(matches: Match[]) {
-		matches.forEach((match) => {
-			if (match.result === "win") nbWin++;
-			else nbLose++;
-		});
-	}
-
 	async function loadMore() {
-		let res = await fetch(
-			`http://localhost:3000/game?startIndex=${index}&pageSize=${5}&id=${
-				$user.id
-			}`
-		);
-		index += 5;
-		let data = await res.json();
-		matches = [...matches, ...data];
-		getStat(matches);
+		try {
+			const data = await fetchMatchHistory($user.profile.username, index, nbMatchesToLoad);
+			index += nbMatchesToLoad;
+			matches = [...matches, ...data];
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	onMount(async () => {
@@ -43,11 +34,11 @@
 		<div class="user-stats">
 			<span>{$user.profile?.username}</span>
 			<div>
-				<span style="color: var(--ins-color);;">{nbWin}</span>
+				<span style="color: var(--ins-color);;">{$user.profile?.wins}</span>
 				/
 				<span style="color: var(--color);">0</span>
 				/
-				<span style="color: var(--del-color);;">{nbLose}</span>
+				<span style="color: var(--del-color);;">{$user.profile?.losses}</span>
 			</div>
 		</div>
 	</div>

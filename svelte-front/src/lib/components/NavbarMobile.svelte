@@ -1,10 +1,11 @@
 <script lang="ts">
     import Drawer from "./Drawer.svelte";
     import Notifications from "./Notifications.svelte";
+    import { notifications } from "$lib/stores/notifications";
+    import { user } from "$lib/stores/user";
 
     let showDrawer = false;
     let showNotif = false;
-    let numberNotif = 2;
 
     function setShowDrawer(val: boolean) {
         showDrawer = val;
@@ -19,10 +20,12 @@
         <img src="pong-icon.svg" alt="icon pong" class="pong-icon"/>
     </a>
     <div class="header-profile">
+    {#if $user.isLoggedIn}
         <button class="ring-wrapper" on:click={() => showNotif = !showNotif}>
             <iconify-icon icon="mdi:bell-ring" style="font-size: 40px; color: #f0f6fc;"></iconify-icon>
-            <span class="ring-notif">{numberNotif}</span>
+            <span class="ring-notif">{$notifications.length}</span>
         </button>
+    {/if}
     </div>
 </div>
 <Drawer show={showDrawer} setShow={setShowDrawer}/>

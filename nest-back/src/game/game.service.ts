@@ -10,7 +10,7 @@ export class GameService {
 	constructor(
 		@InjectRepository(Match) private matchRepository: Repository<Match>,
 		private usersService: UsersService
-	) { }
+	) {}
 
 	async save(score: number[], player: number[]) {
 		const match = new Match();
@@ -18,7 +18,9 @@ export class GameService {
 		match.scoreLoser = Math.min(...score);
 		match.winner = score[0] > score[1] ? await this.usersService.getById(player[0]) : await this.usersService.getById(player[1]);
 		match.loser = score[0] > score[1] ? await this.usersService.getById(player[1]) : await this.usersService.getById(player[0]);
-		this.matchRepository.save(match);
+		await this.matchRepository.save(match);
+		await this.usersService.addWin(match.winner.id);
+		await this.usersService.addLoss(match.loser.id);
 	}
 
 	async findMatches(pageNumber: number, pageSize: number, userId: number) {

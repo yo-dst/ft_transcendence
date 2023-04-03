@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Post, Redirect, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Response } from "express";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "../auth.service";
@@ -15,6 +15,15 @@ export class TwoFactorAuthController {
 		private usersService: UsersService,
 		private authService: AuthService
 	) {}
+
+	@Get("redirect")
+	@Redirect()
+	redirect() {
+		return {
+			url: "http://localhost:5173",
+			statusCode: 302
+		}
+	}
 
 	@Post("generate")
 	@UseGuards(JwtAuthGuard)

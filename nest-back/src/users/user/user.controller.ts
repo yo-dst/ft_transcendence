@@ -10,15 +10,17 @@ import UpdateUsernameDto from "./dto/update-username.dto";
 export class UserController {
 	constructor(
 		private usersService: UsersService
-	) { }
+	) {}
+
 	// returns what must be returned of user for frontend
 	@Get()
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async getUser(@Req() req: RequestWithUser) {
 		const profile = await this.usersService.getProfile(req.user.id);
 		return {
-			profile,
-			id: req.user.id
+			id: req.user.id,
+			isTwoFactorAuthenticationEnabled: req.user.isTwoFactorAuthenticationEnabled,
+			profile
 		}
 	}
 
@@ -32,7 +34,7 @@ export class UserController {
 		if (user) {
 			throw new BadRequestException('User with that username already exists');
 		}
-		return this.usersService.setUsername(req.user.id, newUsername);
+		await this.usersService.setUsername(req.user.id, newUsername);
 	}
 
 	@Patch("avatar")
@@ -41,7 +43,7 @@ export class UserController {
 		@Req() req: RequestWithUser,
 		@Body() { newAvatar }: UpdateAvatarDto
 	) {
-		return this.usersService.setAvatar(req.user.id, newAvatar);
+		await this.usersService.setAvatar(req.user.id, newAvatar);
 	}
 
 	@Patch("remove-friend")
@@ -79,9 +81,9 @@ export class UserController {
 		return Promise.all(friendRequests.map(async ({ id, creator, receiver }) => {
 			const creatorProfile = await this.usersService.getProfile(creator.id);
 			return {
-				id: id,
+				id,
 				creator: creatorProfile
-			}
+			};
 		}));
 	}
 

@@ -1,34 +1,44 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
+	import "@picocss/pico";
+	import "../app.css";
+	import 'iconify-icon';
 	import { onMount } from "svelte";
 	import { user } from "$lib/stores/user";
+	import { eventsSocket } from "$lib/stores/events-socket";
+	import { notifications } from "$lib/stores/notifications";
 	import { io } from "socket.io-client";
+    import { fetchProfile, loginUser } from "$lib/api";
 
-	$: console.log("user logged in", $user?.profile);
+	$: console.log("user", $user);
+
+	$: console.log("eventsSocket", $eventsSocket);
 
 	let hasMounted = false;
 
 	onMount(async () => {
-		console.log("main layout mounting...");
-
-		let res = await fetch("http://localhost:3000/auth", {
-			credentials: "include",
-		});
-		let data = await res.json();
-		console.log("http://localhost:3000/auth response", data);
-
-		res = await fetch("http://localhost:3000/user", {
-			credentials: "include",
-		});
-		data = await res.json();
-		if (res.ok) {
-			$user.isLoggedIn = true;
-			$user.profile = data.profile;
-			$user.id = data.id;
-			$user.socket = io("localhost:3000");
-		} else {
-			console.log("b4 goto login");
-			goto("/login");
+		try {
+			await loginUser();
+	
+			$eventsSocket = io("http://localhost:3000/events", {
+				auth: {
+					username: $user.profile?.username
+				}
+			});
+	
+			$eventsSocket.on("receive-friend-request", async (data: { id: number, creatorUsername: string }) => {
+				const newFriendRequest = await fetchProfile(data.creatorUsername);
+				const newNotification = {
+					type: "friend-request",
+					data: newFriendRequest
+				};
+				$notifications = [...$notifications, newNotification];
+			});
+	
+			$eventsSocket.on("receive-game-request", (data: any) => {
+				$notifications = [...$notifications, { type: "game-request", data }];
+			});
+		} catch (err) {
+			// goto("/login");
 		}
 
 		hasMounted = true;

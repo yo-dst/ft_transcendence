@@ -9,6 +9,12 @@ export class Profile {
 	@Column({ unique: true })
 	username: string;
 
+	@Column({ default: 0 })
+	wins: number;
+
+	@Column({ default: 0 })
+	losses: number;
+
 	@OneToOne(type => Avatar, {
 		eager: true,
 		cascade: true

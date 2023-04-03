@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
+import { EventsGateway } from './events.gateway';
 
 @Module({
 	imports: [
@@ -25,6 +26,7 @@ import * as Joi from 'joi';
       		})
 		}),
 		DatabaseModule
-	]
+	],
+	providers: [EventsGateway]
 })
 export class AppModule {}

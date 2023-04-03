@@ -2,63 +2,41 @@
 	import { user } from "$lib/stores/user";
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
+    import { logoutUser, turnOffTwoFactorAuthentication, updateUserAvatar, updateUserUsername } from "$lib/api";
 
-	let username: string | undefined;
-	let updateUsernameError: any;
+	let newUsername: string = "";
 	let files: any;
-	let updateAvatarError: any;
 	let isTwoFactorAuthenticationEnabled: boolean;
 
+	let updateUsernameError: string;
+	let updateAvatarError: string;
+	
 	async function updateUsername() {
-		const res = await fetch(
-			`http://localhost:3000/user/username`,
-			{
-				method: "PATCH",
-				credentials: "include",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					newUsername: username,
-				}),
-			}
-		);
-		const data = await res.json();
-		if (res.ok) {
-			$user.profile.username = username;
-			updateUsernameError = undefined;
-		} else {
-			updateUsernameError = data;
+		try {
+			await updateUserUsername(newUsername);
+			updateUsernameError = "";
+		} catch (err) {
+			updateUsernameError = err.message;
 		}
 	}
 
 	async function updateAvatar() {
-		const reader = new FileReader();
-		reader.addEventListener("load", async () => {
-			let avatar: string = reader.result;
-			const res = await fetch(
-				`http://localhost:3000/user/avatar`,
-				{
-					method: "PATCH",
-					credentials: "include",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						newAvatar: avatar,
-					}),
+		try {
+			const reader = new FileReader();
+			reader.addEventListener("load", async () => {
+				const newAvatar = reader.result;
+				if (typeof newAvatar !== "string") {
+					throw "Error: can't load image";
 				}
-			);
-			const data = await res.json();
-			if (res.ok) {
-				$user.profile.avatar.url = avatar;
+				await updateUserAvatar(newAvatar);
 				updateAvatarError = undefined;
-			} else {
-				updateAvatarError = data;
+			});
+
+			if (files && files[0]) {
+				reader.readAsDataURL(files[0]);
 			}
-		});
-		if (files && files[0]) {
-			reader.readAsDataURL(files[0]);
+		} catch (err) {
+			updateAvatarError = err;
 		}
 	}
 
@@ -66,26 +44,21 @@
 		if (isTwoFactorAuthenticationEnabled) {
 			goto("/2fa/activate");
 		} else {
-			const res = await fetch("http://localhost:3000/2fa/turn-off", {
-				method: "POST",
-				credentials: "include",
-			});
-			if (res.ok) {
-				$user.isTwoFactorAuthenticationEnabled = false;
-			} else {
+			try {
+				await turnOffTwoFactorAuthentication();
+			} catch (err) {
 				isTwoFactorAuthenticationEnabled = true;
+				console.log(err);
 			}
 		}
 	}
 
 	async function logout() {
-		const res = await fetch("http://localhost:3000/auth/logout", {
-			credentials: "include",
-		});
-		if (res.ok) {
-			$user.isLoggedIn = false;
-			$user.profile = undefined;
+		try {
+			await logoutUser();
 			goto("/login");
+		} catch (err) {
+			console.log(err);
 		}
 	}
 
@@ -93,7 +66,7 @@
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
-			username = $user.profile?.username;
+			newUsername = $user.profile.username;
 			isTwoFactorAuthenticationEnabled = $user.isTwoFactorAuthenticationEnabled;
 		}
 	});
@@ -104,11 +77,11 @@
 
 	<label for="username">Username</label>
 	<div class="input-button-container">
-		<input name="username" bind:value={username} />
+		<input name="username" bind:value={newUsername} />
 		<button on:click={updateUsername}>Update</button>
 	</div>
 {#if updateUsernameError}
-	<pre class="error">{JSON.stringify(updateUsernameError, undefined, 2)}</pre>
+	<p class="error">{updateUsernameError}</p>
 {/if}
 
 	<label for="avatar">Avatar </label>
@@ -122,7 +95,7 @@
 		<button on:click={updateAvatar}>Update</button>
 	</div>
 {#if updateAvatarError}
-	<pre class="error">{JSON.stringify(updateAvatarError, undefined, 2)}</pre>
+	<span class="error">{updateAvatarError}</span>
 {/if}
 
 	<label for="isTwoFactorAuthenticationEnabled">

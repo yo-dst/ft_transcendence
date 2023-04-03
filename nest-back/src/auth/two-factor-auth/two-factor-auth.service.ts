@@ -18,8 +18,8 @@ export class TwoFactorAuthService {
 
 	async generateQrCodeDataURL(otpAuthUrl: string): Promise<any> {
 		return qrcode.toDataURL(otpAuthUrl, {
-			width: 200,
-			height: 200
+			width: 300,
+			height: 300
 		});
   }
 

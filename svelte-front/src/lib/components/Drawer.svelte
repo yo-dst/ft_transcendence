@@ -3,24 +3,22 @@
 	import Drawer from "svelte-drawer-component";
 	import { user } from "$lib/stores/user";
 	import { goto } from "$app/navigation";
+    import { eventsSocket } from "$lib/stores/events-socket";
+    import { logoutUser } from "$lib/api";
 
 	export let show: boolean;
 	export let setShow: any;
 
 	async function logout() {
-		const res = await fetch("http://localhost:3000/auth/logout", {
-			credentials: "include",
-		});
-		if (res.ok) {
-			$user.isLoggedIn = false;
-			$user.profile = undefined;
+		try {
+			await logoutUser();
 			goto("/login");
+		} catch (err) {
+			console.log(err);
 		}
 	}
 
 	onMount(async () => {
-		console.log("drawer mounting...");
-
 		const elements = document.getElementsByTagName("a");
 		for (let i = 0; i < elements.length; ++i) {
 			elements[i].addEventListener("click", () => {

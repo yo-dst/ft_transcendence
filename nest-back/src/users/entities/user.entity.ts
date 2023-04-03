@@ -39,7 +39,6 @@ class User {
 
 	@OneToMany(type => Match, match => match.loser)
 	matchesLost: Match[];
-
 }
 
 export default User;

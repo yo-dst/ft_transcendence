@@ -42,13 +42,13 @@ export class MatchmakingGateway {
 	}
 
 	@SubscribeMessage('id')
-	setEmail(client: CustomSocket, id: number) {
+	setId(client: CustomSocket, id: number) {
 		client.userId = id;
 	}
 
 	// if 2 players in the array, match them and create a new room
 	matchPlayers(gameMode: number) {
-		if (this.masterQueue[gameMode].length == 2) {
+		if (this.masterQueue[gameMode].length >= 2) {
 			const p1 = this.masterQueue[gameMode].shift();
 			const p2 = this.masterQueue[gameMode].shift();
 			const roomId = v4();

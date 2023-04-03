@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
+    import { user } from "$lib/stores/user";
+    import { onMount } from "svelte";
 	import type { PageData } from "./$types";
 
 	export let data: PageData;
@@ -10,6 +13,12 @@
 	function joinChannel() {
 		showPasswordModal = true;
 	}
+
+	onMount(() => {
+		if (!$user.isLoggedIn) {
+			goto("/login");
+		}
+	});
 </script>
 
 <section>

@@ -1,151 +1,144 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import Loading from "$lib/components/Loading.svelte";
 	import { user } from "$lib/stores/user";
-    import type { Error } from "$lib/types/error";
     import type { FriendRequest } from "$lib/types/friend-request";
-    import type { Profile } from "$lib/types/profile";
     import { onMount } from "svelte";
+	import { eventsSocket } from "$lib/stores/events-socket";
+    import type { Friend } from "$lib/types/friend";
+    import { acceptFriendRequest, declineFriendRequest, fetchFriendRequests, fetchFriendsProfile, fetchProfile, removeFriend, sendFriendRequest } from "$lib/api";
+    import { notifications } from "$lib/stores/notifications";
+    import type { Profile } from "$lib/types/profile";
+	
+	let friendsProfile: Profile[] = [];
+	let friends: Friend[] = [];
+	let friendRequests: FriendRequest[] = [];
 
-	let friendsData: {
-		friends?: Profile[],
-		error?: Error,
-		loading: boolean
-	} = {
-		loading: false
-	};
-
-	let friendRequestsData: {
-		friendRequests?: FriendRequest[],
-		error?: Error,
-		loading: boolean
-	} = {
-		loading: false
-	};
-
-	let addFriendData: {
-		username: string,
-		error?: Error
-	} = {
-		username: ""
-	}
+	let sendRequestValue: string;
+	let sendRequestError: any;
 
 	var countFakeFriend = 0;
 	function addFakeFriend() {
 		const fakeFriend = {
-			username: `fake${countFakeFriend}`,
-			avatar: {
-				url: "https://picsum.photos/200"
+			isLoggedIn: countFakeFriend % 2 === 0,
+			isInGame: false,
+			profile: {
+				username: `fake${countFakeFriend}`,
+				avatar: {
+					url: "https://picsum.photos/200"
+				},
+				wins: countFakeFriend,
+				losses: countFakeFriend
 			}
 		}
-		friendsData.friends = [...friendsData.friends, fakeFriend];
+		friends = [...friends, fakeFriend];
 		countFakeFriend++;
 	}
 
 	var countFakeFriendRequest = 0;
 	function addFakeFriendRequest() {
 		const fakeFriendRequest = {
+			id: countFakeFriend,
 			creator: {
 				username: `fake${countFakeFriendRequest}`,
 				avatar: {
 					url: "https://picsum.photos/200"
-				}
+				},
+				wins: countFakeFriend,
+				losses: countFakeFriend
 			}
 		}
-		friendRequestsData.friendRequests = [...friendRequestsData.friendRequests, fakeFriendRequest];
+		friendRequests = [...friendRequests, fakeFriendRequest];
 		countFakeFriendRequest++;
 	}
 
-	async function fetchFriends() {
-		friendsData.loading = true;
-		const res = await fetch("http://localhost:3000/user/friends", { credentials: "include" });
-		const data = await res.json();
-		if (res.ok) {
-			friendsData.friends = data;
-		} else {
-			friendsData.error = data;
-		}
-		friendsData.loading = false;
-	}
-
-	async function fetchFriendRequests() {
-		friendRequestsData.loading = true;
-		const res = await fetch("http://localhost:3000/user/friend-requests", { credentials: "include" });
-		const data = await res.json();
-		if (res.ok) {
-			friendRequestsData.friendRequests = data;
-		} else {
-			friendRequestsData.error = data;
-		}
-		friendRequestsData.loading = false;
-	}
-
-	async function sendFriendRequest() {
-		const res = await fetch("http://localhost:3000/friend-requests", {
-			method: "POST",
-			credentials: "include",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ username: addFriendData.username })
+	async function isUserConnected(username: string): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			$eventsSocket.emit("is-user-connected", username, (isLoggedIn: boolean) => {
+				resolve(isLoggedIn);
+			});
 		});
-		const data = await res.json();
-		if (res.ok) {
-			addFriendData.error = undefined;
-		} else {
-			addFriendData.error = data;
-		}
+	}
+
+	async function getFriendsStatus(friendsProfile: Profile[]) {
+		friends = await Promise.all(friendsProfile.map(async profile => {
+			const isConnected = await isUserConnected(profile.username);
+			return {
+				isLoggedIn: isConnected,
+				isInGame: false,
+				profile
+			};
+		}));
+	}
+
+	async function sendRequest() {
+		const friendRequest = await sendFriendRequest(sendRequestValue);
+		$eventsSocket.emit("send-friend-request", {
+			id: friendRequest.id,
+			receiverUsername: sendRequestValue
+		});
 	}
 	
-	async function acceptFriendRequest(friendRequest: any) {
-		const res = await fetch(`http://localhost:3000/friend-requests/accept/${friendRequest.id}`, {
-			method: "POST",
-			credentials: "include"
-		});
-		const data = await res.json();
-		if (res.ok) {
-			friendRequestsData.friendRequests = friendRequestsData.friendRequests.filter(request  => request.id !== friendRequest.id);
-			friendsData.friends = [...friendsData.friends, data];
-		} else {
-			console.log(data);
-		}
+	// remove notif
+	async function acceptRequest(id: number) {
+		const newFriendProfile = await acceptFriendRequest(id);
+		friendsProfile = [...friendsProfile, newFriendProfile];
+		friendRequests = friendRequests.filter(request => request.id !== id);
+		$notifications = $notifications.filter(notification => (notification.type !== "friend-request" && notification.data.id === id))
+		$eventsSocket.emit("accept-friend-request", newFriendProfile.username);
 	}
 
-	async function declineFriendRequest(friendRequest: any) {
-		const res = await fetch(`http://localhost:3000/friend-requests/decline/${friendRequest.id}`, {
-			method: "POST",
-			credentials: "include"
-		});
-		const data = await res.json();
-		if (res.ok) {
-			friendRequestsData.friendRequests = friendRequestsData.friendRequests.filter(request => request.id !== friendRequest.id);
-		} else {
-			console.log(data);
-		}
+	async function declineRequest(id: number) {
+		await declineFriendRequest(id);
+		friendRequests = friendRequests.filter(request => request.id !== id);
+		$notifications = $notifications.filter(notification => (notification.type !== "friend-request" && notification.data.id === id))
 	}
 
-	async function removeFriend(username: string) {
-		const res = await fetch("http://localhost:3000/user/remove-friend", {
-			method: "PATCH",
-			credentials: "include",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ username })
-		});
-		if (res.ok) {
-			friendsData.friends = friendsData.friends.filter(friend => friend.username !== username);
-		} else {
-			console.log(await res.json());
-		}
+	async function remove(username: string) {
+		await removeFriend(username);
+		friendsProfile = friendsProfile.filter(profile => profile.username !== username);
+		$eventsSocket.emit("remove-friend", username);
 	}
+
+	$: getFriendsStatus(friendsProfile);
 
 	onMount(async () => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
-			fetchFriends();
-			fetchFriendRequests();
+			friendsProfile = await fetchFriendsProfile();
+			friendRequests = await fetchFriendRequests();
+
+			$eventsSocket.on("user-connected", (username: string) => {
+				friends = friends.map(friend => {
+					if (friend.profile.username === username) {
+						friend.isLoggedIn = true;
+					}
+					return friend;
+				});
+			});
+
+			$eventsSocket.on("user-disconnected", (username: string) => {
+				friends = friends.map(friend => {
+					if (friend.profile.username === username) {
+						friend.isLoggedIn = false;
+					}
+					return friend;
+				});
+			});
+
+			$eventsSocket.on("friend-request-accepted", async (username: string) => {
+				const newFriendProfile = await fetchProfile(username);
+				friendsProfile = [...friendsProfile, newFriendProfile];
+			});
+
+			$eventsSocket.on("friend-removed", (username: string) => {
+				friendsProfile = friendsProfile.filter(profile => profile.username !== username);
+			});
+
+			$eventsSocket.on("receive-friend-request", async (friendRequest: any) => {
+				const creatorProfile = await fetchProfile(friendRequest.creatorUsername);
+				friendRequests = [...friendRequests, { id: friendRequest.id, creator: creatorProfile }]; 
+			});
 		}
 	});
 </script>
@@ -153,71 +146,55 @@
 <section>
 	<h3>Add a friend</h3>
 	<div class="input-button-container">
-		<input type="text" placeholder="Username" bind:value={addFriendData.username} />
-		<button on:click={sendFriendRequest} style="background-color: var(--ins-color); border:none;">
+		<input type="text" placeholder="Username" bind:value={sendRequestValue} />
+		<button on:click={sendRequest} style="background-color: var(--ins-color); border:none;">
 			<iconify-icon icon="fluent-mdl2:add-friend" style="font-size: 1.5rem"/>
 		</button>
 	</div>
-{#if addFriendData.error}
-	<pre>{JSON.stringify(addFriendData.error, undefined, 2)}</pre>
+{#if sendRequestError}
+	<pre>{JSON.stringify(sendRequestError, undefined, 2)}</pre>
 {/if}
 </section>
 
 <section>
 	<div class="list-container bg-light-dark">
 		<h3>Friends</h3>
-		<div class="center-container">
-	{#if friendsData.loading}
-		<Loading/>
-	{:else if friendsData.error}
-		<pre>{JSON.stringify(friendsData.error, undefined, 2)}</pre>
-	{:else if friendsData.friends}
 		<ul>
-		{#each friendsData.friends as friend}
+		{#each friends as friend}
 			<li class="li-friend">
-				<div>
-					<img src={friend.avatar.url} alt="friend"/>
-					<span>{friend.username}</span>
+				<div class="friend-profile">
+					<div class:online={friend.isLoggedIn}></div>
+					<img src={friend.profile.avatar.url} alt="friend"/>
+					<span>{friend.profile.username}</span>
 				</div>
 				<div>
-					<button on:click={() => removeFriend(friend.username)} style="background-color: var(--del-color);">
+					<button on:click={() => remove(friend.profile.username)} style="background-color: var(--del-color);">
 						<iconify-icon icon="charm:cross" style="font-size: 1.7rem;"/>
 					</button>
 				</div>
 			</li>
 		{/each}
 		</ul>
-	{/if}
-		</div>
 	</div>
 </section>
 
 <section>
 	<div class="list-container bg-light-dark">
 		<h3>Friend requests received</h3>
-		<div class="center-container">
-	{#if friendRequestsData.loading}
-		<Loading/>
-	{:else if friendRequestsData.error}
-		<pre>{JSON.stringify(friendRequestsData.error, undefined, 2)}</pre>
-	{:else if friendRequestsData.friendRequests}
 		<ul>
-		{#each friendRequestsData.friendRequests as friendRequest}
+		{#each friendRequests as friendRequest}
 			<li>
 				<div>
 					<img src={friendRequest.creator.avatar.url} alt="friend-request-creator"/>
 					<span>{friendRequest.creator.username}</span>
-					<!-- <pre>{JSON.stringify(friendRequest, undefined, 2)}</pre> -->
 				</div>
 				<div>
-					<button on:click={() => acceptFriendRequest(friendRequest)}>accept</button>
-					<button on:click={() => declineFriendRequest(friendRequest)}>decline</button>
+					<button on:click={() => acceptRequest(friendRequest.id)}>accept</button>
+					<button on:click={() => declineRequest(friendRequest.id)}>decline</button>
 				</div>
 			</li>
 		{/each}
 		</ul>
-	{/if}
-		</div>
 	</div>
 </section>
 
@@ -295,5 +272,19 @@
 
 	.li-friend button:hover {
 		opacity: 0.9;
+	}
+
+	.li-friend .friend-profile {
+		position: relative;
+	}
+
+	.online {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background-color: greenyellow;
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
 	}
 </style>

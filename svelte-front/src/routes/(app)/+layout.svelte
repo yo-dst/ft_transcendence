@@ -1,7 +1,4 @@
 <script lang="ts">
-	import "@picocss/pico";
-	import "../../app.css";
-	import 'iconify-icon';
 	import NavbarMobile from "$lib/components/NavbarMobile.svelte";
     import Navbar from "$lib/components/Navbar.svelte";
 </script>

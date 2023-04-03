@@ -14,7 +14,7 @@ import { UserController } from './user/user.controller';
   imports: [TypeOrmModule.forFeature([User, FriendRequest, Avatar, Profile])],
   providers: [
     UsersService,
-    FriendRequestsService,
+    FriendRequestsService
   ],
   controllers: [
     UsersController,

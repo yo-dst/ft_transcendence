@@ -19,7 +19,7 @@
 	}
 
 	onMount(() => {
-		if (!$user) {
+		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
 			socket.emit("id", $user.id);
@@ -47,6 +47,10 @@
 	<button on:click={() => (selectedGameMode = 2)} disabled={isSearching}
 		>{selectedGameMode === 2 ? "✅" : "👻"} Ghost</button
 	>
+</section>
+
+<section>
+	<a role="button" href="/users">Users logged in</a>
 </section>
 
 <style>

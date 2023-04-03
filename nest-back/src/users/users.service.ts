@@ -16,10 +16,7 @@ export class UsersService {
 	getAll() {
 		return this.usersRepository.find({
 			relations: {
-				profile: true,
-				friends: {
-					profile: true
-				},
+				friends: true,
 				friendRequestsCreated: true,
 				friendRequestsReceived: true
 			}
@@ -200,6 +197,24 @@ export class UsersService {
 		});
 		return user.profile;
 	}
+
+  async addWin(userId: number) {
+    const user = await this.usersRepository.findOne({
+			relations: { profile: true },
+			where: { id: userId }
+		});
+		user.profile.wins += 1;
+		return this.usersRepository.save(user);
+  }
+
+  async addLoss(userId: number) {
+    const user = await this.usersRepository.findOne({
+			relations: { profile: true },
+			where: { id: userId }
+		});
+		user.profile.losses += 1;
+		return this.usersRepository.save(user);
+  }
 }
 
 

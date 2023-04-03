@@ -51,7 +51,10 @@ export class FriendRequestsController {
 		if (friendRequest) {
 			throw new BadRequestException("Friend request already exists");
 		}
-		return this.friendRequestsService.create(creator, receiver)
+		const newFriendRequest = await this.friendRequestsService.create(creator, receiver);
+		const creatorProfile = await this.usersService.getProfile(creator.id);
+		const receiverProfile = await this.usersService.getProfile(receiver.id);
+		return { id: newFriendRequest.id, creator: creatorProfile, receiver: receiverProfile };
 	}
 
 	@Post("accept/:id")

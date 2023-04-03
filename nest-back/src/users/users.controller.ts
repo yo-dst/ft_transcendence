@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import JwtTwoFactorAuthGuard from 'src/auth/two-factor-auth/jwt-two-factor-auth.guard';
 import { UsersService } from './users.service';
 
@@ -40,4 +40,24 @@ export class UsersController {
 		}
 		return user;
 	}
+
+	@Get("profile/:username")
+	@UseGuards(JwtTwoFactorAuthGuard)
+	async getProfile(@Param("username") username: string) {
+		const user = await this.usersService.getByUsername(username);
+		if (!user) {
+			throw new BadRequestException();
+		}
+		return this.usersService.getProfile(user.id);
+	}
+
+	// @Get(":username/match-history")
+	// @UseGuards(JwtTwoFactorAuthGuard)
+	// async getMatchHistory(@Param("username") username: string) {
+	// 	const user = await this.usersService.getByUsername(username);
+	// 	if (!user) {
+	// 		throw new NotFoundException();
+	// 	}
+	// 	return this.matchHistoryService.matchHistory(user.id);
+	// }
 }
