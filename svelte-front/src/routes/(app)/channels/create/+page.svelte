@@ -1,9 +1,19 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
+    import { goto } from "$app/navigation";
+    import type { Socket } from "socket.io-client";
+    import { getContext } from "svelte";
+    import SocketContext from "../SocketContext.svelte";
 
 	let name: string;
 	let password: string;
 	let capacity = 25;
+	const socket: Socket = getContext(SocketContext);
+
+	function createRoom() {
+		socket.emit('createRoom', name, capacity, password, (id: string) => {
+			goto(id);
+		});
+	}
 </script>
 
 <section>
@@ -38,9 +48,7 @@
 
 		<button
 			type="submit"
-			on:click={() => {
-				goto("/channels/1");
-			}}>Create channel</button
+			on:click={createRoom}>Create channel</button
 		>
 	</form>
 </section>

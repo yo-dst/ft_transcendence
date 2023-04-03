@@ -1,45 +1,67 @@
 <script lang="ts">
-	import type { PageData } from "./$types";
+    import { goto } from "$app/navigation";
+    import ModalChannels from "$lib/components/ModalChannels.svelte";
+    import type { chatRoom } from "$lib/types/chat-rooms";
+    import type { Socket } from "socket.io-client";
+    import { getContext } from "svelte";
+    import SocketContext from "./SocketContext.svelte";
+	
+	const socket: Socket = getContext(SocketContext);
+	let rooms: chatRoom[] = [];
+	let isModalShowing = false;
 
-	export let data: PageData;
+	socket.emit('getRooms', (Rooms: chatRoom[]) => {
+		rooms = Rooms;
+	})
 
-	let channels = data.channels;
-
-	let showPasswordModal = false;
-
-	function joinChannel() {
-		showPasswordModal = true;
+	function joinRoom(id: string) {
+		socket.emit('joinRoom', id, undefined, (found: boolean) => {
+			if (found) goto('/channels/' + id);
+		})
 	}
+
+	function closeModal() {
+		isModalShowing = false;
+	}
+
 </script>
 
 <section>
 	<a href="/channels/create" role="button" style="width: 100%;">Create your channel</a>
 	<div class="title">Channels</div>
 	<ul>
-		{#each channels as channel}
+		{#each rooms as room}
 			<li>
 				<div class="channel-left">
 					<div class="users">
-						<span>{channel.users} / {channel.capacity}</span>
+						<span>{room.member.length} / {room.capacity}</span>
 						<iconify-icon icon="fa-solid:user-friends"></iconify-icon>	
 					</div>
 					<div class="channel-name">
-						{channel.name}
-						<small><i>{channel.owner}</i></small>
+						{room.name}
+						<small><i>{room.ownerName}</i></small>
 					</div>
 				</div>
 				<div class="channel-right">
-					{#if !channel.public}
+					{#if !room.isPublic}
 						<iconify-icon icon="material-symbols:lock" style="font-size: 1.5rem;"></iconify-icon>
-					{/if}
-						<button class="secondary" on:click={joinChannel}>
+						<button class="secondary" on:click={() => {isModalShowing = true}}>
 							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
 						</button>
-				</div>
-			</li>
+					{:else}
+						<button class="secondary" on:click={() => {joinRoom(room.id)}}>
+							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
+						</button>
+						{/if}
+					</div>
+				</li>
+				{#if isModalShowing}
+					<ModalChannels {socket} closeModal={closeModal} roomId={room.id}/>
+				{/if}
 		{/each}
 	</ul>
 </section>
+
 
 <style>
 	.title {

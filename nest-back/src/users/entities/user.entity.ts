@@ -1,5 +1,4 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import Avatar from "./avatar.entity";
 import FriendRequest from "../friend-requests/entities/friend-request.entity";
 import { Profile } from "./profile.entity";
 import { Match } from "../../game/entities/match.entity";
@@ -17,6 +16,9 @@ class User {
 
 	@Column({ default: false })
 	isTwoFactorAuthenticationEnabled: boolean;
+
+	@Column({ type: 'jsonb', default: [] })
+	blockedUser: number[];
 
 	@OneToOne(type => Profile, {
 		cascade: true
