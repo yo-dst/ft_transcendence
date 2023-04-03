@@ -30,8 +30,8 @@
 		<span>Error ! Wrong password.</span>
 		{/if}
 	  <footer>
-		<a href="#cancel" on:click={closeModal} role="button" class="secondary">Cancel</a>
-		<a href="#confirm" role="button" on:click={sendPassword}>Confirm</a>
+		<a href=" " on:click={closeModal} role="button" class="secondary">Cancel</a>
+		<a href=" " role="button" on:click={sendPassword}>Confirm</a>
 	  </footer>
 	</article>
   </dialog>

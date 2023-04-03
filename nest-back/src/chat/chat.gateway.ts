@@ -25,7 +25,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('createRoom')
 	handleRoomCreation(client: Socket, info: string | number) {
-		const room = new ChatRoom(client.data.userId, client.data.username, info[0], info[1], info[2]);
+		const room = new ChatRoom(client.data.userId, client.data.username, info[0], info[1], info[2], info[3]);
 		client.join(room.id);
 		this.ChatRooms.push(room);
 		return room.id;
@@ -47,7 +47,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('getRooms')
 	handleRoom(client: Socket) {
-		return this.ChatRooms.map(({ password, banList, admins, owner, ...rest }) => rest);
+		// return only public chatRooms with only the relevant informations
+		return this.ChatRooms.filter((room) => (room.isPublic === true)).map(({ password, banList, admins, owner, ...rest }) => rest);
 	}
 
 	@SubscribeMessage('newMessage')
@@ -56,8 +57,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(info[0]).emit('newMessage', client.data.username, info[1]);
 	}
 
-	@SubscribeMessage('getRoomName')
+	@SubscribeMessage('getInfo')
 	returnRoomName(client: Socket, roomId: string) {
-		return this.ChatRooms.find((room) => room.id === roomId).name;
+		const room = this.ChatRooms.find((room) => (room.id === roomId));
+		return { roomName: room.name, isPublic: room.isPublic }
+	};
+
+	@SubscribeMessage('roomUpdate')
+	handleRoomUpdate(client: Socket, info: string | boolean) {
+		const room = this.ChatRooms.find((room) => (room.id === info[0]));
+		console.log(room);
+		room.update(info[1], info[2]);
 	}
 }

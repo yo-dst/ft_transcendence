@@ -11,19 +11,21 @@ export class ChatRoom {
 	public capacity: number;
 	public id: string;
 	public isPublic: boolean;
+	public isProtected: boolean;
 
-	constructor(owner: number, ownerName: string, name: string, capacity: number, password: string) {
+	constructor(owner: number, ownerName: string, name: string, capacity: number, password: string, isPrivate: boolean) {
 		this.name = name;
 		this.owner = owner;
 		this.admins.push(owner);
 		this.member.push(owner);
 		this.ownerName = ownerName;
+		this.isPublic = isPrivate === true ? false : true;
 		if (password) {
 			this.password = password;
-			this.isPublic = false;
+			this.isProtected = false;
 		}
 		else
-			this.isPublic = true;
+			this.isProtected = true;
 		this.capacity = capacity;
 		this.id = v4();
 	}
@@ -32,6 +34,15 @@ export class ChatRoom {
 		if (!this.member.includes(userId) && this.capacity >= this.member.length) {
 			this.member.push(userId);
 		}
+	}
+
+	update(isPrivate: boolean, password: string) {
+		this.isPublic = isPrivate === true ? false : true;
+		if (password && password != "") {
+			this.password = password;
+			this.isProtected = true;
+		}
+		else this.isProtected = false;
 	}
 
 }

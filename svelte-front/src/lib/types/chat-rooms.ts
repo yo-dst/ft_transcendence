@@ -7,4 +7,5 @@ export type chatRoom = {
 	id: string;
 	name: string;
 	isPublic: boolean;
+	isProtected: boolean;
 }

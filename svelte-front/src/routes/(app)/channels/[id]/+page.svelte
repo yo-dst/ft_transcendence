@@ -11,13 +11,14 @@
 	let usernames: string[] = [];
 	let element: any;
 	const socket: Socket = getContext(SocketContext);
-	const channelId = $page.url.href.split('/').pop();
+	const channelId: string | undefined = $page.url.href.split('/').pop();
 	let roomName: string;
 	let showSettingsModal:boolean = false;
+	let isPublic: boolean;
 
-	socket.emit('getRoomName', channelId, (RoomName: string) => {
-		roomName = RoomName;
-		console.log(roomName);
+	socket.emit('getInfo', channelId, (info: any) => {
+		roomName = info.roomName;
+		isPublic = info.isPublic;
 	});
 
 	// triggers after component has been updated
@@ -45,8 +46,10 @@
 
 <article>
 	<header>
-		<iconify-icon on:click={() => {showSettingsModal = true}} on:keypress icon="material-symbols:settings-outline" style="font-size: 2rem;"/>
-		<h1>Channel {roomName}</h1>
+		<div>
+			<iconify-icon style="margin-left: 0.6rem;font-size: 2rem;" on:click={() => {showSettingsModal = true}} on:keypress icon="material-symbols:settings-outline"/>
+				<h1 style="margin:0">Channel {roomName}</h1>
+		</div>
 	</header>
 
 	<body bind:this={element} style="overflow: auto;">
@@ -61,7 +64,7 @@
 			{/each}
 		</ul>
 	</body>
-		<footer>
+		<footer style="margin-top:auto">
 			<div>
 				<input bind:value={input} on:keypress={(e) => {if (e.key === "Enter") sendMessage()}} type="text" style="margin: 0;margin-right: 1rem;text-indent: 2rem;">
 				<iconify-icon on:click={sendMessage} on:keypress icon="ic:baseline-send" style="font-size: 1.5rem;"></iconify-icon>
@@ -70,21 +73,27 @@
 </article>
 
 {#if showSettingsModal}
-	<ModalChannelSettings />
+	<ModalChannelSettings closeModal={() => {showSettingsModal = false}} {isPublic} {channelId}/>
 {/if}
 
 <style>
 	header {
 		padding: 1rem 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
-	header h1 {
-		text-align: center;
-		margin: 0;
+	header div {
+		display: flex;
+		align-items: center; /* align items in the center vertically */
+		justify-content: center; /* distribute items evenly */
+		width: 100%; /* take up the full width */
 	}
 
-	footer {
-		margin-top: auto;
+	header iconify-icon {
+		font-size: 2rem;
+		margin-right: 2.3rem;
 	}
 
 	article {
@@ -94,12 +103,12 @@
 		margin: auto;
 	}
 
-	div {
+	footer div {
 		display: flex;
 		align-items: center;
 	}
 
-	iconify-icon {
+	footer iconify-icon {
 		position: absolute;
 		padding-left: 1rem;
 	}

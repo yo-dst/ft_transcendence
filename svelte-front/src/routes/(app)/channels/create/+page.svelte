@@ -4,13 +4,14 @@
     import { getContext } from "svelte";
     import SocketContext from "../SocketContext.svelte";
 
+	let isPrivate: boolean = false;
 	let name: string;
 	let password: string;
 	let capacity = 25;
 	const socket: Socket = getContext(SocketContext);
 
 	function createRoom() {
-		socket.emit('createRoom', name, capacity, password, (id: string) => {
+		socket.emit('createRoom', name, capacity, password, isPrivate, (id: string) => {
 			goto(id);
 		});
 	}
@@ -44,7 +45,15 @@
 			placeholder="Password"
 			bind:value={password}
 		/>
-		<small>Leave it empty if you want a public channel</small>
+		<small>Leave it empty if you don't want a password</small>
+
+		<fieldset>
+			<label for="switch">
+				<input type="checkbox" id="switch" name="switch" role="switch" bind:checked={isPrivate}>
+				Private
+				<small style="padding-top: 0.5rem;margin:0;">Private rooms will not appear in the listing</small>
+			</label>
+		</fieldset>
 
 		<button
 			type="submit"
