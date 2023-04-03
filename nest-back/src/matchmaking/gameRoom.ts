@@ -1,6 +1,4 @@
 import { ball, paddle, gameInfo } from "./pong";
-import { Match } from "src/game/entities/match.entity";
-import { UsersService } from "src/users/users.service";
 import { GameService } from "src/game/game.service";
 
 export class GameRoom {
