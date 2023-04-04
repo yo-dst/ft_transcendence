@@ -66,12 +66,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('roomUpdate')
 	handleRoomUpdate(client: Socket, info: string | boolean) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]));
-		console.log(room);
 		room.update(info[1], info[2]);
 	}
 
 	@SubscribeMessage('getRoomScope')
 	returnRoomScore(client: Socket, roomId: string) {
 		return this.ChatRooms.find((room) => (room.id === roomId)).isPublic;
+	}
+
+	@SubscribeMessage('leaveRoom')
+	handleQuitRoom(client: Socket, ids: string | number) {
+		const room = this.ChatRooms.find((room) => (room.id === ids[0]));
+		room.deleteUser(ids[1]);
+		if (room.member.length === 0)
+			this.ChatRooms.splice(this.ChatRooms.indexOf(room), 1);
 	}
 }
