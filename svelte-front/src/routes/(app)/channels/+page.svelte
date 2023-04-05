@@ -56,7 +56,7 @@
 					</div>
 				</div>
 				<div class="channel-right">
-					{#if room.isProtected}
+					{#if room.isProtected && !room.member.includes($user.id)}
 						<iconify-icon icon="material-symbols:lock" style="font-size: 1.5rem;"></iconify-icon>
 						<button class="secondary" on:click={() => {isModalShowing = true}}>
 							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>

@@ -35,7 +35,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('joinRoom')
 	handleClientJoinRoom(client: Socket, info: string) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]))
-		if (room && (!room.isProtected || info[1] === room.password)) {
+		if (room && (!room.isProtected || info[1] === room.password || room.member.includes(client.data.userId))) {
 			client.join(room.id);
 			room.addUser(client.data.userId);
 			this.server.emit('roomUpdate', this.handleRoom());
