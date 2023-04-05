@@ -252,3 +252,60 @@ export const loginUserWithTwoFactorAuthentication = async (code: string): Promis
 		throw new Error(error.message);
 	}
 }
+
+export const fetchBlockList = async (): Promise<number[]> => {
+	const res = await fetch(`${host}/user/blocked-users`, {
+		credentials: "include",
+	})
+	if (!res.ok) {
+		const error = await res.json();
+		throw new Error(error.message);
+	}
+	return await res.json();
+}
+
+export const blockUser = async (usernameToBlock: string) => {
+	const res = await fetch(`${host}/user/block-user`, {
+		method: "PATCH",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			usernameToBlock
+		})
+	});
+	if (!res.ok) {
+		const error = await res.json();
+		throw new Error(error.message);
+	}
+	let blockedId = await res.json();
+	user.update(value => {
+		let userUpdated = value;
+		userUpdated.blocked?.push(blockedId);
+		return userUpdated;
+	})
+}
+
+export const unblockUser = async (usernameToUnblock: string) => {
+	const res = await fetch(`${host}/user/unblock-user`, {
+		method: "PATCH",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			usernameToUnblock
+		})
+	});
+	if (!res.ok) {
+		const error = await res.json();
+		throw new Error(error.message);
+	}
+	let unblockedId = await res.json();
+	user.update(value => {
+		let userUpdated = value;
+		userUpdated.blocked?.splice(value.blocked?.indexOf(unblockedId), 1);
+		return userUpdated;
+	})
+}
