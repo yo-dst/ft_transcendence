@@ -1,11 +1,11 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import ModalChannels from "$lib/components/ModalChannels.svelte";
     import { user } from "$lib/stores/user";
     import type { chatRoom } from "$lib/types/chat-rooms";
     import { io } from "socket.io-client";
     import { onMount } from "svelte";
 	import { chatSocket } from "$lib/stores/chat-socket";
+    import ModalPasswordChannels from "$lib/components/ModalPasswordChannels.svelte";
 	
 	let rooms: chatRoom[] = [];
 	let isModalShowing = false;
@@ -25,8 +25,6 @@
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
-			$chatSocket = io("localhost:3000/chat", {auth: {username: $user.profile?.username}});
-			
 			$chatSocket.emit('getRooms', (Rooms: chatRoom[]) => {
 				rooms = Rooms;
 			})
@@ -35,7 +33,6 @@
 				rooms = Rooms;
 			})
 		}
-
 	});
 </script>
 
@@ -69,7 +66,7 @@
 					</div>
 				</li>
 				{#if isModalShowing}
-					<ModalChannels closeModal={closeModal} roomId={room.id}/>
+					<ModalPasswordChannels closeModal={closeModal} roomId={room.id}/>
 				{/if}
 		{/each}
 	</ul>

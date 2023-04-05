@@ -4,7 +4,7 @@
 
 
 	export let closeModal: () => void;
-	export let roomId: string;
+	export let roomId: string | undefined;
 	let password: string;
 	let showError: boolean = false;
 

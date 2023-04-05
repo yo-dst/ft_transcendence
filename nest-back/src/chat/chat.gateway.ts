@@ -15,8 +15,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	async handleConnection(client: Socket) {
 		const user = await this.usersService.getByUsername(client.handshake.auth.username)
-		client.data.userId = await user.id;
+		client.data.userId = user.id;
 		client.data.username = client.handshake.auth.username;
+		client.emit('loaded');
 	}
 
 	handleDisconnect(client: Socket) {
@@ -52,8 +53,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('newMessage')
 	handleNewMessage(client: Socket, info: string) {
-		if (this.ChatRooms.find((room) => (room.member.includes(client.data.userId))))
+		console.log('before if');
+		if (this.ChatRooms.find((room) => (room.member.includes(client.data.userId)))) {
+			console.log(client.data.username, info[0]);
+			console.log(info[0]);
 			this.server.to(info[0]).emit('newMessage', client.data.username, info[1]);
+		}
 	}
 
 	@SubscribeMessage('getInfo')
@@ -81,5 +86,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (room.member.length === 0)
 			this.ChatRooms.splice(this.ChatRooms.indexOf(room), 1);
 		this.server.emit('roomUpdate', this.handleRoom());
+	}
+
+	@SubscribeMessage('verifyUser')
+	handleUserVerification(client: Socket, channelId: string) {
+		const room = this.ChatRooms.find((room) => (room.id === channelId));
+		if (room.member.includes(client.data.userId)) {
+			client.join(channelId);
+			return true;
+		}
+		return false;
 	}
 }
