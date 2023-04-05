@@ -30,6 +30,10 @@
 			$chatSocket.emit('getRooms', (Rooms: chatRoom[]) => {
 				rooms = Rooms;
 			})
+
+			$chatSocket.on('roomUpdate', (Rooms: chatRoom[]) => {
+				rooms = Rooms;
+			})
 		}
 
 	});
