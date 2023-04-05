@@ -6,6 +6,7 @@
     import { chatSocket } from "$lib/stores/chat-socket";
     import Loading from "$lib/components/Loading.svelte";
     import ModalPasswordChannels from "$lib/components/ModalPasswordChannels.svelte";
+    import { goto } from "$app/navigation";
 
 	let messages: string[] = [];
 	let input: string = "";
