@@ -14,8 +14,17 @@ export class FriendRequestsService {
 		return this.friendRequestRepository.find();
 	}
 
-	async getOneBy(props: any) {
-		return this.friendRequestRepository.findOneBy({ ...props });
+	async getOneByCreatorAndReceiver(creatorId: number, receiverId: number) {
+		return this.friendRequestRepository.findOne({
+			where: {
+				creator: {
+					id: creatorId
+				},
+				receiver: {
+					id: receiverId
+				}
+			}
+		})
 	}
 
 	async getById(id: number) {

@@ -3,26 +3,27 @@
 	import { onMount } from "svelte";
 	import { user } from "$lib/stores/user";
 	import type { Match } from "$lib/types/match";
-    import { fetchMatchHistory } from "$lib/api";
+    import { fetchMatchHistory, fetchProfile } from "$lib/api";
+    import { page } from "$app/stores";
+    import type { Profile } from "$lib/types/profile";
 
 	let nbMatchesToLoad = 5;
 	let index = 0;
 	let matches: Match[] = [];
+	const username = $page.url.pathname.split("/")[2];
+	let userProfile: Profile;
 
 	async function loadMore() {
-		try {
-			const data = await fetchMatchHistory($user.profile.username, index, nbMatchesToLoad);
-			index += nbMatchesToLoad;
-			matches = [...matches, ...data];
-		} catch (err) {
-			console.log(err);
-		}
+		const data = await fetchMatchHistory(username, index, nbMatchesToLoad);
+		index += nbMatchesToLoad;
+		matches = [...matches, ...data];
 	}
 
 	onMount(async () => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
+			userProfile = await fetchProfile(username);
 			await loadMore();
 		}
 	});
@@ -30,15 +31,15 @@
 
 <section>
 	<div class="user">
-		<img src={$user.profile?.avatar?.url} alt="profile" />
+		<img src={userProfile?.avatar?.url} alt="profile" />
 		<div class="user-stats">
-			<span>{$user.profile?.username}</span>
+			<span>{userProfile?.username}</span>
 			<div>
-				<span style="color: var(--ins-color);;">{$user.profile?.wins}</span>
+				<span style="color: var(--ins-color);;">{userProfile?.wins}</span>
 				/
 				<span style="color: var(--color);">0</span>
 				/
-				<span style="color: var(--del-color);;">{$user.profile?.losses}</span>
+				<span style="color: var(--del-color);;">{userProfile?.losses}</span>
 			</div>
 		</div>
 	</div>

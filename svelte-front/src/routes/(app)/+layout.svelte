@@ -26,7 +26,7 @@
 	}
 
 	main {
-		margin-bottom: 25px;
+		margin-bottom: 75px;
 		max-width: 500px;
 	}
 

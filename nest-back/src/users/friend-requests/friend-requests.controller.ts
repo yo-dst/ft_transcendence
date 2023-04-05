@@ -44,10 +44,13 @@ export class FriendRequestsController {
 		if (!receiver) {
 			throw new BadRequestException("User with that username doesn't exist");
 		}
+		if (creator.id === receiver.id) {
+			throw new BadRequestException("Pls find a real friend");
+		}
 		if (await this.usersService.areFriends(creator.id, receiver.id)) {
 			throw new BadRequestException("You are already friend with this user");
 		}
-		const friendRequest = await this.friendRequestsService.getOneBy({ creator, receiver });
+		const friendRequest = await this.friendRequestsService.getOneByCreatorAndReceiver(creator.id, receiver.id);
 		if (friendRequest) {
 			throw new BadRequestException("Friend request already exists");
 		}

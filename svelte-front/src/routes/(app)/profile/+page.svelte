@@ -3,19 +3,14 @@
 	import { onMount } from "svelte";
 	import { user } from "$lib/stores/user";
 	import type { Match } from "$lib/types/match";
-    import { fetchMatchHistory, fetchProfile } from "$lib/api";
-    import { page } from "$app/stores";
-    import { error } from "@sveltejs/kit";
-    import type { Profile } from "$lib/types/profile";
+    import { fetchMatchHistory } from "$lib/api";
 
 	let nbMatchesToLoad = 5;
 	let index = 0;
 	let matches: Match[] = [];
-	const username = $page.url.searchParams.get("username");
-	let userProfile: Profile;
 
 	async function loadMore() {
-		const data = await fetchMatchHistory(userProfile.username, index, nbMatchesToLoad);
+		const data = await fetchMatchHistory($user.profile.username, index, nbMatchesToLoad);
 		index += nbMatchesToLoad;
 		matches = [...matches, ...data];
 	}
@@ -24,18 +19,6 @@
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
-			if (!username) {
-				throw error(404, {
-					message: "Not found"
-				});
-			}
-			try {
-				userProfile = await fetchProfile(username);
-			} catch (err) {
-				throw error(404, {
-					message: "Not found"
-				});
-			}
 			await loadMore();
 		}
 	});
