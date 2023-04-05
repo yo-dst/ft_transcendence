@@ -47,10 +47,6 @@
 		}
 	}
 
-	$chatSocket.on('test', () => {
-		console.log("ok")
-	})	
-
 	$chatSocket.on('newMessage', (Username: string, newMessage: string) => {
 		usernames = [...usernames, Username];
 		messages = [...messages, newMessage];

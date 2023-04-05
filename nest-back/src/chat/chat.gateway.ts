@@ -53,10 +53,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('newMessage')
 	handleNewMessage(client: Socket, info: string) {
-		console.log('before if');
 		if (this.ChatRooms.find((room) => (room.member.includes(client.data.userId)))) {
-			console.log(client.data.username, info[0]);
-			console.log(info[0]);
 			this.server.to(info[0]).emit('newMessage', client.data.username, info[1]);
 		}
 	}
