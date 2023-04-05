@@ -1,5 +1,7 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
     import { chatSocket } from "$lib/stores/chat-socket";
+    import { user } from "$lib/stores/user";
 
 	export let closeModal: () => void;
 	export let channelId: string | undefined;
@@ -12,6 +14,11 @@
 
 	function sendChange() {
 		$chatSocket.emit('roomUpdate', channelId, isPrivate, password);
+		closeModal();
+	}
+
+	function leaveRoom() {
+		$chatSocket.emit('leaveRoom', channelId, $user.id);
 		closeModal();
 	}
 </script>
@@ -32,7 +39,7 @@
 	  </fieldset>
 		
 	  <footer>
-		<a href=" " role="button" id="leave">Leave Room</a>
+		<a href="/channels" role="button" id="leave" on:click={leaveRoom}>Leave Room</a>
 		<a href=" " role="button" class="secondary" id="move" on:click={closeModal}>Cancel</a>
 		<a href=" " role="button" id="move" on:click={sendChange}>Confirm</a>
 	  </footer>

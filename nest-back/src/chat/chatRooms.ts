@@ -22,10 +22,10 @@ export class ChatRoom {
 		this.isPublic = isPrivate === true ? false : true;
 		if (password) {
 			this.password = password;
-			this.isProtected = false;
+			this.isProtected = true;
 		}
 		else
-			this.isProtected = true;
+			this.isProtected = false;
 		this.capacity = capacity;
 		this.id = v4();
 	}
@@ -38,14 +38,17 @@ export class ChatRoom {
 
 	update(isPrivate: boolean, password: string) {
 		this.isPublic = isPrivate === true ? false : true;
-		console.log(password);
 		if (password && password != "") {
 			this.password = password;
 			this.isProtected = true;
 		}
 		else this.isProtected = false;
-		console.log(this.password);
-		console.log(this.isProtected);
+	}
+
+	deleteUser(userId: number){
+		this.member.splice(this.member.findIndex((member) => (member === userId)), 1);
+		this.admins.splice(this.admins.findIndex((admins) => (admins === userId)), 1);
+		// need to correcly change owner
 	}
 
 }

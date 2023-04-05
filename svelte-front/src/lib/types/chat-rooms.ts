@@ -6,6 +6,5 @@ export type chatRoom = {
 	capacity: number;
 	id: string;
 	name: string;
-	isPublic: boolean;
 	isProtected: boolean;
 }
