@@ -4,6 +4,7 @@
     import { goto } from "$app/navigation";
 	import { page } from "$app/stores";
 	import { notifications } from "$lib/stores/notifications";
+	import PongIcon from "$lib/assets/pong-icon.svg";
 
 	let showNotif = false;
 
@@ -28,7 +29,7 @@
 </script>
 
 <div class="header">
-    <img src="pong-icon.svg" 
+    <img src={PongIcon} 
 		alt="icon pong"
 		on:click={() => goto("/")}
 		on:keypress

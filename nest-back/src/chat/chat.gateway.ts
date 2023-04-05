@@ -15,8 +15,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	async handleConnection(client: Socket) {
 		const user = await this.usersService.getByUsername(client.handshake.auth.username)
-		client.data.userId = await user.id;
+		client.data.userId = user.id;
 		client.data.username = client.handshake.auth.username;
+		client.emit('loaded');
 	}
 
 	handleDisconnect(client: Socket) {
@@ -28,33 +29,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const room = new ChatRoom(client.data.userId, client.data.username, info[0], info[1], info[2], info[3]);
 		client.join(room.id);
 		this.ChatRooms.push(room);
+		this.server.emit('roomUpdate', this.handleRoom());
 		return room.id;
 	}
 
 	@SubscribeMessage('joinRoom')
 	handleClientJoinRoom(client: Socket, info: string) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]))
-		console.log(room);
-		console.log(info[1]);
-		console.log(info[0]);
-		if (room && (room.isPublic || info[1] === room.password)) {
+		if (room && (!room.isProtected || info[1] === room.password || room.member.includes(client.data.userId))) {
 			client.join(room.id);
 			room.addUser(client.data.userId);
+			this.server.emit('roomUpdate', this.handleRoom());
 			return true;
 		}
 		return false;
 	}
 
 	@SubscribeMessage('getRooms')
-	handleRoom(client: Socket) {
+	handleRoom() {
 		// return only public chatRooms with only the relevant informations
 		return this.ChatRooms.filter((room) => (room.isPublic === true)).map(({ password, banList, admins, owner, ...rest }) => rest);
 	}
 
 	@SubscribeMessage('newMessage')
 	handleNewMessage(client: Socket, info: string) {
-		if (this.ChatRooms.find((room) => (room.member.includes(client.data.userId))))
+		if (this.ChatRooms.find((room) => (room.member.includes(client.data.userId)))) {
 			this.server.to(info[0]).emit('newMessage', client.data.username, info[1]);
+		}
 	}
 
 	@SubscribeMessage('getInfo')
@@ -67,6 +68,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	handleRoomUpdate(client: Socket, info: string | boolean) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]));
 		room.update(info[1], info[2]);
+		this.server.emit('roomUpdate', this.handleRoom());
 	}
 
 	@SubscribeMessage('getRoomScope')
@@ -80,5 +82,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		room.deleteUser(ids[1]);
 		if (room.member.length === 0)
 			this.ChatRooms.splice(this.ChatRooms.indexOf(room), 1);
+		this.server.emit('roomUpdate', this.handleRoom());
+	}
+
+	@SubscribeMessage('verifyUser')
+	handleUserVerification(client: Socket, channelId: string) {
+		const room = this.ChatRooms.find((room) => (room.id === channelId));
+		if (room.member.includes(client.data.userId)) {
+			client.join(channelId);
+			return true;
+		}
+		return false;
 	}
 }

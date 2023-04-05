@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { acceptFriendRequest, declineFriendRequest } from "$lib/api";
 	import { notifications } from "$lib/stores/notifications";
 
 	export let show: boolean;
@@ -10,14 +11,23 @@
 		<ul>
 		{#each $notifications as notification}
 			<li>
-				<span>{notification.type} - {notification.data.username}</span>
+				<span>{notification.type} - {notification.data.creator.username}</span>
 				<div class="button-wrapper">
-					<button class="accept-button">
-						<iconify-icon icon="fluent-mdl2:accept-medium"></iconify-icon>
-					</button>
-					<button class="decline-button">
-						<iconify-icon icon="radix-icons:cross-2"></iconify-icon>
-					</button>
+					{#if notification.type === "friend-request"}
+						<button class="accept-button" on:click={() => acceptFriendRequest(notification.data.id)}>
+							<iconify-icon icon="fluent-mdl2:accept-medium"></iconify-icon>
+						</button>
+						<button class="decline-button" on:click={() => declineFriendRequest(notification.data.id)}>
+							<iconify-icon icon="radix-icons:cross-2"></iconify-icon>
+						</button>
+					{:else if notification.type === "game-request"}
+						<button class="accept-button">
+							<iconify-icon icon="fluent-mdl2:accept-medium"></iconify-icon>
+						</button>
+						<button class="decline-button">
+							<iconify-icon icon="radix-icons:cross-2"></iconify-icon>
+						</button>
+					{/if}
 				</div>
 			</li>
 		{/each}

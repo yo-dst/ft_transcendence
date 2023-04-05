@@ -4,7 +4,7 @@
 
 
 	export let closeModal: () => void;
-	export let roomId: string;
+	export let roomId: string | undefined;
 	let password: string;
 	let showError: boolean = false;
 
@@ -29,7 +29,7 @@
 		<span>Error ! Wrong password.</span>
 		{/if}
 	  <footer>
-		<a href=" " on:click={closeModal} role="button" class="secondary">Cancel</a>
+		<a href="/channels" on:click={closeModal} role="button" class="secondary">Cancel</a>
 		<a href=" " role="button" on:click={sendPassword}>Confirm</a>
 	  </footer>
 	</article>

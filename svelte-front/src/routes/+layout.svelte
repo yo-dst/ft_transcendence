@@ -7,9 +7,10 @@
 	import { eventsSocket } from "$lib/stores/events-socket";
 	import { notifications } from "$lib/stores/notifications";
 	import { io } from "socket.io-client";
-    import { fetchFriendsProfile, fetchProfile, loginUser } from "$lib/api";
+    import { fetchFriendRequests, fetchFriendsProfile, fetchProfile, loginUser } from "$lib/api";
     import { friendsProfile } from "$lib/stores/friends-profile";
     import type { Notification } from "$lib/types/notification";
+    import { friendRequests } from "$lib/stores/friend-requests";
 
 	$: console.log("user", $user);
 
@@ -21,6 +22,7 @@
 		try {
 			await loginUser();
 			$friendsProfile = await fetchFriendsProfile();
+			$friendRequests = await fetchFriendRequests();
 			$eventsSocket = io("http://localhost:3000/events", {
 				auth: {
 					username: $user.profile?.username

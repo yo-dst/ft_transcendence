@@ -1,20 +1,18 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
 	import { user } from "$lib/stores/user";
-    import type { FriendRequest } from "$lib/types/friend-request";
     import { onMount } from "svelte";
 	import { eventsSocket } from "$lib/stores/events-socket";
     import type { Friend } from "$lib/types/friend";
-    import { acceptFriendRequest, declineFriendRequest, fetchFriendRequests, fetchFriendsProfile, fetchProfile, removeFriend, sendFriendRequest } from "$lib/api";
-    import { notifications } from "$lib/stores/notifications";
+    import { acceptFriendRequest, declineFriendRequest, fetchProfile, removeFriend, sendFriendRequest } from "$lib/api";
     import type { Profile } from "$lib/types/profile";
 	import { friendsProfile } from "$lib/stores/friends-profile";
+	import { friendRequests } from "$lib/stores/friend-requests";
 	
 	let friends: Friend[] = [];
-	let friendRequests: FriendRequest[] = [];
 
 	let sendRequestValue: string;
-	let sendRequestError: any;
+	let sendRequestError: string;
 
 	var countFakeFriend = 0;
 	function addFakeFriend() {
@@ -47,7 +45,7 @@
 				losses: countFakeFriend
 			}
 		}
-		friendRequests = [...friendRequests, fakeFriendRequest];
+		$friendRequests = [...$friendRequests, fakeFriendRequest];
 		countFakeFriendRequest++;
 	}
 
@@ -68,34 +66,20 @@
 				profile
 			};
 		}));
+		friends.sort((a, b) => {
+			if (a.isLoggedIn && b.isLoggedIn)
+				return 0;
+			else if (a.isLoggedIn) {
+				return -1;
+			}
+			return 1;
+		});
 	}
 
 	async function sendRequest() {
-		const friendRequest = await sendFriendRequest(sendRequestValue);
-		$eventsSocket.emit("send-friend-request", {
-			id: friendRequest.id,
-			receiverUsername: sendRequestValue
-		});
-	}
-	
-	async function acceptRequest(id: number) {
-		const newFriendProfile = await acceptFriendRequest(id);
-		$friendsProfile = [...$friendsProfile, newFriendProfile];
-		friendRequests = friendRequests.filter(request => request.id !== id);
-		$notifications = $notifications.filter(notification => (notification.type !== "friend-request" && notification.data.id === id))
-		$eventsSocket.emit("accept-friend-request", newFriendProfile.username);
-	}
-
-	async function declineRequest(id: number) {
-		await declineFriendRequest(id);
-		friendRequests = friendRequests.filter(request => request.id !== id);
-		$notifications = $notifications.filter(notification => (notification.type !== "friend-request" && notification.data.id === id))
-	}
-
-	async function remove(username: string) {
-		await removeFriend(username);
-		$friendsProfile = $friendsProfile.filter(profile => profile.username !== username);
-		$eventsSocket.emit("remove-friend", username);
+		sendFriendRequest(sendRequestValue)
+			.then(() => sendRequestError = "")
+			.catch(err => sendRequestError = err);
 	}
 
 	$: getFriendsStatus($friendsProfile);
@@ -105,7 +89,6 @@
 			goto("/login");
 		} else {
 			getFriendsStatus($friendsProfile);
-			friendRequests = await fetchFriendRequests();
 
 			$eventsSocket.on("user-connected", (username: string) => {
 				friends = friends.map(friend => {
@@ -136,7 +119,7 @@
 
 			$eventsSocket.on("receive-friend-request", async (friendRequest: any) => {
 				const creatorProfile = await fetchProfile(friendRequest.creatorUsername);
-				friendRequests = [...friendRequests, { id: friendRequest.id, creator: creatorProfile }]; 
+				$friendRequests = [...$friendRequests, { id: friendRequest.id, creator: creatorProfile }]; 
 			});
 		}
 	});
@@ -144,15 +127,15 @@
 
 <section>
 	<h3>Add a friend</h3>
-	<div class="input-button-container">
+	<div class="input-button-container" style="margin-bottom: -0.5rem;">
 		<input type="text" placeholder="Username" bind:value={sendRequestValue} />
 		<button on:click={sendRequest} style="background-color: var(--ins-color); border:none;">
 			<iconify-icon icon="fluent-mdl2:add-friend" style="font-size: 1.5rem"/>
 		</button>
 	</div>
-{#if sendRequestError}
-	<pre>{JSON.stringify(sendRequestError, undefined, 2)}</pre>
-{/if}
+	{#if sendRequestError}
+		<span class="error">{sendRequestError}</span>
+	{/if}
 </section>
 
 <section>
@@ -160,17 +143,19 @@
 		<h3>Friends</h3>
 		<ul>
 		{#each friends as friend}
-			<li class="li-friend">
-				<div class="friend-profile">
-					<div class:online={friend.isLoggedIn}></div>
-					<img src={friend.profile.avatar.url} alt="friend"/>
-					<span>{friend.profile.username}</span>
-				</div>
-				<div>
-					<button on:click={() => remove(friend.profile.username)} style="background-color: var(--del-color);">
-						<iconify-icon icon="charm:cross" style="font-size: 1.7rem;"/>
-					</button>
-				</div>
+			<li>
+				<a href={`/profile/${friend.profile.username}`}>
+					<div class="friend-profile">
+						<div class:online={friend.isLoggedIn}></div>
+						<img src={friend.profile.avatar.url} alt="friend"/>
+						<span>{friend.profile.username}</span>
+					</div>
+					<div>
+					</div>
+				</a>
+				<button on:click={() => removeFriend(friend.profile.username)} class="remove-button">
+					<iconify-icon icon="charm:cross" style="font-size: 1.7rem;"/>
+				</button>
 			</li>
 		{/each}
 		</ul>
@@ -181,15 +166,19 @@
 	<div class="list-container bg-light-dark">
 		<h3>Friend requests received</h3>
 		<ul>
-		{#each friendRequests as friendRequest}
+		{#each $friendRequests as friendRequest}
 			<li>
-				<div>
+				<a href={`/profile/${friendRequest.creator.username}`}>
 					<img src={friendRequest.creator.avatar.url} alt="friend-request-creator"/>
 					<span>{friendRequest.creator.username}</span>
-				</div>
-				<div>
-					<button on:click={() => acceptRequest(friendRequest.id)}>accept</button>
-					<button on:click={() => declineRequest(friendRequest.id)}>decline</button>
+				</a>
+				<div class="friend-request-buttons">
+					<button on:click={() => acceptFriendRequest(friendRequest.id)} style="background-color: var(--ins-color);">
+						<iconify-icon icon="fluent-mdl2:accept-medium" style="font-size: 1.55rem;"></iconify-icon>
+					</button>
+					<button on:click={() => declineFriendRequest(friendRequest.id)} style="background-color: var(--del-color);">
+						<iconify-icon icon="charm:cross" style="font-size: 1.5rem;"/>
+					</button>
 				</div>
 			</li>
 		{/each}
@@ -216,26 +205,36 @@
 	}
 
 	ul > li {
-		background-color: #0d1117;
-		list-style-type: none;
-		padding: 0.5rem 1rem;
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
+		background-color: #0d1117;
+		list-style-type: none;
 		border-radius: 5px;
 		margin-bottom: 0.7rem;
+		padding: 0.5rem 1rem;
+
 	}
 
-	ul > li > :first-child {
+	ul > li:hover {
+		background-color: #33383E;
+		cursor: pointer;
+	}
+
+	ul > li:hover button {
+		display: flex;
+	}
+
+	ul > li > a {
+		width: 80%;
 		display: flex;
 		align-items: center;
+		text-decoration: none;
+		color: #f0f6fc;
 	}
 
-	ul > li > :last-child {
-		display: flex;
-		gap: 0.5rem;
+	ul > li > a:hover img {
+		transform: scale(1.05);
 	}
-
 
 	ul > li img {
 		height: 3.5rem;
@@ -247,33 +246,30 @@
 	}
 
 	ul > li button {
+		display: none;
 		width: auto;
 		height: auto;
 		margin-bottom: 0;
-		display: flex;
 		justify-content: center;
 		align-items: center;
 		border: none;
 	}
 
-	.li-friend button {
-		display: none;
-	}
-
-	.li-friend:hover {
-		background-color: #33383E;
-		cursor: pointer;
-	}
-
-	.li-friend:hover button {
-		display: flex;
-	}
-
-	.li-friend button:hover {
+	ul > li button:hover {
 		opacity: 0.9;
 	}
 
-	.li-friend .friend-profile {
+	.friend-request-buttons {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.remove-button {
+		background-color: var(--del-color);
+	}
+
+	.friend-profile {
 		position: relative;
 	}
 
@@ -281,9 +277,21 @@
 		position: absolute;
 		top: 0;
 		left: 0;
-		background-color: greenyellow;
+		background-color: var(--ins-color);
 		width: 16px;
 		height: 16px;
 		border-radius: 50%;
+		box-shadow: 0 0 5px black;
+		z-index: 10;
+	}
+
+	.error {
+		color: var(--del-color);
+	}
+
+	@media (max-width: 700px) {
+		ul > li button {
+			display: flex;
+		}
 	}
 </style>

@@ -3,6 +3,7 @@
     import Notifications from "./Notifications.svelte";
     import { notifications } from "$lib/stores/notifications";
     import { user } from "$lib/stores/user";
+    import PongIcon from "$lib/assets/pong-icon.svg";
 
     let showDrawer = false;
     let showNotif = false;
@@ -17,7 +18,7 @@
         <iconify-icon icon="charm:menu-hamburger" style="font-size: 50px; color: #f0f6fc;"></iconify-icon>
     </button>
     <a href="/">
-        <img src="pong-icon.svg" alt="icon pong" class="pong-icon"/>
+        <img src={PongIcon} alt="icon pong" class="pong-icon"/>
     </a>
     <div class="header-profile">
     {#if $user.isLoggedIn}

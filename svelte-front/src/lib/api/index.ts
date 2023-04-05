@@ -1,8 +1,12 @@
 import { eventsSocket } from "$lib/stores/events-socket";
+import { friendRequests } from "$lib/stores/friend-requests";
+import { friendsProfile } from "$lib/stores/friends-profile";
+import { notifications } from "$lib/stores/notifications";
 import { user } from "$lib/stores/user";
 import type { FriendRequest } from "$lib/types/friend-request";
 import type { Match } from "$lib/types/match";
 import type { Profile } from "$lib/types/profile";
+import { get } from "svelte/store";
 
 const host = "http://localhost:3000";
 
@@ -170,7 +174,7 @@ export const fetchFriendRequests = async (): Promise<FriendRequest[]> => {
 	return await res.json();
 }
 
-export const sendFriendRequest = async (username: string): Promise<FriendRequest> => {
+export const sendFriendRequest = async (username: string): Promise<void> => {
 	const res = await fetch(`${host}/friend-requests`, {
 		method: "POST",
 		credentials: "include",
@@ -183,10 +187,15 @@ export const sendFriendRequest = async (username: string): Promise<FriendRequest
 		const error = await res.json();
 		throw new Error(error.message);
 	}
-	return await res.json();
+	const data = await res.json();
+	const socket = get(eventsSocket);
+	socket.emit("send-friend-request", {
+		id: data.id,
+		receiverUsername: username
+	});
 }
 
-export const acceptFriendRequest = async (friendRequestId: number): Promise<Profile> => {
+export const acceptFriendRequest = async (friendRequestId: number): Promise<void> => {
 	const res = await fetch(`${host}/friend-requests/accept/${friendRequestId}`, {
 		method: "POST",
 		credentials: "include"
@@ -195,7 +204,12 @@ export const acceptFriendRequest = async (friendRequestId: number): Promise<Prof
 		const error = await res.json();
 		throw new Error(error.message);
 	}
-	return await res.json();
+	const data = await res.json();
+	friendsProfile.update(value => { return [...value, data]; });
+	friendRequests.update(value => value.filter(request => request.id !== friendRequestId));
+	notifications.update(value => value.filter(notification => (notification.type !== "friend-request" && notification.data.id === friendRequestId)));
+	const socket = get(eventsSocket);
+	socket.emit("accept-friend-request", data.username);
 }
 
 export const declineFriendRequest = async (friendRequestId: number): Promise<void> => {
@@ -207,6 +221,8 @@ export const declineFriendRequest = async (friendRequestId: number): Promise<voi
 		const error = await res.json();
 		throw new Error(error.message);
 	}
+	friendRequests.update(value => value.filter(request => request.id !== friendRequestId));
+	notifications.update(value => value.filter(notification => (notification.type !== "friend-request" && notification.data.id === friendRequestId)));
 }
 
 export const removeFriend = async (username: string): Promise<void> => {
@@ -222,6 +238,9 @@ export const removeFriend = async (username: string): Promise<void> => {
 		const error = await res.json();
 		throw new Error(error.message);
 	}
+	friendsProfile.update(value => value.filter(profile => profile.username !== username));
+	const socket = get(eventsSocket);
+	socket.emit("remove-friend", username);
 }
 
 export const generateTwoFactorAuthenticationQrCode = async (): Promise<string> => {
