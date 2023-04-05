@@ -92,9 +92,3 @@ html {
 a:focus {
   background-color: transparent;
 }
-
-button:focus {
-  background-color: transparent;
-}
-
-

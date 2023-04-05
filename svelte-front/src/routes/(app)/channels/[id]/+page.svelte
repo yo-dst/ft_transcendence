@@ -4,6 +4,7 @@
     import { page } from "$app/stores";
     import ModalChannelSettings from "$lib/components/ModalChannelSettings.svelte";
     import { chatSocket } from "$lib/stores/chat-socket";
+    import ChatModal from "$lib/components/ChatModal.svelte";
 
 	let messages: string[] = [];
 	let input: string = "";
@@ -13,6 +14,9 @@
 	let roomName: string;
 	let showSettingsModal:boolean = false;
 	let isPublic: boolean;
+	let show = false;
+	const setShow = (value: boolean) => show = value;
+	let usernameForModal: string;
 
 	$chatSocket.emit('getInfo', channelId, (info: any) => {
 		roomName = info.roomName;
@@ -57,7 +61,19 @@
 			</li>
 			{#each messages as message, index}
 				<li>
-					<span style="color: #FEA347">{usernames[index]}</span> : {message}
+					{#if usernames[index] !== $user.profile?.username}
+						<span style="color: #FEA347;"
+							on:click|stopPropagation={() => { usernameForModal = usernames[index]; setShow(true); }}
+							on:keypress
+						>
+							{usernames[index]}
+						</span>
+					{:else}
+						<span style="color: #FEA347; text-decoration: underline;">
+							{usernames[index]}
+						</span>
+					{/if}
+					: {message}
 				</li>
 			{/each}
 		</ul>
@@ -72,6 +88,10 @@
 
 {#if showSettingsModal}
 	<ModalChannelSettings closeModal={() => {showSettingsModal = false}} {channelId}/>
+{/if}
+
+{#if show}
+	<ChatModal {setShow} username={usernameForModal} />
 {/if}
 
 <style>
@@ -109,6 +129,10 @@
 	footer iconify-icon {
 		position: absolute;
 		padding-left: 1rem;
+	}
+
+	ul li {
+		list-style: none;
 	}
 
 </style>
