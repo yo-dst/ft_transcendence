@@ -4,6 +4,9 @@
     import { page } from "$app/stores";
     import ModalChannelSettings from "$lib/components/ModalChannelSettings.svelte";
     import { chatSocket } from "$lib/stores/chat-socket";
+    import Loading from "$lib/components/Loading.svelte";
+    import ModalPasswordChannels from "$lib/components/ModalPasswordChannels.svelte";
+    import { goto } from "$app/navigation";
     import ChatModal from "$lib/components/ChatModal.svelte";
 
 	let messages: string[] = [];
@@ -14,6 +17,14 @@
 	let roomName: string;
 	let showSettingsModal:boolean = false;
 	let isPublic: boolean;
+	let isLoading: boolean = true;
+	let showPasswordModal: boolean = true;
+	
+	$chatSocket.emit('verifyUser', channelId, (isConnected: boolean) => {
+		if (isConnected) showPasswordModal = false;
+		else showPasswordModal = true;
+		isLoading = false;
+	})
 	let show = false;
 	const setShow = (value: boolean) => show = value;
 	let usernameForModal: string;
@@ -23,9 +34,10 @@
 		isPublic = info.isPublic;
 	});
 
+
 	// triggers after component has been updated
 	afterUpdate(() => {
-		if(messages) scrollToBottom(element);
+		if(messages && element) scrollToBottom(element);
 	})
 
 	const scrollToBottom = async (node: any) => {
@@ -34,18 +46,23 @@
 
 	function sendMessage() {
 		if (input){
+			console.log("sended");
 			$chatSocket.emit('newMessage', channelId, input);
 			input = "";
 		}
 	}
 
-	$chatSocket.on('newMessage', (Username, newMessage) => {
+	$chatSocket.on('newMessage', (Username: string, newMessage: string) => {
 		usernames = [...usernames, Username];
 		messages = [...messages, newMessage];
 	})
 
 </script>
-
+{#if isLoading}
+	<Loading/>
+{:else if showPasswordModal}
+<ModalPasswordChannels closeModal={() => {}} roomId={channelId}/>
+{:else}
 <article>
 	<header>
 		<div>
