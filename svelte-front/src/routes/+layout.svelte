@@ -7,7 +7,7 @@
 	import { eventsSocket } from "$lib/stores/events-socket";
 	import { notifications } from "$lib/stores/notifications";
 	import { io } from "socket.io-client";
-    import { fetchFriendRequests, fetchFriendsProfile, fetchProfile, loginUser } from "$lib/api";
+    import { fetchBlockList, fetchFriendRequests, fetchFriendsProfile, fetchProfile, loginUser } from "$lib/api";
     import { friendsProfile } from "$lib/stores/friends-profile";
     import type { Notification } from "$lib/types/notification";
     import { friendRequests } from "$lib/stores/friend-requests";
@@ -28,6 +28,7 @@
 					username: $user.profile?.username
 				}
 			});
+			fetchBlockList();
 			$eventsSocket.on("receive-friend-request", async (data: { id: number, creatorUsername: string }) => {
 				const creatorProfile = await fetchProfile(data.creatorUsername);
 				const newNotification: Notification = {

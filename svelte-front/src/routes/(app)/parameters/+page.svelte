@@ -3,10 +3,12 @@
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
     import { logoutUser, turnOffTwoFactorAuthentication, updateUserAvatar, updateUserUsername } from "$lib/api";
+    import ModalBlockedUser from "$lib/components/ModalBlockedUser.svelte";
 
 	let newUsername: string = "";
 	let files: any;
 	let isTwoFactorAuthenticationEnabled: boolean;
+	let showBlockedModal: boolean = false;
 
 	let updateUsernameError: string;
 	let updateAvatarError: string;
@@ -113,6 +115,11 @@
 	{/if}
 	</label>
 </section>
+
+<button style="width:40%; margin:0" on:click={() => {showBlockedModal = true}}>Block list</button>
+{#if showBlockedModal}
+	<ModalBlockedUser closeModal={() => {showBlockedModal = false}}/>
+{/if}
 
 <div class="logout-wrapper">
 	<h3>Log in with another account</h3>

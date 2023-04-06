@@ -5,6 +5,8 @@ import { UsersService } from "../users.service";
 import RemoveFriendDto from "./dto/remove-friend.dto";
 import UpdateAvatarDto from "./dto/update-avatar.dto";
 import UpdateUsernameDto from "./dto/update-username.dto";
+import BlockedDto from "./dto/block.dto";
+import UnblockDto from "./dto/unblock.dto";
 
 @Controller("user")
 export class UserController {
@@ -20,6 +22,7 @@ export class UserController {
 		return {
 			id: req.user.id,
 			isTwoFactorAuthenticationEnabled: req.user.isTwoFactorAuthenticationEnabled,
+			blocked: req.user.blockedUser,
 			profile
 		}
 	}
@@ -62,6 +65,7 @@ export class UserController {
 		await this.usersService.removeFriends(req.user.id, friendToBeRemoved.id);
 	}
 
+	
 	@Get("friends")
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async getFriends(@Req() req: RequestWithUser) {
@@ -73,7 +77,7 @@ export class UserController {
 		}
 		return friendsProfiles;
 	}
-
+	
 	@Get("friend-requests")
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async getFriendRequests(@Req() req: RequestWithUser) {
@@ -87,9 +91,33 @@ export class UserController {
 		}));
 	}
 
+	@Patch("block-user")
+	@UseGuards(JwtTwoFactorAuthGuard)
+	async blockUser(
+		@Req() req: RequestWithUser, 
+		@Body() {usernameToBlock}: BlockedDto
+	) {
+		return await this.usersService.addBlockedUser(req.user.id, usernameToBlock);
+	}
+
+	@Patch("unblock-user")
+	@UseGuards(JwtTwoFactorAuthGuard)
+	async unblockUser(
+		@Req() req: RequestWithUser,
+		@Body() {usernameToUnblock}: UnblockDto
+	) {
+		return await this.usersService.removeBlockedUser(req.user.id, usernameToUnblock);
+	}
+
 	@Get("profile")
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async getProfile(@Req() req: RequestWithUser) {
 		return this.usersService.getProfile(req.user.id);
+	}
+
+	@Get("blocked-users")
+	@UseGuards(JwtTwoFactorAuthGuard)
+	async getBlockedUser(@Req() req: RequestWithUser) {
+		return this.usersService.getBlockedUsers(req.user.id);
 	}
 }

@@ -14,4 +14,5 @@ export type UserType = {
 	socket?: Socket,
 	state?: number,
 	id?: number
+	blocked: Profile[]
 }

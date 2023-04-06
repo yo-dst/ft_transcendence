@@ -272,7 +272,7 @@ export const loginUserWithTwoFactorAuthentication = async (code: string): Promis
 	}
 }
 
-export const fetchBlockList = async (): Promise<number[]> => {
+export const fetchBlockList = async () => {
 	const res = await fetch(`${host}/user/blocked-users`, {
 		credentials: "include",
 	})
@@ -280,7 +280,12 @@ export const fetchBlockList = async (): Promise<number[]> => {
 		const error = await res.json();
 		throw new Error(error.message);
 	}
-	return await res.json();
+	const blockedProfile = await res.json();
+	user.update(value => {
+		let userUpdated = value;
+		userUpdated.blocked = blockedProfile;
+		return userUpdated;
+	})
 }
 
 export const blockUser = async (usernameToBlock: string) => {

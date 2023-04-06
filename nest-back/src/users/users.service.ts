@@ -215,6 +215,27 @@ export class UsersService {
 		user.profile.losses += 1;
 		return this.usersRepository.save(user);
   }
+
+  async getBlockedUsers(userId: number) {
+	const user = await this.getById(userId);
+	const usersProfilePromises = user.blockedUser.map(async (number: number) => {return await this.getProfile(number)});
+	const usersProfile = await Promise.all(usersProfilePromises);
+	return usersProfile;
+  }
+
+  async addBlockedUser(userId: number, usernameToBlock: string) {
+	const user = await this.getById(userId);
+	const userToBlock = await this.getByUsername(usernameToBlock);
+	user.blockedUser.push(userToBlock.id);
+	await this.usersRepository.save(user);
+	return await this.getProfile(userToBlock.id);
+  }
+
+  async removeBlockedUser(userId: number, usernameToUnblock: string) {
+	const user = await this.getById(userId);
+	const userToUnblock = await this.getByUsername(usernameToUnblock);
+	user.blockedUser.splice(user.blockedUser.indexOf(userToUnblock.id), 1);
+	await this.usersRepository.save(user);
+	return await this.getProfile(userToUnblock.id);
+  }
 }
-
-

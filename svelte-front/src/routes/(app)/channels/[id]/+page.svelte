@@ -6,7 +6,6 @@
     import { chatSocket } from "$lib/stores/chat-socket";
     import Loading from "$lib/components/Loading.svelte";
     import ModalPasswordChannels from "$lib/components/ModalPasswordChannels.svelte";
-    import { goto } from "$app/navigation";
 
 	let messages: string[] = [];
 	let input: string = "";
@@ -42,15 +41,16 @@
 
 	function sendMessage() {
 		if (input){
-			console.log("sended");
 			$chatSocket.emit('newMessage', channelId, input);
 			input = "";
 		}
 	}
 
 	$chatSocket.on('newMessage', (Username: string, newMessage: string) => {
-		usernames = [...usernames, Username];
-		messages = [...messages, newMessage];
+		if (!$user.blocked.find((user) => (user.username === Username)) || $user.blocked.length === 0) {
+			usernames = [...usernames, Username];
+			messages = [...messages, newMessage];
+		}
 	})
 
 </script>
