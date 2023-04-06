@@ -60,12 +60,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	@SubscribeMessage('getInfo')
-	returnRoomName(client: Socket, roomId: string) {
-		const room = this.ChatRooms.find((room) => (room.id === roomId));
-		return { roomName: room.name, isPublic: room.isPublic }
-	};
-
 	@SubscribeMessage('roomUpdate')
 	handleRoomUpdate(client: Socket, info: string | boolean) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]));
@@ -92,8 +86,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const room = this.ChatRooms.find((room) => (room.id === channelId));
 		if (room.member.includes(client.data.userId)) {
 			client.join(channelId);
-			return true;
+			return { isConnected: true, roomName: room.name, isPublic: room.isPublic, isAdmin: room.admins.includes(client.data.userId) }
 		}
-		return false;
+		return { isConnected: false, roomName: room.name, isPublic: room.isPublic, isAdmin: room.admins.includes(client.data.userId) }
 	}
 }

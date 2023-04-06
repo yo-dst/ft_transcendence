@@ -19,23 +19,20 @@
 	let isPublic: boolean;
 	let isLoading: boolean = true;
 	let showPasswordModal: boolean = true;
-	let userIsAdmin = true;
+	let userIsAdmin: boolean;
 	let showUserList = false;
 	
-	$chatSocket.emit('verifyUser', channelId, (isConnected: boolean) => {
-		if (isConnected) showPasswordModal = false;
+	$chatSocket.emit('verifyUser', channelId, (info: any) => {
+		if (info.isConnected) showPasswordModal = false;
 		else showPasswordModal = true;
+		roomName = info.roomName;
+		isPublic = info.isPublic;
+		userIsAdmin = info.isAdmin;
 		isLoading = false;
 	})
 	let show = false;
 	const setShow = (value: boolean) => show = value;
 	let usernameForModal: string;
-
-	$chatSocket.emit('getInfo', channelId, (info: any) => {
-		roomName = info.roomName;
-		isPublic = info.isPublic;
-	});
-
 
 	// triggers after component has been updated
 	afterUpdate(() => {
