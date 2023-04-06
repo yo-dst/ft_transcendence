@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from "$lib/stores/user";
-    import { afterUpdate } from "svelte";
+    import { afterUpdate, onMount } from "svelte";
     import { page } from "$app/stores";
     import ModalChannelSettings from "$lib/components/ModalChannelSettings.svelte";
     import { chatSocket } from "$lib/stores/chat-socket";
@@ -19,6 +19,8 @@
 	let isPublic: boolean;
 	let isLoading: boolean = true;
 	let showPasswordModal: boolean = true;
+	let userIsAdmin = true;
+	let showUserList = false;
 	
 	$chatSocket.emit('verifyUser', channelId, (isConnected: boolean) => {
 		if (isConnected) showPasswordModal = false;
@@ -37,6 +39,9 @@
 
 	// triggers after component has been updated
 	afterUpdate(() => {
+		if (showUserList) {
+			return;
+		}
 		if(messages && element) scrollToBottom(element);
 	})
 
@@ -58,6 +63,11 @@
 		}
 	})
 
+	onMount(() => {
+		if (!$user.isLoggedIn) {
+			goto("/login");
+		}
+	})
 </script>
 {#if isLoading}
 	<Loading/>
@@ -67,41 +77,81 @@
 <article>
 	<header>
 		<div>
-			<iconify-icon style="margin-left: 0.6rem;font-size: 2rem;" on:click={() => {showSettingsModal = true}} on:keypress icon="material-symbols:settings-outline"/>
-				<h1 style="margin:0">Channel {roomName}</h1>
+			{#if userIsAdmin}
+				<iconify-icon icon="material-symbols:settings-outline"
+					style="font-size: 1.8rem"
+					on:click={() => {showSettingsModal = true}}
+					on:keypress
+				></iconify-icon>
+			{/if}
+			<h3 class="safe-words">Channel {roomName}</h3>
+		</div>
+		<div>
+			{#if !showUserList}
+				<iconify-icon icon="mdi:users-group"
+					style="font-size: 2rem"
+					on:click={() => showUserList = true}
+					on:keypress
+				></iconify-icon>
+			{:else}
+				<iconify-icon icon="jam:messages-f"
+					style="font-size: 1.8rem; margin-top: 0.15rem;"
+					on:click={() => showUserList = false}
+					on:keypress
+				></iconify-icon>
+			{/if}
+			<iconify-icon icon="pepicons-pop:leave"
+				style="font-size: 1.8rem"
+				on:click={() => {}}
+				on:keypress
+			></iconify-icon>
 		</div>
 	</header>
 
-	<body bind:this={element} style="overflow: auto;">
-		<ul>
-			<li>
-				<span style="color: #9F2B68">System</span> : Welcome to the channel {$user.profile?.username} !
-			</li>
-			{#each messages as message, index}
+	<!-- add icon for admin(s) and owner -->
+	{#if showUserList}
+		<body style="overflow: auto;">
+			<ul>
+				<!-- sort them -> owner > admin > random -->
+				{#each usernames as username}
+					<li>
+						<span>{username}</span>
+					</li>
+				{/each}
+			</ul>
+		</body>
+	{:else}
+		<body bind:this={element} style="overflow: auto;">
+			<ul>
 				<li>
-					{#if usernames[index] !== $user.profile?.username}
-						<span style="color: #FEA347;"
-							on:click|stopPropagation={() => { usernameForModal = usernames[index]; setShow(true); }}
-							on:keypress
-						>
-							{usernames[index]}
-						</span>
-					{:else}
-						<span style="color: #FEA347; text-decoration: underline;">
-							{usernames[index]}
-						</span>
-					{/if}
-					: {message}
+					<span style="color: #9F2B68">System</span> : Welcome to the channel {$user.profile?.username} !
 				</li>
-			{/each}
-		</ul>
-	</body>
+				{#each messages as message, index}
+					<li>
+						{#if usernames[index] !== $user.profile?.username}
+							<span style="color: #FEA347;"
+								on:click|stopPropagation={() => { usernameForModal = usernames[index]; setShow(true); }}
+								on:keypress
+							>
+								{usernames[index]}
+							</span>
+						{:else}
+							<span style="color: #FEA347; text-decoration: underline;">
+								{usernames[index]}
+							</span>
+						{/if}
+						: {message}
+					</li>
+				{/each}
+			</ul>
+		</body>
 		<footer style="margin-top:auto">
 			<div>
 				<input bind:value={input} on:keypress={(e) => {if (e.key === "Enter") sendMessage()}} type="text" style="margin: 0;margin-right: 1rem;text-indent: 2rem;">
 				<iconify-icon on:click={sendMessage} on:keypress icon="ic:baseline-send" style="font-size: 1.5rem;"></iconify-icon>
 			</div>
 		</footer>
+	{/if}
 </article>
 {/if}
 
@@ -115,22 +165,33 @@
 
 <style>
 	header {
-		padding: 1rem 0;
+		padding: 1rem;
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		justify-content: space-between;
+		gap: 3rem;
 	}
 
-	header div {
+	header h3 {
+		margin-bottom: 0;
+	}
+
+	header > :first-child {
 		display: flex;
-		align-items: center; /* align items in the center vertically */
-		justify-content: center; /* distribute items evenly */
-		width: 100%; /* take up the full width */
+		align-items: center;
+		gap: 0.5rem;
 	}
 
-	header iconify-icon {
-		font-size: 2rem;
-		margin-right: 2.3rem;
+	header > :last-child {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 1rem;
+	}
+
+	header iconify-icon:hover {
+		cursor: pointer;
+		transform: scale(1.05);
 	}
 
 	article {

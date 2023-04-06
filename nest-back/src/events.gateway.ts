@@ -94,4 +94,18 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(this.connectedUsers[index].socketId).emit("friend-request-accepted", client.data.username);
 		}
 	}
+
+	@SubscribeMessage("update-username")
+	handleUpdateUsername(
+		@ConnectedSocket() client: Socket,
+		@MessageBody() newUsername: string
+	) {
+		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
+		if (index !== -1) {
+			this.connectedUsers[index].username = newUsername;
+			this.server.emit("user-disconnected", client.data.username);
+			this.server.emit("user-connected", newUsername);
+			client.data.username = newUsername;
+		}
+	}
 }

@@ -1,13 +1,9 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import ChatModal from "$lib/components/ChatModal.svelte";
 	import { eventsSocket } from "$lib/stores/events-socket";
     import { onMount } from "svelte";
 
-	let show = false;
-	const setShow = (value: boolean) => { show = value; };
 	let users: string[] = [];
-	let username: string;
 
 	onMount(() => {
 		if (!$eventsSocket) {
@@ -36,12 +32,11 @@
 	<h3>Users logged in</h3>
 	<ul>
 		{#each users as user}
-			<li on:click|stopPropagation={() => { setShow(true); username = user; }} on:keypress>
-				{user}
+			<li>
+				<a href={`/profile/${user}`}>{user}</a>
 			</li>
 		{/each}
 	</ul>
-	<ChatModal {show} {setShow} {username}/>
 </section>
 
 <style>

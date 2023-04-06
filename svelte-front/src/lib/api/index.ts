@@ -94,6 +94,8 @@ export const updateUserUsername = async (newUsername: string): Promise<void> => 
 		userUpdated.profile.username = newUsername;
 		return userUpdated;
 	});
+	const socket = get(eventsSocket);
+	socket.emit("update-username", newUsername);
 }
 
 export const updateUserAvatar = async (newAvatar: string): Promise<void> => {

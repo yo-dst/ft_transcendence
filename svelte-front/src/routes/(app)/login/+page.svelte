@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
+    import { user } from "$lib/stores/user";
+    import { onMount } from "svelte";
 
 	let username: string;
 	let loginError: any;
@@ -16,6 +18,12 @@
 			},
 		});
 	}
+
+	onMount(() => {
+		if ($user.isLoggedIn) {
+			goto("/");
+		}
+	})
 </script>
 
 <a
