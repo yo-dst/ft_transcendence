@@ -303,10 +303,10 @@ export const blockUser = async (usernameToBlock: string) => {
 		const error = await res.json();
 		throw new Error(error.message);
 	}
-	let blockedId = await res.json();
+	let blockedProfile = await res.json();
 	user.update(value => {
 		let userUpdated = value;
-		userUpdated.blocked?.push(blockedId);
+		userUpdated.blocked?.push(blockedProfile);
 		return userUpdated;
 	})
 }

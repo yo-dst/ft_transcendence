@@ -49,7 +49,7 @@
 					</div>
 					<div class="channel-name">
 						{room.name}
-						<small><i>{room.ownerName}</i></small>
+						<small><i>{room.ownerProfile.username}</i></small>
 					</div>
 				</div>
 				<div class="channel-right">

@@ -15,9 +15,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	async handleConnection(client: Socket) {
 		const user = await this.usersService.getByUsername(client.handshake.auth.username)
-		client.data.userId = user.id;
-		client.data.username = client.handshake.auth.username;
-		client.emit('loaded');
+		if (user) {
+			client.data.userId = user.id;
+			client.data.username = client.handshake.auth.username;
+			client.emit('loaded');
+		}
 	}
 
 	handleDisconnect(client: Socket) {
@@ -25,8 +27,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('createRoom')
-	handleRoomCreation(client: Socket, info: string | number) {
-		const room = new ChatRoom(client.data.userId, client.data.username, info[0], info[1], info[2], info[3]);
+	async handleRoomCreation(client: Socket, info: string | number) {
+		const room = new ChatRoom(client.data.userId, await (this.usersService.getProfile(client.data.userId)), info[0], info[1], info[2], info[3]);
 		client.join(room.id);
 		this.ChatRooms.push(room);
 		this.server.emit('roomUpdate', this.handleRoom());

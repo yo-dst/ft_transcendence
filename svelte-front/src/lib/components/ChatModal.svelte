@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { fetchProfile, sendFriendRequest } from "$lib/api";
+    import { blockUser, fetchProfile, sendFriendRequest, unblockUser } from "$lib/api";
+    import { user } from "$lib/stores/user";
     import type { Profile } from "$lib/types/profile";
     import { onDestroy, onMount } from "svelte";
 
@@ -8,7 +9,6 @@ screenLeft
 	export let username: string;
 
 	let userProfile: Profile;
-	let userIsBlocked: boolean;
 	let userIsFriend: boolean;
 
 	function handleClickOutside(event: any) {
@@ -39,10 +39,10 @@ screenLeft
 		{#if !userIsFriend}
 			<button on:click={() => sendFriendRequest(userProfile?.username)}>Send friend request</button>
 		{/if}
-		{#if !userIsBlocked}
-			<button>Block</button>
+		{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}
+			<button on:click={() => blockUser(userProfile.username)}>Block</button>
 		{:else}
-			<button>Unblock</button>
+			<button on:click={() => unblockUser(userProfile.username)}>Unblock</button>
 		{/if}
 	</article>
 </dialog>

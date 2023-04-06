@@ -1,4 +1,5 @@
 <script>
+    import { goto } from "$app/navigation";
     import { chatSocket } from "$lib/stores/chat-socket";
     import { user } from "$lib/stores/user";
     import { io } from "socket.io-client";
@@ -7,10 +8,15 @@
 	let hasMounted = false;
 
 	onMount(() => {
-		$chatSocket = io("localhost:3000/chat", {auth: {username: $user.profile?.username}});
-		$chatSocket.on('loaded', () => {
-			hasMounted = true;
-		});
+		if (!$user.isLoggedIn) {
+			goto('/login');
+		}
+		else {
+			$chatSocket = io("localhost:3000/chat", {auth: {username: $user.profile?.username}});
+			$chatSocket.on('loaded', () => {
+				hasMounted = true;
+			});
+		}
 	})
 </script>
 

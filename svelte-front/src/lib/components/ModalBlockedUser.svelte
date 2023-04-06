@@ -4,7 +4,6 @@
 
     export let closeModal: () => void;
     let userToBlock: string;
-    let userToUnblock: string;
     fetchBlockList();
     console.log($user.blocked)
 </script>
