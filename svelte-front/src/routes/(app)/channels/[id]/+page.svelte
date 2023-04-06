@@ -63,6 +63,11 @@
 		}
 	})
 
+	function leaveRoom() {
+		$chatSocket.emit('leaveRoom', channelId, $user.id);
+		goto("/channels");
+	}
+
 	onMount(() => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
@@ -102,7 +107,7 @@
 			{/if}
 			<iconify-icon icon="pepicons-pop:leave"
 				style="font-size: 1.8rem"
-				on:click={() => {}}
+				on:click={leaveRoom}
 				on:keypress
 			></iconify-icon>
 		</div>

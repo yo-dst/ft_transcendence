@@ -1,17 +1,26 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { chatSocket } from "$lib/stores/chat-socket";
+    import { createEventDispatcher } from "svelte";
 
 	let isPrivate: boolean = false;
 	let name: string;
 	let password: string;
 	let capacity = 25;
+	let error: string = "";
+	const dispatch = createEventDispatcher();
 
 	function createRoom() {
-		$chatSocket.emit('createRoom', name, capacity, password, isPrivate, (id: string) => {
-			goto(id);
-		});
+		if (name.length > 10) {
+			error = "Name cannot be longer than 10 characters";
+		}
+		else {
+			$chatSocket.emit('createRoom', name, capacity, password, isPrivate, (id: string) => {
+				goto(id);
+			});
+		}
 	}
+
 </script>
 
 <section>
@@ -24,6 +33,7 @@
 			bind:value={name}
 			required
 		/>
+		<p style="color:red">{error}</p>
 
 		<label for="size"
 			>Capacity <kbd style="margin-left: 0.5rem;">{capacity}</kbd></label
@@ -53,7 +63,6 @@
 		</fieldset>
 
 		<button
-			type="submit"
 			on:click={createRoom}>Create channel</button
 		>
 	</form>

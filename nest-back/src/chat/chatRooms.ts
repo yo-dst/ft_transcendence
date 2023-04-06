@@ -1,3 +1,4 @@
+import { Profile } from 'src/users/entities/profile.entity';
 import { v4 } from 'uuid';
 
 export class ChatRoom {
@@ -6,19 +7,19 @@ export class ChatRoom {
 	public member: number[] = [];
 	public banList: number[] = [];
 	public owner: number;
-	public ownerName: string;
 	public password: string;
 	public capacity: number;
 	public id: string;
 	public isPublic: boolean;
 	public isProtected: boolean;
+	public ownerProfile: Profile;
 
-	constructor(owner: number, ownerName: string, name: string, capacity: number, password: string, isPrivate: boolean) {
+	constructor(owner: number, ownerProfile:Profile,  name: string, capacity: number, password: string, isPrivate: boolean) {
 		this.name = name;
 		this.owner = owner;
 		this.admins.push(owner);
 		this.member.push(owner);
-		this.ownerName = ownerName;
+		this.ownerProfile = ownerProfile;
 		this.isPublic = isPrivate === true ? false : true;
 		if (password) {
 			this.password = password;
@@ -48,7 +49,9 @@ export class ChatRoom {
 	deleteUser(userId: number){
 		this.member.splice(this.member.findIndex((member) => (member === userId)), 1);
 		this.admins.splice(this.admins.findIndex((admins) => (admins === userId)), 1);
-		// need to correcly change owner
+		if (this.member.length > 0) {
+			this.owner = this.member[0];
+		}
 	}
 
 }

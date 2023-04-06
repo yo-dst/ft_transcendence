@@ -1,8 +1,10 @@
+import type { Profile } from "./profile";
+
 export type chatRoom = {
 	admins: number[];
 	member: number[];
 	banList: number[];
-	ownerName: string;
+	ownerProfile: Profile;
 	capacity: number;
 	id: string;
 	name: string;
