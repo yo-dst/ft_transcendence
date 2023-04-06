@@ -9,8 +9,8 @@
     import { goto } from "$app/navigation";
     import ChatModal from "$lib/components/ChatModal.svelte";
 
-	let messages: string[] = [];
 	let input: string = "";
+	let messages: string[] = []
 	let usernames: string[] = [];
 	let usersConnected: {status: string, username: string}[] = [];
 	let element: any;
@@ -69,6 +69,8 @@
 	onMount(() => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
+		} else {
+			// users = fetchUsersInRoom();
 		}
 	})
 </script>
@@ -117,6 +119,7 @@
 			<ul>
 				<!-- sort them -> owner > admin > random -->
 				{#each [...new Set(usernames)] as username}
+
 					<li>
 						<span>{username}</span>
 					</li>
