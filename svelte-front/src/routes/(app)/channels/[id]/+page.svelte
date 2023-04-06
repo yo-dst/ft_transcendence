@@ -115,7 +115,7 @@
 		<body style="overflow: auto;">
 			<ul>
 				<!-- sort them -> owner > admin > random -->
-				{#each usernames as username}
+				{#each [...new Set(usernames)] as username}
 					<li>
 						<span>{username}</span>
 					</li>
