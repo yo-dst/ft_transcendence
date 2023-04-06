@@ -12,6 +12,7 @@
 	let messages: string[] = [];
 	let input: string = "";
 	let usernames: string[] = [];
+	let usersConnected: {status: string, username: string}[] = [];
 	let element: any;
 	const channelId: string | undefined = $page.url.href.split('/').pop();
 	let roomName: string;
