@@ -6,6 +6,8 @@
     import { chatSocket } from "$lib/stores/chat-socket";
     import Loading from "$lib/components/Loading.svelte";
     import ModalPasswordChannels from "$lib/components/ModalPasswordChannels.svelte";
+    import { goto } from "$app/navigation";
+    import ChatModal from "$lib/components/ChatModal.svelte";
 
 	let messages: string[] = [];
 	let input: string = "";
@@ -23,6 +25,9 @@
 		else showPasswordModal = true;
 		isLoading = false;
 	})
+	let show = false;
+	const setShow = (value: boolean) => show = value;
+	let usernameForModal: string;
 
 	$chatSocket.emit('getInfo', channelId, (info: any) => {
 		roomName = info.roomName;
@@ -74,7 +79,19 @@
 			</li>
 			{#each messages as message, index}
 				<li>
-					<span style="color: #FEA347">{usernames[index]}</span> : {message}
+					{#if usernames[index] !== $user.profile?.username}
+						<span style="color: #FEA347;"
+							on:click|stopPropagation={() => { usernameForModal = usernames[index]; setShow(true); }}
+							on:keypress
+						>
+							{usernames[index]}
+						</span>
+					{:else}
+						<span style="color: #FEA347; text-decoration: underline;">
+							{usernames[index]}
+						</span>
+					{/if}
+					: {message}
 				</li>
 			{/each}
 		</ul>
@@ -86,11 +103,14 @@
 			</div>
 		</footer>
 </article>
+{/if}
 
 {#if showSettingsModal}
 	<ModalChannelSettings closeModal={() => {showSettingsModal = false}} {channelId}/>
 {/if}
 
+{#if show}
+	<ChatModal {setShow} username={usernameForModal} />
 {/if}
 
 <style>
@@ -128,6 +148,10 @@
 	footer iconify-icon {
 		position: absolute;
 		padding-left: 1rem;
+	}
+
+	ul li {
+		list-style: none;
 	}
 
 </style>

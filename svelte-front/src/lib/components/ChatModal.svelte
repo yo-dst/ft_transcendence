@@ -1,10 +1,15 @@
 <script lang="ts">
+    import { fetchProfile, sendFriendRequest } from "$lib/api";
+    import type { Profile } from "$lib/types/profile";
     import { onDestroy, onMount } from "svelte";
 
 screenLeft
-	export let show: boolean;
 	export let setShow: any;
 	export let username: string;
+
+	let userProfile: Profile;
+	let userIsBlocked: boolean;
+	let userIsFriend: boolean;
 
 	function handleClickOutside(event: any) {
     	if (!event.target.closest('#chat-modal')) {
@@ -13,8 +18,11 @@ screenLeft
   	}
 
 	onMount(async () => {
+		console.log("username", username);
 		document.addEventListener("click", handleClickOutside);
-		
+
+		userProfile = await fetchProfile(username);
+		console.log(userProfile);
 	});
 
 	onDestroy(() => {
@@ -22,19 +30,29 @@ screenLeft
 	});
 </script>
 
-{#if show}
-	<dialog open={show}>
-		<article id="chat-modal">
+<dialog open={true}>
+	<article id="chat-modal">
 		<header>
-			<button class="close" on:click={() => setShow(false)}></button>
-			{username}
+			<img src={userProfile?.avatar?.url} alt="avatar"/>
+			<span class="safe-words">{userProfile?.username}</span>
 		</header>
-		<p>
-			Nunc nec ligula a tortor sollicitudin dictum in vel enim. 
-			Quisque facilisis turpis vel eros dictum aliquam et nec turpis. 
-			Sed eleifend a dui nec ullamcorper. 
-			Praesent vehicula lacus ac justo accumsan ullamcorper.
-		</p>
-		</article>
-	</dialog>
-{/if}
+		{#if !userIsFriend}
+			<button on:click={() => sendFriendRequest(userProfile?.username)}>Send friend request</button>
+		{/if}
+		{#if !userIsBlocked}
+			<button>Block</button>
+		{:else}
+			<button>Unblock</button>
+		{/if}
+	</article>
+</dialog>
+
+<style>
+	header img {
+		border-radius: 50%;
+        width: 35%;
+        height: auto;
+        object-fit: cover;
+        aspect-ratio: 1/1;
+	}
+</style>
