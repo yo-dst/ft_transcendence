@@ -67,8 +67,9 @@
 <article>
 	<header>
 		<div>
-			<iconify-icon style="margin-left: 0.6rem;font-size: 2rem;" on:click={() => {showSettingsModal = true}} on:keypress icon="material-symbols:settings-outline"/>
-				<h1 style="margin:0">Channel {roomName}</h1>
+			<iconify-icon style="font-size: 2rem;" on:click={() => {showSettingsModal = true}} on:keypress icon="material-symbols:settings-outline"/>
+			<h1 style="margin:0; text-align:center">Channel {roomName}</h1>
+			<iconify-icon style="font-size: 2rem;" on:click={() => {$chatSocket.emit('leaveRoom', channelId, $user.id); goto("/channels")}} on:keypress icon="fluent-mdl2:leave" rotate={2}/>
 		</div>
 	</header>
 
@@ -124,8 +125,18 @@
 	header div {
 		display: flex;
 		align-items: center; /* align items in the center vertically */
-		justify-content: center; /* distribute items evenly */
-		width: 100%; /* take up the full width */
+	}
+
+
+	header iconify-icon:first-child {
+  		font-size: 2rem;
+  		margin-right: 1rem;
+  		margin-left: 1.7rem; /* set the same value as margin-right of the second iconify-icon */
+	}
+
+	header iconify-icon:last-child {
+  		font-size: 2rem;
+  		margin-left: 1rem;
 	}
 
 	header iconify-icon {
