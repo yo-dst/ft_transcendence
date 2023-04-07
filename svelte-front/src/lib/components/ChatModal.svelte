@@ -9,11 +9,11 @@
 	export let setShow: any;
 	export let username: string;
 	export let isAdmin: boolean;
+	export let isOwner: boolean;
 	export let channelId: string | undefined;
 
 	let userProfile: Profile;
 	let userIsFriend: boolean;
-	let youAreAdmin = true;
 	let userIsAdmin = false;
 
 	function handleClickOutside(event: any) {
@@ -44,8 +44,8 @@
 			{#if !userIsFriend}
 				<button on:click={() => sendFriendRequest(userProfile?.username)}>Friend request</button>
 			{/if}
-			{#if youAreAdmin && !userIsAdmin}
-				<button on:click={() => {}}>Give admin rights</button>
+			{#if (isAdmin || isOwner) && !userIsAdmin}
+				<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
 			{/if}
 			{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}
 				<button on:click={() => blockUser(userProfile.username)}>Block</button>

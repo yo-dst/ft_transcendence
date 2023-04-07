@@ -182,7 +182,7 @@
 {/if}
 
 {#if show}
-	<ChatModal {setShow} username={usernameForModal} isAdmin={userIsAdmin} {channelId}/>
+	<ChatModal {setShow} username={usernameForModal} isAdmin={userIsAdmin} {channelId} {isOwner}/>
 {/if}
 
 <style>
