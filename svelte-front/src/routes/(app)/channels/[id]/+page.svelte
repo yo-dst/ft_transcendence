@@ -121,19 +121,22 @@
 		</div>
 	</header>
 
-	<!-- add icon for admin(s) and owner -->
 	{#if showUserList}
 		<body style="overflow: auto;">
-			<ul>
-				<!-- sort them -> owner > admin > random -->
-				{connectedUser.owner}
+			<ul class="ul-users-list">
+				<li on:click|stopPropagation={() => { usernameForModal = connectedUser.owner; setShow(true); }} on:keypress>
+					<iconify-icon icon="game-icons:throne-king" style="font-size: 1.5rem;"></iconify-icon>
+					<span>{connectedUser.owner}</span>
+				</li>
 				{#each connectedUser.admin as username}
-					<li>
+					<li on:click|stopPropagation={() => { usernameForModal = username; setShow(true); }} on:keypress>
+						<iconify-icon icon="clarity:administrator-solid" style="font-size: 1.5rem;"></iconify-icon>
 						<span>{username}</span>
 					</li>
 				{/each}
 				{#each connectedUser.member as username}
-					<li>
+					<li on:click|stopPropagation={() => { usernameForModal = username; setShow(true); }} on:keypress>
+						<iconify-icon icon="clarity:user-solid" style="font-size: 1.5rem;"></iconify-icon>
 						<span>{username}</span>
 					</li>
 				{/each}
@@ -232,6 +235,21 @@
 
 	ul li {
 		list-style: none;
+		
 	}
 
+	.ul-users-list li {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		cursor: pointer;
+	}
+
+	.ul-users-list li:hover {
+		text-decoration: underline;
+	}
+
+	.ul-users-list li:hover iconify-icon {
+		transform: scale(1.05);
+	}
 </style>

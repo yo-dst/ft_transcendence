@@ -2,15 +2,38 @@
     import { goto } from "$app/navigation";
     import { user } from "$lib/stores/user";
     import type { chatRoom } from "$lib/types/chat-rooms";
-    import { io } from "socket.io-client";
     import { onMount } from "svelte";
 	import { chatSocket } from "$lib/stores/chat-socket";
     import ModalPasswordChannels from "$lib/components/ModalPasswordChannels.svelte";
 	
 	let rooms: chatRoom[] = [];
+	let joinedRooms: chatRoom[] = [];
 	let isModalShowing = false;
 
-	
+	function getJoinedRooms(rooms: chatRoom[]): chatRoom[] {
+		const userId = $user.id;
+		if (!userId) {
+			return [];
+		}
+		return rooms.filter(room => {
+			if (($user.id === room.owner)
+				|| (room.admins.indexOf(userId) !== -1)
+				|| (room.member.indexOf(userId)) !== -1) {
+				return true;
+			}
+			return false;
+		});
+	}
+
+	function roomIsJoined(room: chatRoom) {
+		for (let i = 0; i < joinedRooms.length; i++) {
+			if (joinedRooms[i].id === room.id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	function joinRoom(id: string) {
 		$chatSocket.emit('joinRoom', id, undefined, (found: boolean) => {
 			if (found) goto('/channels/' + id);
@@ -20,6 +43,8 @@
 	function closeModal() {
 		isModalShowing = false;
 	}
+
+	$: joinedRooms = getJoinedRooms(rooms);
 
 	onMount(() => {
 		if (!$user.isLoggedIn) {
@@ -38,9 +63,12 @@
 
 <section>
 	<a href="/channels/create" role="button" style="width: 100%;">Create your channel</a>
-	<div class="title">Channels</div>
+</section>
+
+<section>
+	<h3>Joined channels</h3>
 	<ul>
-		{#each rooms as room}
+		{#each joinedRooms as room}
 			<li>
 				<div class="channel-left">
 					<div class="users">
@@ -64,25 +92,55 @@
 						<button class="secondary" on:click={() => {joinRoom(room.id)}}>
 							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
 						</button>
+					{/if}
+				</div>
+			</li>
+		{/each}
+	</ul>
+</section>
+
+<section>
+	<h3>Channels</h3>
+	<ul>
+		{#each rooms as room}
+			{#if !roomIsJoined(room)}
+				<li>
+					<div class="channel-left">
+						<div class="users">
+							<span>{room.member.length + room.admins.length + 1} / {room.capacity}</span>
+							<iconify-icon icon="fa-solid:user-friends"></iconify-icon>	
+						</div>
+						<div class="channel-name">
+							{room.name}
+							<small><i>{room.ownerProfile.username}</i></small>
+						</div>
+					</div>
+					<div class="channel-right">
+						{#if room.member.length + room.admins.length + 1 >= room.capacity}
+							<p>room filled</p>
+						{:else if room.isProtected && (!room.member.includes($user.id) || room.admins.includes($user.id) || room.owner === $user.id)}
+							<iconify-icon icon="material-symbols:lock" style="font-size: 1.5rem;"></iconify-icon>
+							<button class="secondary" on:click={() => {isModalShowing = true}}>
+								<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
+							</button>
+						{:else}
+							<button class="secondary" on:click={() => {joinRoom(room.id)}}>
+								<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
+							</button>
 						{/if}
 					</div>
+					{#if isModalShowing}
+						<ModalPasswordChannels closeModal={closeModal} roomId={room.id}/>
+					{/if}
 				</li>
-				{#if isModalShowing}
-					<ModalPasswordChannels closeModal={closeModal} roomId={room.id}/>
-				{/if}
+			{/if}
 		{/each}
 	</ul>
 </section>
 
 <style>
-	.title {
-		margin-top: 1.5rem;
-		padding-left: 0.5rem;
-		font-size: 1.5rem;
-		color: var(--h3-color);
-		background-color: #090D10;
-		padding-top: 0.2rem;
-		border-radius: 5px 5px 0 0;
+	h3 {
+		margin-bottom: 0;
 	}
 
 	ul {
