@@ -17,8 +17,6 @@ export class ChatRoom {
 	constructor(owner: number, ownerProfile:Profile,  name: string, capacity: number, password: string, isPrivate: boolean) {
 		this.name = name;
 		this.owner = owner;
-		this.admins.push(owner);
-		this.member.push(owner);
 		this.ownerProfile = ownerProfile;
 		this.isPublic = isPrivate === true ? false : true;
 		if (password) {
@@ -32,7 +30,7 @@ export class ChatRoom {
 	}
 
 	addUser(userId: number) {
-		if (!this.member.includes(userId) && this.capacity >= this.member.length) {
+		if (this.capacity > (this.member.length + this.admins.length + 1) && !this.member.includes(userId) && !this.admins.includes(userId) && this.owner != userId) {
 			this.member.push(userId);
 		}
 	}
@@ -47,10 +45,21 @@ export class ChatRoom {
 	}
 
 	deleteUser(userId: number){
-		this.member.splice(this.member.findIndex((member) => (member === userId)), 1);
-		this.admins.splice(this.admins.findIndex((admins) => (admins === userId)), 1);
-		if (this.member.length > 0) {
-			this.owner = this.member[0];
+		if (this.member.includes(userId)) this.member.splice(this.member.findIndex((member) => (member === userId)), 1);
+		else if (this.admins.includes(userId)) this.admins.splice(this.admins.findIndex((admins) => (admins === userId)), 1);
+		else if (userId === this.owner) {
+			if (this.admins.length > 0) this.owner = this.admins[0];
+			else if (this.member.length > 0) this.owner = this.member[0];
+			else this.owner = undefined;
+		}
+	}
+
+	addAdmin(userId: number) {
+		if (!this.admins.includes(userId)) {
+			if (this.member.includes(userId)) {
+				this.deleteUser(userId);
+			}
+			this.admins.push(userId);
 		}
 	}
 

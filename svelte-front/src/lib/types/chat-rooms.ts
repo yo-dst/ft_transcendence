@@ -5,6 +5,7 @@ export type chatRoom = {
 	member: number[];
 	banList: number[];
 	ownerProfile: Profile;
+	owner: number;
 	capacity: number;
 	id: string;
 	name: string;

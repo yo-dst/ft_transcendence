@@ -26,6 +26,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	}
 
+	async sendConnectedUsers(channelId: string, room: ChatRoom) {
+		const memberUsername = await Promise.all(room.member.map(async (user) => ((await this.usersService.getProfile(user)).username)));
+		const adminUsername = await Promise.all(room.admins.map(async (user) => ((await this.usersService.getProfile(user)).username)));
+		this.server.to(channelId).emit('updateConnectedUsers', { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username });
+	}
+
 	@SubscribeMessage('createRoom')
 	async handleRoomCreation(client: Socket, info: string | number) {
 		const room = new ChatRoom(client.data.userId, await (this.usersService.getProfile(client.data.userId)), info[0], info[1], info[2], info[3]);
@@ -36,11 +42,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('joinRoom')
-	handleClientJoinRoom(client: Socket, info: string) {
+	async handleClientJoinRoom(client: Socket, info: string) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]))
-		if (room && (!room.isProtected || info[1] === room.password || room.member.includes(client.data.userId))) {
+		if (room && (!room.isProtected || info[1] === room.password || room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId)) {
 			client.join(room.id);
 			room.addUser(client.data.userId);
+			this.sendConnectedUsers(info[0], room);
 			this.server.emit('roomUpdate', this.handleRoom());
 			return true;
 		}
@@ -50,12 +57,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('getRooms')
 	handleRoom() {
 		// return only public chatRooms with only the relevant informations
-		return this.ChatRooms.filter((room) => (room.isPublic === true)).map(({ password, banList, admins, owner, ...rest }) => rest);
+		return this.ChatRooms.filter((room) => (room.isPublic === true)).map(({ password, banList, ...rest }) => rest);
 	}
 
 	@SubscribeMessage('newMessage')
 	handleNewMessage(client: Socket, info: string) {
-		if (this.ChatRooms.find((room) => (room.member.includes(client.data.userId)))) {
+		if (this.ChatRooms.find((room) => (room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId))) {
 			this.server.to(info[0]).emit('newMessage', client.data.username, info[1]);
 		}
 	}
@@ -73,21 +80,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('leaveRoom')
-	handleQuitRoom(client: Socket, ids: string | number) {
+	async handleQuitRoom(client: Socket, ids: string | number) {
 		const room = this.ChatRooms.find((room) => (room.id === ids[0]));
 		room.deleteUser(ids[1]);
-		if (room.member.length === 0)
+		if (room.owner === undefined)
 			this.ChatRooms.splice(this.ChatRooms.indexOf(room), 1);
+		else {
+			this.sendConnectedUsers(ids[0], room);
+		}
 		this.server.emit('roomUpdate', this.handleRoom());
 	}
 
 	@SubscribeMessage('verifyUser')
-	handleUserVerification(client: Socket, channelId: string) {
+	async handleUserVerification(client: Socket, channelId: string) {
 		const room = this.ChatRooms.find((room) => (room.id === channelId));
-		if (room.member.includes(client.data.userId)) {
-			client.join(channelId);
-			return { isConnected: true, roomName: room.name, isPublic: room.isPublic, isAdmin: room.admins.includes(client.data.userId) }
+		if (room) {
+			const memberUsername = await Promise.all(room.member.map(async (user) => ((await this.usersService.getProfile(user)).username)));
+			const adminUsername = await Promise.all(room.admins.map(async (user) => ((await this.usersService.getProfile(user)).username)));
+			if (room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId) {
+				client.join(channelId);
+				return { isConnected: true, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), isOwner: room.owner === client.data.userId, connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
+			}
+			return { isConnected: false, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), isOwner: room.owner === client.data.userId, connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
 		}
-		return { isConnected: false, roomName: room.name, isPublic: room.isPublic, isAdmin: room.admins.includes(client.data.userId) }
+		return undefined;
+	}
+
+	@SubscribeMessage('newAdmin')
+	async addNewUser(client: Socket, info: any) {
+		const room = this.ChatRooms.find((room) => (room.id === info[0]));
+		if (room) {
+			room.addAdmin((await this.usersService.getByUsername(info[1])).id);
+			this.sendConnectedUsers(info[0], room);
+		}
 	}
 }

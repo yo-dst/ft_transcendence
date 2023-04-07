@@ -1,19 +1,22 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { blockUser, fetchProfile, sendFriendRequest, unblockUser } from "$lib/api";
+    import { chatSocket } from "$lib/stores/chat-socket";
     import { user } from "$lib/stores/user";
     import type { Profile } from "$lib/types/profile";
     import { onDestroy, onMount } from "svelte";
+    import Loading from "./Loading.svelte";
 
-screenLeft
 	export let setShow: any;
 	export let username: string;
+	export let admins: string[];
+	export let isOwner: boolean;
+	export let channelId: string | undefined;
 
 	let userProfile: Profile;
 	let userIsFriend: boolean;
-	let youAreAdmin = true;
-	let userIsAdmin = false;
-
+	let isLoading: boolean = true;
+	
 	function handleClickOutside(event: any) {
     	if (!event.target.closest('#chat-modal')) {
 			setShow(false);
@@ -24,13 +27,16 @@ screenLeft
 		document.addEventListener("click", handleClickOutside);
 
 		userProfile = await fetchProfile(username);
+		isLoading = false;
 	});
 
 	onDestroy(() => {
 		document.removeEventListener("click", handleClickOutside);
 	});
 </script>
-
+{#if isLoading}
+<Loading/>
+{:else}
 <dialog open={true}>
 	<article id="chat-modal">
 		<header on:click={() => goto(`/profile/${userProfile?.username}`)} on:keypress>
@@ -42,8 +48,8 @@ screenLeft
 			{#if !userIsFriend}
 				<button on:click={() => sendFriendRequest(userProfile?.username)}>Friend request</button>
 			{/if}
-			{#if youAreAdmin && !userIsAdmin}
-				<button on:click={() => {}}>Give admin rights</button>
+			{#if (admins.includes($user.profile.username) || isOwner) && !admins.includes(userProfile.username)}
+				<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
 			{/if}
 			{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}
 				<button on:click={() => blockUser(userProfile.username)}>Block</button>
@@ -53,6 +59,7 @@ screenLeft
 		</body>
 	</article>
 </dialog>
+{/if}
 
 <style>
 	article {

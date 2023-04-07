@@ -8,6 +8,7 @@
     import ModalPasswordChannels from "$lib/components/ModalPasswordChannels.svelte";
     import { goto } from "$app/navigation";
     import ChatModal from "$lib/components/ChatModal.svelte";
+    import type { connectedUser } from "$lib/types/connected-user";
 
 	let input: string = "";
 	let messages: string[] = []
@@ -17,19 +18,21 @@
 	const channelId: string | undefined = $page.url.href.split('/').pop();
 	let roomName: string;
 	let showSettingsModal:boolean = false;
-	let isPublic: boolean;
 	let isLoading: boolean = true;
 	let showPasswordModal: boolean = true;
 	let userIsAdmin: boolean;
 	let showUserList = false;
+	let connectedUser: connectedUser;
+	let isOwner: boolean = false;
 	
 	$chatSocket.emit('verifyUser', channelId, (info: any) => {
 		if (info.isConnected) showPasswordModal = false;
 		else showPasswordModal = true;
 		roomName = info.roomName;
-		isPublic = info.isPublic;
 		userIsAdmin = info.isAdmin;
 		isLoading = false;
+		connectedUser = info.connectedUser;
+		isOwner = info.isOwner;
 	})
 	let show = false;
 	const setShow = (value: boolean) => show = value;
@@ -61,6 +64,11 @@
 		}
 	})
 
+	$chatSocket.on('updateConnectedUsers', (info: any) => {
+		connectedUser = info;
+		connectedUser = connectedUser;
+	})
+
 	function leaveRoom() {
 		$chatSocket.emit('leaveRoom', channelId, $user.id);
 		goto("/channels");
@@ -82,7 +90,7 @@
 <article>
 	<header>
 		<div>
-			{#if userIsAdmin}
+			{#if connectedUser.owner === $user.profile?.username}
 				<iconify-icon icon="material-symbols:settings-outline"
 					style="font-size: 1.8rem"
 					on:click={() => {showSettingsModal = true}}
@@ -118,8 +126,13 @@
 		<body style="overflow: auto;">
 			<ul>
 				<!-- sort them -> owner > admin > random -->
-				{#each [...new Set(usernames)] as username}
-
+				{connectedUser.owner}
+				{#each connectedUser.admin as username}
+					<li>
+						<span>{username}</span>
+					</li>
+				{/each}
+				{#each connectedUser.member as username}
 					<li>
 						<span>{username}</span>
 					</li>
@@ -166,7 +179,7 @@
 {/if}
 
 {#if show}
-	<ChatModal {setShow} username={usernameForModal} />
+	<ChatModal {setShow} username={usernameForModal} admins={connectedUser.admin} {channelId} {isOwner}/>
 {/if}
 
 <style>
