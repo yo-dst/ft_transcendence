@@ -75,8 +75,6 @@ screenLeft
 
 	header img {
 		border-radius: 50%;
-        /* width: 35%; */
-        /* height: auto; */
 		width: 96px;
 		height: 96px;
         object-fit: cover;

@@ -88,8 +88,6 @@
 		if (!$user.isLoggedIn) {
 			goto("/login");
 		} else {
-			getFriendsStatus($friendsProfile);
-
 			$eventsSocket.on("user-connected", (username: string) => {
 				friends = friends.map(friend => {
 					if (friend.profile.username === username) {

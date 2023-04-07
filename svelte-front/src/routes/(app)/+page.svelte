@@ -3,10 +3,14 @@
 	import { io, Socket } from "socket.io-client";
 	import { user } from "$lib/stores/user";
 	import { onMount } from "svelte";
+    import PlayVsFriendsModal from "$lib/components/PlayVsFriendsModal.svelte";
+    import ChatModal from "$lib/components/ChatModal.svelte";
 
 	let selectedGameMode = 0;
 	let isSearching = false;
 	let socket = io("localhost:3000/matchmaking");
+	let show = false;
+	const setShow = (value: boolean) => show = value; 
 
 	function joinQueue() {
 		socket.emit("joinQueue", selectedGameMode);
@@ -31,27 +35,84 @@
 </script>
 
 <section>
-	{#if !isSearching}
-		<button on:click={joinQueue}>Find match</button>
-	{:else}
-		<button on:click={leaveQueue}>Leave</button>
-	{/if}
-	<button>Play vs friends</button>
-	Game Mode
-	<button on:click={() => (selectedGameMode = 0)} disabled={isSearching}
-		>{selectedGameMode === 0 ? "✅" : "🧢"} Default</button
-	>
-	<button on:click={() => (selectedGameMode = 1)} disabled={isSearching}
-		>{selectedGameMode === 1 ? "✅" : "⚡"} Speed</button
-	>
-	<button on:click={() => (selectedGameMode = 2)} disabled={isSearching}
-		>{selectedGameMode === 2 ? "✅" : "👻"} Ghost</button
-	>
+	<h3>Game mode</h3>
+	<div class="game-mode">
+		<button class={selectedGameMode === 0 ? "" : "outline"}
+			on:click={() => selectedGameMode = 0}
+		>
+			🧢 Classic
+		</button>
+		<button class={selectedGameMode === 1 ? "" : "outline"}
+			on:click={() => selectedGameMode = 1}
+		>
+			👻 Ghost
+		</button>
+		<button class={selectedGameMode === 2 ? "" : "outline"}
+			on:click={() => selectedGameMode = 2}
+		>
+			⚡ Speed
+		</button>
+	</div>
 </section>
 
 <section>
-	<a role="button" href="/users">Users logged in</a>
+	<h3>Find game</h3>
+	<div class="find-game">
+		{#if !isSearching}
+			<button on:click={joinQueue}>Play</button>
+		{:else}
+			<button class="outline" on:click={leaveQueue}>Leave</button>
+		{/if}
+		<div class="or">
+			<span></span>
+			<span>or</span>
+			<span></span>
+		</div>
+		<button on:click|stopPropagation={() => setShow(true)}>Play vs friends</button>
+	</div>
 </section>
 
+{#if show}
+	<PlayVsFriendsModal {setShow}/>
+{/if}
+
 <style>
+	h3 {
+		margin-bottom: 1rem;
+	}
+
+	.game-mode {
+		display: flex;
+		gap: 1rem;
+	}
+
+	.game-mode button {
+		
+	}
+
+	.find-game {
+
+	}
+
+	.or {
+		padding: 0 2rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+		margin-bottom: 1rem;
+	}
+
+	.or > :first-child {
+		width: 40%;
+		height: 0.5px;
+		background-color: white;
+		opacity: 0.8;
+	}
+
+	.or > :last-child {
+		width: 40%;
+		height: 0.5px;
+		background-color: white;
+		opacity: 0.8;
+	}
 </style>

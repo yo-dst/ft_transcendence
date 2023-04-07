@@ -12,7 +12,7 @@
 			goto('/login');
 		}
 		else {
-			$chatSocket = io("localhost:3000/chat", {auth: {username: $user.profile?.username}});
+			$chatSocket = io("localhost:3000/chat", { auth: { username: $user.profile?.username } });
 			$chatSocket.on('loaded', () => {
 				hasMounted = true;
 			});
