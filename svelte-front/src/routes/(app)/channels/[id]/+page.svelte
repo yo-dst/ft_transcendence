@@ -67,7 +67,6 @@
 	$chatSocket.on('updateConnectedUsers', (info: any) => {
 		connectedUser = info;
 		connectedUser = connectedUser;
-		console.log(connectedUser);
 	})
 
 	function leaveRoom() {
@@ -180,7 +179,7 @@
 {/if}
 
 {#if show}
-	<ChatModal {setShow} username={usernameForModal} isAdmin={userIsAdmin} {channelId} {isOwner}/>
+	<ChatModal {setShow} username={usernameForModal} admins={connectedUser.admin} {channelId} {isOwner}/>
 {/if}
 
 <style>

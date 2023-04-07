@@ -5,17 +5,18 @@
     import { user } from "$lib/stores/user";
     import type { Profile } from "$lib/types/profile";
     import { onDestroy, onMount } from "svelte";
+    import Loading from "./Loading.svelte";
 
 	export let setShow: any;
 	export let username: string;
-	export let isAdmin: boolean;
+	export let admins: string[];
 	export let isOwner: boolean;
 	export let channelId: string | undefined;
 
 	let userProfile: Profile;
 	let userIsFriend: boolean;
-	let userIsAdmin = false;
-
+	let isLoading: boolean = true;
+	
 	function handleClickOutside(event: any) {
     	if (!event.target.closest('#chat-modal')) {
 			setShow(false);
@@ -26,13 +27,16 @@
 		document.addEventListener("click", handleClickOutside);
 
 		userProfile = await fetchProfile(username);
+		isLoading = false;
 	});
 
 	onDestroy(() => {
 		document.removeEventListener("click", handleClickOutside);
 	});
 </script>
-
+{#if isLoading}
+<Loading/>
+{:else}
 <dialog open={true}>
 	<article id="chat-modal">
 		<header on:click={() => goto(`/profile/${userProfile?.username}`)} on:keypress>
@@ -44,7 +48,7 @@
 			{#if !userIsFriend}
 				<button on:click={() => sendFriendRequest(userProfile?.username)}>Friend request</button>
 			{/if}
-			{#if (isAdmin || isOwner) && !userIsAdmin}
+			{#if (admins.includes($user.profile.username) || isOwner) && !admins.includes(userProfile.username)}
 				<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
 			{/if}
 			{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}
@@ -55,6 +59,7 @@
 		</body>
 	</article>
 </dialog>
+{/if}
 
 <style>
 	article {
