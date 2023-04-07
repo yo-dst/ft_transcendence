@@ -90,7 +90,7 @@
 <article>
 	<header>
 		<div>
-			{#if userIsAdmin}
+			{#if connectedUser.owner === $user.profile?.username}
 				<iconify-icon icon="material-symbols:settings-outline"
 					style="font-size: 1.8rem"
 					on:click={() => {showSettingsModal = true}}
