@@ -33,8 +33,6 @@
 		isLoading = false;
 		connectedUser = info.connectedUser;
 		isOwner = info.isOwner;
-		console.log(connectedUser);
-		// connectedUser.member = connectedUser.member.filter(item => !connectedUser.admin.includes(item));
 	})
 	let show = false;
 	const setShow = (value: boolean) => show = value;
@@ -70,7 +68,6 @@
 		connectedUser = info;
 		connectedUser = connectedUser;
 		console.log(connectedUser);
-		// connectedUser.member = connectedUser.member.filter(item => !connectedUser.admin.includes(item));
 	})
 
 	function leaveRoom() {
@@ -130,6 +127,7 @@
 		<body style="overflow: auto;">
 			<ul>
 				<!-- sort them -> owner > admin > random -->
+				{connectedUser.owner}
 				{#each connectedUser.admin as username}
 					<li>
 						<span>{username}</span>

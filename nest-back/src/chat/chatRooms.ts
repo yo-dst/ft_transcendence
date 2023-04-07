@@ -49,7 +49,8 @@ export class ChatRoom {
 		else if (this.admins.includes(userId)) this.admins.splice(this.admins.findIndex((admins) => (admins === userId)), 1);
 		else if (this.member.length > 0 && userId === this.owner) {
 			if (this.admins.length > 0) this.owner = this.admins[0];
-			else this.owner = this.member[0];
+			else if (this.member.length) this.owner = this.member[0];
+			else this.owner = undefined;
 		}
 	}
 
