@@ -10,9 +10,10 @@
     import ChatModal from "$lib/components/ChatModal.svelte";
     import type { connectedUser } from "$lib/types/connected-user";
 
-	let messages: string[] = [];
 	let input: string = "";
+	let messages: string[] = []
 	let usernames: string[] = [];
+	let usersConnected: {status: string, username: string}[] = [];
 	let element: any;
 	const channelId: string | undefined = $page.url.href.split('/').pop();
 	let roomName: string;
@@ -80,6 +81,8 @@
 	onMount(() => {
 		if (!$user.isLoggedIn) {
 			goto("/login");
+		} else {
+			// users = fetchUsersInRoom();
 		}
 	})
 </script>
