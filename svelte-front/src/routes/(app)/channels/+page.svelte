@@ -44,7 +44,7 @@
 			<li>
 				<div class="channel-left">
 					<div class="users">
-						<span>{room.member.length} / {room.capacity}</span>
+						<span>{room.member.length + room.admins.length + 1} / {room.capacity}</span>
 						<iconify-icon icon="fa-solid:user-friends"></iconify-icon>	
 					</div>
 					<div class="channel-name">
@@ -53,7 +53,7 @@
 					</div>
 				</div>
 				<div class="channel-right">
-					{#if room.isProtected && !room.member.includes($user.id)}
+					{#if room.isProtected && (!room.member.includes($user.id) || room.admins.includes($user.id) || room.owner === $user.id)}
 						<iconify-icon icon="material-symbols:lock" style="font-size: 1.5rem;"></iconify-icon>
 						<button class="secondary" on:click={() => {isModalShowing = true}}>
 							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
