@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import { user } from "$lib/stores/user";
 	import type { Match } from "$lib/types/match";
@@ -14,24 +13,28 @@
 	let userProfile: Profile;
 
 	async function loadMore() {
-		const data = await fetchMatchHistory(username, index, nbMatchesToLoad);
-		index += nbMatchesToLoad;
-		matches = [...matches, ...data];
+		try {
+			const data = await fetchMatchHistory($user.profile.username, index, nbMatchesToLoad);
+			matches = [...matches, ...data];
+			index += nbMatchesToLoad;
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	onMount(async () => {
-		if (!$user.isLoggedIn) {
-			goto("/login");
-		} else {
+		try {
 			userProfile = await fetchProfile(username);
-			await loadMore();
+			await loadMore()
+		} catch (err) {
+			console.log(err);
 		}
 	});
 </script>
 
 <section>
 	<div class="user">
-		<img src={userProfile?.avatar?.url} alt="profile" />
+		<img src={userProfile.avatar.url} alt="profile" />
 		<div class="user-stats">
 			<span>{userProfile?.username}</span>
 			<div>

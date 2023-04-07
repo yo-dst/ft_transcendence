@@ -18,13 +18,7 @@ export const logoutUser = async (): Promise<void> => {
 		const error = await res.json();
 		throw new Error(error.message);
 	}
-	user.update(value => {
-		return {
-			...value,
-			isLoggedIn: false,
-			profile: undefined
-		}
-	});
+	user.set(undefined);
 	eventsSocket.update(value => {
 		value?.disconnect();
 		return undefined;
@@ -40,12 +34,7 @@ export const loginUser = async (): Promise<void> => {
 		throw new Error(error.message);
 	}
 	const data = await res.json();
-	user.update(value => {
-		return {
-			...data,
-			isLoggedIn: true,
-		};
-	});
+	user.set(data);
 }
 
 export const fetchProfile = async (username: string): Promise<Profile> => {
@@ -154,7 +143,7 @@ export const turnOffTwoFactorAuthentication = async (): Promise<void> => {
 	});
 } 
 
-export const fetchFriendsProfile = async (): Promise<Profile[]> => {
+export const fetchFriendsProfile = async (): Promise<void> => {
 	const res = await fetch(`${host}/user/friends`, {
 		credentials: "include"
 	});
@@ -162,18 +151,20 @@ export const fetchFriendsProfile = async (): Promise<Profile[]> => {
 		const error = await res.json();
 		throw new Error(error.message);
 	}
-	return await res.json();
+	const data = await res.json();
+	friendsProfile.set(data);
 }
 
-export const fetchFriendRequests = async (): Promise<FriendRequest[]> => {
-	const res = await fetch("http://localhost:3000/user/friend-requests", {
+export const fetchFriendRequests = async (): Promise<void> => {
+	const res = await fetch(`${host}/user/friend-requests`, {
 		credentials: "include"
 	});
 	if (!res.ok) {
 		const error = await res.json();
 		throw new Error(error.message);
 	}
-	return await res.json();
+	const data = await res.json();
+	friendRequests.set(data);
 }
 
 export const sendFriendRequest = async (username: string): Promise<void> => {

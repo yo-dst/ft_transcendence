@@ -10,9 +10,8 @@
 	import { friendRequests } from "$lib/stores/friend-requests";
 	
 	let friends: Friend[] = [];
-
-	let sendRequestValue: string;
-	let sendRequestError: string;
+	let sendRequestValue = "";
+	let sendRequestError = "";
 
 	var countFakeFriend = 0;
 	function addFakeFriend() {
@@ -77,49 +76,34 @@
 	}
 
 	async function sendRequest() {
-		sendFriendRequest(sendRequestValue)
-			.then(() => sendRequestError = "")
-			.catch(err => sendRequestError = err);
+		try {
+			sendFriendRequest(sendRequestValue);
+			sendRequestError = "";
+		} catch (err) {
+			sendRequestError = err.message;
+		}
 	}
 
 	$: getFriendsStatus($friendsProfile);
 
 	onMount(async () => {
-		if (!$user.isLoggedIn) {
-			goto("/login");
-		} else {
-			$eventsSocket.on("user-connected", (username: string) => {
-				friends = friends.map(friend => {
-					if (friend.profile.username === username) {
-						friend.isLoggedIn = true;
-					}
-					return friend;
-				});
+		$eventsSocket.on("user-connected", (username: string) => {
+			friends = friends.map(friend => {
+				if (friend.profile.username === username) {
+					friend.isLoggedIn = true;
+				}
+				return friend;
 			});
+		});
 
-			$eventsSocket.on("user-disconnected", (username: string) => {
-				friends = friends.map(friend => {
-					if (friend.profile.username === username) {
-						friend.isLoggedIn = false;
-					}
-					return friend;
-				});
+		$eventsSocket.on("user-disconnected", (username: string) => {
+			friends = friends.map(friend => {
+				if (friend.profile.username === username) {
+					friend.isLoggedIn = false;
+				}
+				return friend;
 			});
-
-			$eventsSocket.on("friend-request-accepted", async (username: string) => {
-				const newFriendProfile = await fetchProfile(username);
-				$friendsProfile = [...$friendsProfile, newFriendProfile];
-			});
-
-			$eventsSocket.on("friend-removed", (username: string) => {
-				$friendsProfile = $friendsProfile.filter(profile => profile.username !== username);
-			});
-
-			$eventsSocket.on("receive-friend-request", async (friendRequest: any) => {
-				const creatorProfile = await fetchProfile(friendRequest.creatorUsername);
-				$friendRequests = [...$friendRequests, { id: friendRequest.id, creator: creatorProfile }]; 
-			});
-		}
+		});
 	});
 </script>
 

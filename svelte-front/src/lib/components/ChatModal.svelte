@@ -28,7 +28,7 @@
 		document.addEventListener("click", handleClickOutside);
 
 		userProfile = await fetchProfile(username);
-		userIsFriend = $friendsProfile.findIndex(profile => profile.username === userProfile?.username) !== -1;
+		userIsFriend = $friendsProfile.findIndex(profile => profile.username === userProfile.username) !== -1;
 		isLoading = false;
 	});
 
@@ -41,15 +41,15 @@
 {:else}
 <dialog open={true}>
 	<article id="chat-modal">
-		<header on:click={() => goto(`/profile/${userProfile?.username}`)} on:keypress>
-			<img src={userProfile?.avatar?.url} alt="avatar"/>
-			<span class="safe-words">{userProfile?.username}</span>
+		<header on:click={() => goto(`/profile/${userProfile.username}`)} on:keypress>
+			<img src={userProfile.avatar.url} alt="avatar"/>
+			<span class="safe-words">{userProfile.username}</span>
 		</header>
-		{#if userProfile.username !== $user.profile?.username}
+		{#if userProfile.username !== $user.profile.username}
 			<body>
 				<button on:click={() => {}}>Challenge</button>
 				{#if !userIsFriend}
-					<button on:click={() => sendFriendRequest(userProfile?.username)}>Friend request</button>
+					<button on:click={() => sendFriendRequest(userProfile.username)}>Friend request</button>
 				{/if}
 				{#if (admins.includes($user.profile.username) || isOwner) && !admins.includes(userProfile.username)}
 					<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>

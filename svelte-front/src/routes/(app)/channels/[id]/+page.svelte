@@ -13,7 +13,6 @@
 	let input: string = "";
 	let messages: string[] = []
 	let usernames: string[] = [];
-	let usersConnected: {status: string, username: string}[] = [];
 	let element: any;
 	const channelId: string | undefined = $page.url.href.split('/').pop();
 	let roomName: string;
@@ -24,6 +23,9 @@
 	let showUserList = false;
 	let connectedUser: connectedUser;
 	let isOwner: boolean = false;
+	let show = false;
+	const setShow = (value: boolean) => show = value;
+	let usernameForModal = "";
 	
 	$chatSocket.emit('verifyUser', channelId, (info: any) => {
 		if (info.isConnected) showPasswordModal = false;
@@ -34,9 +36,6 @@
 		connectedUser = info.connectedUser;
 		isOwner = info.isOwner;
 	})
-	let show = false;
-	const setShow = (value: boolean) => show = value;
-	let usernameForModal: string;
 
 	// triggers after component has been updated
 	afterUpdate(() => {
@@ -73,17 +72,10 @@
 		$chatSocket.emit('leaveRoom', channelId, $user.id);
 		goto("/channels");
 	}
-
-	onMount(() => {
-		if (!$user.isLoggedIn) {
-			goto("/login");
-		} else {
-			// users = fetchUsersInRoom();
-		}
-	})
 </script>
+
 {#if isLoading}
-	<Loading/>
+<Loading/>
 {:else if showPasswordModal}
 <ModalPasswordChannels closeModal={() => {}} roomId={channelId}/>
 {:else}

@@ -11,14 +11,10 @@
 	let isModalShowing = false;
 
 	function getJoinedRooms(rooms: chatRoom[]): chatRoom[] {
-		const userId = $user.id;
-		if (!userId) {
-			return [];
-		}
 		return rooms.filter(room => {
 			if (($user.id === room.owner)
-				|| (room.admins.indexOf(userId) !== -1)
-				|| (room.member.indexOf(userId)) !== -1) {
+				|| (room.admins.indexOf($user.id) !== -1)
+				|| (room.member.indexOf($user.id)) !== -1) {
 				return true;
 			}
 			return false;
@@ -37,7 +33,7 @@
 	function joinRoom(id: string) {
 		$chatSocket.emit('joinRoom', id, undefined, (found: boolean) => {
 			if (found) goto('/channels/' + id);
-		})
+		});
 	}
 
 	function closeModal() {
@@ -47,17 +43,13 @@
 	$: joinedRooms = getJoinedRooms(rooms);
 
 	onMount(() => {
-		if (!$user.isLoggedIn) {
-			goto("/login");
-		} else {
-			$chatSocket.emit('getRooms', (Rooms: chatRoom[]) => {
-				rooms = Rooms;
-			})
+		$chatSocket.emit('getRooms', (data: chatRoom[]) => {
+			rooms = data;
+		});
 
-			$chatSocket.on('roomUpdate', (Rooms: chatRoom[]) => {
-				rooms = Rooms;
-			})
-		}
+		$chatSocket.on('roomUpdate', (data: chatRoom[]) => {
+			rooms = data;
+		});
 	});
 </script>
 

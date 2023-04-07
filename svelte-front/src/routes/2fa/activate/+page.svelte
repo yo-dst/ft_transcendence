@@ -16,7 +16,7 @@
 			error = "";
 			goto("/");
 		} catch (err) {
-			error = err;
+			error = err.message;
 		}
 	}
 

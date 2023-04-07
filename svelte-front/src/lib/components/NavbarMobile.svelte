@@ -21,7 +21,7 @@
         <img src={PongIcon} alt="icon pong" class="pong-icon"/>
     </a>
     <div class="header-profile">
-    {#if $user.isLoggedIn}
+    {#if $user}
         <button class="ring-wrapper" on:click={() => showNotif = !showNotif}>
             <iconify-icon icon="mdi:bell-ring" style="font-size: 40px; color: #f0f6fc;"></iconify-icon>
             <span class="ring-notif">{$notifications.length}</span>

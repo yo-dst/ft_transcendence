@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import { user } from "$lib/stores/user";
 	import type { Match } from "$lib/types/match";
@@ -10,31 +9,31 @@
 	let matches: Match[] = [];
 
 	async function loadMore() {
-		const data = await fetchMatchHistory($user.profile.username, index, nbMatchesToLoad);
-		index += nbMatchesToLoad;
-		matches = [...matches, ...data];
+		try {
+			const data = await fetchMatchHistory($user.profile.username, index, nbMatchesToLoad);
+			matches = [...matches, ...data];
+			index += nbMatchesToLoad;
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	onMount(async () => {
-		if (!$user.isLoggedIn) {
-			goto("/login");
-		} else {
-			await loadMore();
-		}
+		await loadMore();
 	});
 </script>
 
 <section>
 	<div class="user">
-		<img src={$user.profile?.avatar?.url} alt="profile" />
+		<img src={$user.profile.avatar.url} alt="profile" />
 		<div class="user-stats">
-			<span>{$user.profile?.username}</span>
+			<span>{$user.profile.username}</span>
 			<div>
-				<span style="color: var(--ins-color);;">{$user.profile?.wins}</span>
+				<span style="color: var(--ins-color);;">{$user.profile.wins}</span>
 				/
 				<span style="color: var(--color);">0</span>
 				/
-				<span style="color: var(--del-color);;">{$user.profile?.losses}</span>
+				<span style="color: var(--del-color);;">{$user.profile.losses}</span>
 			</div>
 		</div>
 	</div>
