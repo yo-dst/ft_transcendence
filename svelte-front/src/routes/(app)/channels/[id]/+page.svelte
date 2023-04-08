@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from "$lib/stores/user";
-    import { afterUpdate, onMount } from "svelte";
+    import { afterUpdate, getContext, onMount } from "svelte";
     import { page } from "$app/stores";
     import ModalChannelSettings from "$lib/components/ModalChannelSettings.svelte";
     import { chatSocket } from "$lib/stores/chat-socket";
@@ -9,13 +9,11 @@
     import { goto } from "$app/navigation";
     import ChatModal from "$lib/components/ChatModal.svelte";
     import type { connectedUser } from "$lib/types/connected-user";
+    import { chatMessages } from "$lib/stores/chat-messages";
 
 	let input: string = "";
-	let messages: string[] = []
-	let usernames: string[] = [];
-	let usersConnected: {status: string, username: string}[] = [];
 	let element: any;
-	const channelId: string | undefined = $page.url.href.split('/').pop();
+	const channelId: string = $page.url.href.split('/').pop() as string;
 	let roomName: string;
 	let showSettingsModal:boolean = false;
 	let isLoading: boolean = true;
@@ -23,8 +21,9 @@
 	let userIsAdmin: boolean;
 	let showUserList = false;
 	let connectedUser: connectedUser;
-	let isOwner: boolean = false;
-	
+
+	if (!$chatMessages[channelId]) $chatMessages[channelId] = [];
+
 	$chatSocket.emit('verifyUser', channelId, (info: any) => {
 		if (info.isConnected) showPasswordModal = false;
 		else showPasswordModal = true;
@@ -32,7 +31,6 @@
 		userIsAdmin = info.isAdmin;
 		isLoading = false;
 		connectedUser = info.connectedUser;
-		isOwner = info.isOwner;
 	})
 	let show = false;
 	const setShow = (value: boolean) => show = value;
@@ -43,7 +41,7 @@
 		if (showUserList) {
 			return;
 		}
-		if(messages && element) scrollToBottom(element);
+		if($chatMessages[channelId] && element) scrollToBottom(element);
 	})
 
 	const scrollToBottom = async (node: any) => {
@@ -57,12 +55,9 @@
 		}
 	}
 
-	$chatSocket.on('newMessage', (Username: string, newMessage: string) => {
-		if (!$user.blocked.find((user) => (user.username === Username)) || $user.blocked.length === 0) {
-			usernames = [...usernames, Username];
-			messages = [...messages, newMessage];
-		}
-	})
+	// $chatSocket.on('newMessage', () => {
+	// 	$chatMessages = $chatMessages;
+	// })
 
 	$chatSocket.on('updateConnectedUsers', (info: any) => {
 		connectedUser = info;
@@ -85,7 +80,7 @@
 {#if isLoading}
 	<Loading/>
 {:else if showPasswordModal}
-<ModalPasswordChannels closeModal={() => {}} roomId={channelId}/>
+<ModalPasswordChannels roomId={channelId}/>
 {:else}
 <article>
 	<header>
@@ -145,21 +140,24 @@
 				<li>
 					<span style="color: #9F2B68">System</span> : Welcome to the channel {$user.profile?.username} !
 				</li>
-				{#each messages as message, index}
+				{#each $chatMessages[channelId] as userInfo}
 					<li>
-						{#if usernames[index] !== $user.profile?.username}
+						<!-- {#if usernames[index] !== $user.profile?.username} -->
+							{#if userInfo.username !== $user.profile?.username}
 							<span style="color: #FEA347;"
-								on:click|stopPropagation={() => { usernameForModal = usernames[index]; setShow(true); }}
+								on:click|stopPropagation={() => { usernameForModal = userInfo.username; setShow(true); }}
 								on:keypress
 							>
-								{usernames[index]}
+								{userInfo.username}
+								<!-- {usernames[index]} -->
 							</span>
 						{:else}
 							<span style="color: #FEA347; text-decoration: underline;">
-								{usernames[index]}
+								<!-- {usernames[index]} -->
+								{userInfo.username}
 							</span>
 						{/if}
-						: {message}
+						: {userInfo.message}
 					</li>
 				{/each}
 			</ul>
@@ -179,7 +177,7 @@
 {/if}
 
 {#if show}
-	<ChatModal {setShow} username={usernameForModal} admins={connectedUser.admin} {channelId} {isOwner}/>
+	<ChatModal {setShow} username={usernameForModal} admins={connectedUser.admin} {channelId} owner={connectedUser.owner}/>
 {/if}
 
 <style>

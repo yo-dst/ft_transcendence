@@ -9,7 +9,6 @@
 	
 	let rooms: chatRoom[] = [];
 	let isModalShowing = false;
-
 	
 	function joinRoom(id: string) {
 		$chatSocket.emit('joinRoom', id, undefined, (found: boolean) => {
@@ -68,7 +67,7 @@
 					</div>
 				</li>
 				{#if isModalShowing}
-					<ModalPasswordChannels closeModal={closeModal} roomId={room.id}/>
+					<ModalPasswordChannels roomId={room.id}/>
 				{/if}
 		{/each}
 	</ul>
