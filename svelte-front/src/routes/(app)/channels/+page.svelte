@@ -75,11 +75,6 @@
 				<div class="channel-right">
 					{#if room.member.length + room.admins.length + 1 >= room.capacity}
 						<p>room filled</p>
-					{:else if room.isProtected && (!room.member.includes($user.id) || room.admins.includes($user.id) || room.owner === $user.id)}
-						<iconify-icon icon="material-symbols:lock" style="font-size: 1.5rem;"></iconify-icon>
-						<button class="secondary" on:click={() => {isModalShowing = true}}>
-							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
-						</button>
 					{:else}
 						<button class="secondary" on:click={() => {joinRoom(room.id)}}>
 							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
@@ -110,7 +105,7 @@
 					<div class="channel-right">
 						{#if room.member.length + room.admins.length + 1 >= room.capacity}
 							<p>room filled</p>
-						{:else if room.isProtected && (!room.member.includes($user.id) || room.admins.includes($user.id) || room.owner === $user.id)}
+						{:else if room.isProtected }
 							<iconify-icon icon="material-symbols:lock" style="font-size: 1.5rem;"></iconify-icon>
 							<button class="secondary" on:click={() => {isModalShowing = true}}>
 								<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
