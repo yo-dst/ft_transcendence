@@ -1,16 +1,17 @@
 import { eventsSocket } from "$lib/stores/events-socket";
 import { friendRequests } from "$lib/stores/friend-requests";
-import { friendsProfile } from "$lib/stores/friends-profile";
+import { friends } from "$lib/stores/friends";
 import { notifications } from "$lib/stores/notifications";
 import { user } from "$lib/stores/user";
-import type { FriendRequest } from "$lib/types/friend-request";
 import type { Match } from "$lib/types/match";
 import type { Profile } from "$lib/types/profile";
+import { getFriendsStatus } from "$lib/utils/getFriendsStatus";
+import { isUserConnected } from "$lib/utils/isUserConnected";
 import { get } from "svelte/store";
 
 const host = "http://localhost:3000";
 
-export const logoutUser = async (): Promise<void> => {
+export const logoutUser = async () => {
 	const res = await fetch(`${host}/auth/logout`, {
 		credentials: "include",
 	});
@@ -25,7 +26,7 @@ export const logoutUser = async (): Promise<void> => {
 	});
 }
 
-export const loginUser = async (): Promise<void> => {
+export const loginUser = async () => {
 	const res = await fetch(`${host}/user`, {
 		credentials: "include"
 	});
@@ -69,7 +70,7 @@ export const fetchMatchHistory = async (
 	return await res.json();
 }
 
-export const updateUserUsername = async (newUsername: string): Promise<void> => {
+export const updateUserUsername = async (newUsername: string) => {
 	const res = await fetch(`${host}/user/username`, {
 		method: "PATCH",
 		credentials: "include",
@@ -96,7 +97,7 @@ export const updateUserUsername = async (newUsername: string): Promise<void> => 
 	socket.emit("update-username", newUsername);
 }
 
-export const updateUserAvatar = async (newAvatar: string): Promise<void> => {
+export const updateUserAvatar = async (newAvatar: string) => {
 	const res = await fetch(`${host}/user/avatar`, {
 		method: "PATCH",
 		credentials: "include",
@@ -121,7 +122,7 @@ export const updateUserAvatar = async (newAvatar: string): Promise<void> => {
 	});
 }
 
-export const turnOnTwoFactorAuthentication = async (code: string): Promise<void> => {
+export const turnOnTwoFactorAuthentication = async (code: string) => {
 	const res = await fetch(`${host}/2fa/turn-on`, {
 		method: "POST",
 		credentials: "include",
@@ -144,7 +145,7 @@ export const turnOnTwoFactorAuthentication = async (code: string): Promise<void>
 	});
 }
 
-export const turnOffTwoFactorAuthentication = async (): Promise<void> => {
+export const turnOffTwoFactorAuthentication = async () => {
 	const res = await fetch(`${host}/2fa/turn-off`, {
 		method: "POST",
 		credentials: "include",
@@ -161,7 +162,7 @@ export const turnOffTwoFactorAuthentication = async (): Promise<void> => {
 	});
 } 
 
-export const fetchFriendsProfile = async (): Promise<void> => {
+export const fetchFriends = async () => {
 	const res = await fetch(`${host}/user/friends`, {
 		credentials: "include"
 	});
@@ -172,11 +173,12 @@ export const fetchFriendsProfile = async (): Promise<void> => {
 		}
 		throw error;
 	}
-	const data = await res.json();
-	friendsProfile.set(data);
+	const profiles = await res.json();
+	const profilesWithStatus = await getFriendsStatus(profiles);
+	friends.set(profilesWithStatus);
 }
 
-export const fetchFriendRequests = async (): Promise<void> => {
+export const fetchFriendRequests = async () => {
 	const res = await fetch(`${host}/user/friend-requests`, {
 		credentials: "include"
 	});
@@ -191,7 +193,7 @@ export const fetchFriendRequests = async (): Promise<void> => {
 	friendRequests.set(data);
 }
 
-export const sendFriendRequest = async (username: string): Promise<void> => {
+export const sendFriendRequest = async (username: string) => {
 	const res = await fetch(`${host}/friend-requests`, {
 		method: "POST",
 		credentials: "include",
@@ -215,7 +217,7 @@ export const sendFriendRequest = async (username: string): Promise<void> => {
 	});
 }
 
-export const acceptFriendRequest = async (friendRequestId: number): Promise<void> => {
+export const acceptFriendRequest = async (friendRequestId: number) => {
 	const res = await fetch(`${host}/friend-requests/accept/${friendRequestId}`, {
 		method: "POST",
 		credentials: "include"
@@ -227,15 +229,20 @@ export const acceptFriendRequest = async (friendRequestId: number): Promise<void
 		}
 		throw error;
 	}
-	const data = await res.json();
-	friendsProfile.update(value => { return [...value, data]; });
+	const creatorProfile = await res.json();
+	const newFriend = {
+		isConnected: await isUserConnected(creatorProfile.username),
+		isInGame: false,
+		profile: creatorProfile
+	};
+	friends.update(value => [...value, newFriend]);
 	friendRequests.update(value => value.filter(request => request.id !== friendRequestId));
 	notifications.update(value => value.filter(notification => (notification.type !== "friend-request" && notification.data.id === friendRequestId)));
 	const socket = get(eventsSocket);
-	socket.emit("accept-friend-request", data.username);
+	socket.emit("accept-friend-request", creatorProfile.username);
 }
 
-export const declineFriendRequest = async (friendRequestId: number): Promise<void> => {
+export const declineFriendRequest = async (friendRequestId: number) => {
 	const res = await fetch(`${host}/friend-requests/decline/${friendRequestId}`, {
 		method: "POST",
 		credentials: "include"
@@ -251,7 +258,7 @@ export const declineFriendRequest = async (friendRequestId: number): Promise<voi
 	notifications.update(value => value.filter(notification => (notification.type !== "friend-request" && notification.data.id === friendRequestId)));
 }
 
-export const removeFriend = async (username: string): Promise<void> => {
+export const removeFriend = async (username: string) => {
 	const res = await fetch(`${host}/user/remove-friend`, {
 		method: "PATCH",
 		credentials: "include",
@@ -267,7 +274,7 @@ export const removeFriend = async (username: string): Promise<void> => {
 		}
 		throw error;
 	}
-	friendsProfile.update(value => value.filter(profile => profile.username !== username));
+	friends.update(value => value.filter(friend => friend.profile.username !== username));
 	const socket = get(eventsSocket);
 	socket.emit("remove-friend", username);
 }
@@ -287,7 +294,7 @@ export const generateTwoFactorAuthenticationQrCode = async (): Promise<string> =
 	return await res.text();
 }
 
-export const loginUserWithTwoFactorAuthentication = async (code: string): Promise<void> => {
+export const loginUserWithTwoFactorAuthentication = async (code: string) => {
 	const res = await fetch("http://localhost:3000/2fa/login", {
 		method: "POST",
 		credentials: "include",

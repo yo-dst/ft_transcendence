@@ -1,22 +1,31 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-	import { user } from "$lib/stores/user";
-    import { onMount } from "svelte";
-	import { eventsSocket } from "$lib/stores/events-socket";
     import type { Friend } from "$lib/types/friend";
-    import { acceptFriendRequest, declineFriendRequest, fetchProfile, removeFriend, sendFriendRequest } from "$lib/api";
-    import type { Profile } from "$lib/types/profile";
-	import { friendsProfile } from "$lib/stores/friends-profile";
+    import { acceptFriendRequest, declineFriendRequest, removeFriend, sendFriendRequest } from "$lib/api";
 	import { friendRequests } from "$lib/stores/friend-requests";
+    import { friends } from "$lib/stores/friends";
 	
-	let friends: Friend[] = [];
+	let friendsSorted: Friend[] = [];
 	let sendRequestValue = "";
 	let sendRequestError = "";
 
+	function sortFriends(friends: Friend[]) {
+		let tmp = friends;
+		return tmp.sort((a, b) => {
+			if (a.isConnected && b.isConnected)
+				return 0;
+			else if (a.isConnected) {
+				return -1;
+			}
+			return 1;
+		});
+	}
+
+	$: friendsSorted = sortFriends($friends);
+	
 	var countFakeFriend = 0;
 	function addFakeFriend() {
 		const fakeFriend = {
-			isLoggedIn: countFakeFriend % 2 === 0,
+			isConnected: countFakeFriend % 2 === 0,
 			isInGame: false,
 			profile: {
 				username: `fake${countFakeFriend}`,
@@ -27,7 +36,7 @@
 				losses: countFakeFriend
 			}
 		}
-		friends = [...friends, fakeFriend];
+		$friends = [...$friends, fakeFriend];
 		countFakeFriend++;
 	}
 
@@ -48,33 +57,6 @@
 		countFakeFriendRequest++;
 	}
 
-	async function isUserConnected(username: string): Promise<boolean> {
-		return new Promise((resolve, reject) => {
-			$eventsSocket.emit("is-user-connected", username, (isLoggedIn: boolean) => {
-				resolve(isLoggedIn);
-			});
-		});
-	}
-
-	async function getFriendsStatus(friendsProfile: Profile[]) {
-		friends = await Promise.all(friendsProfile.map(async profile => {
-			const isConnected = await isUserConnected(profile.username);
-			return {
-				isLoggedIn: isConnected,
-				isInGame: false,
-				profile
-			};
-		}));
-		friends.sort((a, b) => {
-			if (a.isLoggedIn && b.isLoggedIn)
-				return 0;
-			else if (a.isLoggedIn) {
-				return -1;
-			}
-			return 1;
-		});
-	}
-
 	async function sendRequest() {
 		try {
 			sendFriendRequest(sendRequestValue);
@@ -83,28 +65,6 @@
 			sendRequestError = err.message;
 		}
 	}
-
-	$: getFriendsStatus($friendsProfile);
-
-	onMount(async () => {
-		$eventsSocket.on("user-connected", (username: string) => {
-			friends = friends.map(friend => {
-				if (friend.profile.username === username) {
-					friend.isLoggedIn = true;
-				}
-				return friend;
-			});
-		});
-
-		$eventsSocket.on("user-disconnected", (username: string) => {
-			friends = friends.map(friend => {
-				if (friend.profile.username === username) {
-					friend.isLoggedIn = false;
-				}
-				return friend;
-			});
-		});
-	});
 </script>
 
 <section>
@@ -124,19 +84,22 @@
 	<div class="list-container bg-light-dark">
 		<h3>Friends</h3>
 		<ul>
-		{#each friends as friend}
+		{#each friendsSorted as friend}
 			<li>
 				<a href={`/profile/${friend.profile.username}`}>
 					<div class="friend-profile">
-						<div class:online={friend.isLoggedIn}></div>
+						<div class:online={friend.isConnected}></div>
 						<img src={friend.profile.avatar.url} alt="friend"/>
 						<span>{friend.profile.username}</span>
+						{#if friend.isInGame}
+							<iconify-icon icon="mdi:sword-fight" style="font-size: 2rem;"></iconify-icon>
+						{/if}
 					</div>
 					<div>
 					</div>
 				</a>
-				<button on:click={() => removeFriend(friend.profile.username)} class="remove-button">
-					<iconify-icon icon="charm:cross" style="font-size: 1.7rem;"/>
+				<button on:click={() => removeFriend(friend.profile.username)} style="background-color: var(--del-color);">
+					<iconify-icon icon="charm:cross" style="font-size: 1.5rem;"/>
 				</button>
 			</li>
 		{/each}
@@ -156,7 +119,7 @@
 				</a>
 				<div class="friend-request-buttons">
 					<button on:click={() => acceptFriendRequest(friendRequest.id)} style="background-color: var(--ins-color);">
-						<iconify-icon icon="fluent-mdl2:accept-medium" style="font-size: 1.55rem;"></iconify-icon>
+						<iconify-icon icon="fluent-mdl2:accept-medium" style="font-size: 1.5rem;"></iconify-icon>
 					</button>
 					<button on:click={() => declineFriendRequest(friendRequest.id)} style="background-color: var(--del-color);">
 						<iconify-icon icon="charm:cross" style="font-size: 1.5rem;"/>
@@ -247,12 +210,11 @@
 		align-items: center;
 	}
 
-	.remove-button {
-		background-color: var(--del-color);
-	}
-
 	.friend-profile {
 		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	.online {

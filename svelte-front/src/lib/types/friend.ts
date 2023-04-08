@@ -1,7 +1,7 @@
 import type { Profile } from "./profile"
 
 export type Friend = {
-	isLoggedIn: boolean,
+	isConnected: boolean,
 	isInGame: boolean,
 	profile: Profile
 }

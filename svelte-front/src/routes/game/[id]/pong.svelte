@@ -5,6 +5,7 @@
 	import TurnPhone from "$lib/components/turnPhone.svelte";
 	import PostGameLobby from "$lib/components/PostGameLobby.svelte";
 	import DecoTimer from "$lib/components/decoTimer.svelte";
+    import { eventsSocket } from "$lib/stores/events-socket";
 
 	/**
 	 * @type {number}
@@ -80,6 +81,7 @@
 	});
 
 	socket.on("deco", () => {
+		$eventsSocket.emit("leave-game");
 		isPlaying = false;
 	});
 
@@ -89,6 +91,7 @@
 	});
 
 	socket.on("endGame", () => {
+		$eventsSocket.emit("leave-game");
 		socket.emit("destroyGame");
 		isPlaying = false;
 	});

@@ -6,6 +6,7 @@
 	import TurnPhone from "$lib/components/turnPhone.svelte";
 	import { waitFlip } from "./pong";
 	import { user } from "$lib/stores/user";
+    import { eventsSocket } from "$lib/stores/events-socket";
 
 	let turnPhone = true;
 	let id = $page.params.id;
@@ -19,6 +20,7 @@
 	socket.on("found", (gamemode) => {
 		roomExist = true;
 		gameMode = gamemode;
+		$eventsSocket.emit("join-game");
 	});
 
 	waitFlip().then((newTurnPhone) => {

@@ -6,7 +6,7 @@
     import type { Profile } from "$lib/types/profile";
     import { onDestroy, onMount } from "svelte";
     import Loading from "./Loading.svelte";
-    import { friendsProfile } from "$lib/stores/friends-profile";
+    import { friends } from "$lib/stores/friends";
 
 	export let setShow: any;
 	export let username: string;
@@ -28,7 +28,7 @@
 		document.addEventListener("click", handleClickOutside);
 
 		userProfile = await fetchProfile(username);
-		userIsFriend = $friendsProfile.findIndex(profile => profile.username === userProfile.username) !== -1;
+		userIsFriend = $friends.findIndex(friend => friend.profile.username === userProfile.username) !== -1;
 		isLoading = false;
 	});
 

@@ -1,32 +1,14 @@
 <script lang="ts">
-    import { eventsSocket } from "$lib/stores/events-socket";
-    import { friendsProfile } from "$lib/stores/friends-profile";
+    import { friends } from "$lib/stores/friends";
     import type { Friend } from "$lib/types/friend";
-    import type { Profile } from "$lib/types/profile";
 	import { onDestroy, onMount } from "svelte";
 
 	export let setShow: any;
 
 	let friendsConnected: Friend[] = [];
 
-	async function isUserConnected(username: string): Promise<boolean> {
-		return new Promise((resolve, reject) => {
-			$eventsSocket.emit("is-user-connected", username, (isLoggedIn: boolean) => {
-				resolve(isLoggedIn);
-			});
-		});
-	}
-
-	async function getFriendsStatus(friendsProfile: Profile[]) {
-		friendsConnected = await Promise.all(friendsProfile.map(async profile => {
-			const isConnected = await isUserConnected(profile.username);
-			return {
-				isLoggedIn: isConnected,
-				isInGame: false,
-				profile
-			};
-		}));
-		friendsConnected = friendsConnected.filter(friend => friend.isLoggedIn === true);
+	function getFriendsConnected(friends: Friend[]) {
+		friendsConnected = friends.filter(friend => friend.isConnected === true);
 	}
 
 	function handleClickOutside(event: any) {
@@ -35,7 +17,7 @@
 		}
   	}
 
-	$: getFriendsStatus($friendsProfile);
+	$: getFriendsConnected($friends);
 
 	onMount(async () => {
 		document.addEventListener("click", handleClickOutside);
@@ -63,7 +45,7 @@
 							<span class="safe-words">{friend.profile.username}</span>
 						</div>
 						<div>
-							{#if true}
+							{#if friend.isInGame}
 								<iconify-icon icon="mdi:sword-fight" style="font-size: 2rem;"></iconify-icon>
 							{/if}
 							<button on:click={() => {}}>
@@ -79,7 +61,8 @@
 
 <style>
 	article {
-		width: 350px;
+		width: 450px;
+		max-width: 90vw;
 		padding: 0;
 	}
 
@@ -88,6 +71,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		gap: 1rem;
 	}
 
 	header h3 {

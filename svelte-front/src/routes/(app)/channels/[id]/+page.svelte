@@ -74,7 +74,7 @@
 {#if isLoading}
 <Loading/>
 {:else if showPasswordModal}
-<ModalPasswordChannels roomId={channelId}/>
+<ModalPasswordChannels closeModal={() => showPasswordModal = false} roomId={channelId}/>
 {:else}
 <article>
 	<header>

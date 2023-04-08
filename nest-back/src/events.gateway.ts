@@ -2,6 +2,12 @@ import { Logger } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 
+type User = {
+	socketId: string,
+	username: string,
+	isInGame: boolean
+}
+
 @WebSocketGateway({
 	cors: { origin: "http://localhost:5173" },
 	namespace: 'events'
@@ -9,7 +15,7 @@ import { Server, Socket } from "socket.io";
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	private logger = new Logger();
 
-	private connectedUsers: { socketId: string, username: string }[] = [];
+	private connectedUsers: User[] = [];
 
 	@WebSocketServer()
  	server: Server;
@@ -19,7 +25,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.data.username = username;
 		this.connectedUsers.push({
 			socketId: client.id,
-			username: username
+			username: username,
+			isInGame: false
 		});
 		this.server.emit("user-connected", username);
 
@@ -35,6 +42,11 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		
 		this.logger.log(username + " disconnected");
+	}
+
+	@SubscribeMessage("get-users")
+	getUsers(): string[] {
+		return this.connectedUsers.map(user => user.username);
 	}
 
 	@SubscribeMessage("send-friend-request")
@@ -73,11 +85,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	@SubscribeMessage("get-users")
-	getUsers(): string[] {
-		return this.connectedUsers.map(user => user.username);
-	}
-
 	@SubscribeMessage("is-user-connected")
 	getUserStatus(@MessageBody() username: string): boolean {
 		const index = this.connectedUsers.findIndex(user => user.username === username);
@@ -107,5 +114,33 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.emit("user-connected", newUsername);
 			client.data.username = newUsername;
 		}
+	}
+
+	@SubscribeMessage("join-game")
+	handleJoinGame(@ConnectedSocket() client: Socket) {
+		this.logger.log("in join-game event");
+		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
+		if (index !== -1) {
+			this.connectedUsers[index].isInGame = true;
+			this.logger.log("before emitting user-joined-game event");
+			this.server.emit("user-joined-game", client.data.username);
+		}
+	}
+
+	@SubscribeMessage("leave-game")
+	handleLeaveGame(@ConnectedSocket() client: Socket) {
+		this.logger.log("in leave-game event");
+		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
+		if (index !== -1) {
+			this.connectedUsers[index].isInGame = false;
+			this.logger.log("before emitting user-left-game event");
+			this.server.emit("user-left-game", client.data.username);
+		}
+	}
+
+	@SubscribeMessage("is-user-in-game")
+	handleIsUserInGame(@MessageBody() username: string) {
+		const index = this.connectedUsers.findIndex(user => user.username === username);
+		return (index !== -1 && this.connectedUsers[index].isInGame);
 	}
 }
