@@ -1,14 +1,10 @@
-<script>
-    import { goto } from "$app/navigation";
-    import { user } from "$lib/stores/user";
-    import { onMount } from "svelte";
+<script lang="ts">
+    import Loading from "$lib/components/Loading.svelte";
+	import { chatSocket } from "$lib/stores/chat-socket";
 
-
-	onMount(() => {
-		if (!$user.isLoggedIn) {
-			goto('/login');
-		}
-	})
 </script>
-
+{#if $chatSocket != undefined}
 <slot />
+{:else}
+<Loading/>
+{/if}
