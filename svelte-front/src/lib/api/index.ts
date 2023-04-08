@@ -61,7 +61,10 @@ export const fetchMatchHistory = async (
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw new error;
 	}
 	return await res.json();
 }
@@ -79,7 +82,10 @@ export const updateUserUsername = async (newUsername: string): Promise<void> => 
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	user.update(value => {
 		let userUpdated = value;
@@ -103,7 +109,10 @@ export const updateUserAvatar = async (newAvatar: string): Promise<void> => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	user.update(value => {
 		let userUpdated = value;
@@ -125,7 +134,10 @@ export const turnOnTwoFactorAuthentication = async (code: string): Promise<void>
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	user.update(value => {
 		return { ...value, isTwoFactorAuthenticationEnabled: true };
@@ -139,7 +151,10 @@ export const turnOffTwoFactorAuthentication = async (): Promise<void> => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	user.update(value => {
 		return { ...value, isTwoFactorAuthenticationEnabled: false };
@@ -152,7 +167,10 @@ export const fetchFriendsProfile = async (): Promise<void> => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	const data = await res.json();
 	friendsProfile.set(data);
@@ -164,7 +182,10 @@ export const fetchFriendRequests = async (): Promise<void> => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	const data = await res.json();
 	friendRequests.set(data);
@@ -181,7 +202,10 @@ export const sendFriendRequest = async (username: string): Promise<void> => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	const data = await res.json();
 	const socket = get(eventsSocket);
@@ -198,7 +222,10 @@ export const acceptFriendRequest = async (friendRequestId: number): Promise<void
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	const data = await res.json();
 	friendsProfile.update(value => { return [...value, data]; });
@@ -215,7 +242,10 @@ export const declineFriendRequest = async (friendRequestId: number): Promise<voi
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	friendRequests.update(value => value.filter(request => request.id !== friendRequestId));
 	notifications.update(value => value.filter(notification => (notification.type !== "friend-request" && notification.data.id === friendRequestId)));
@@ -232,7 +262,10 @@ export const removeFriend = async (username: string): Promise<void> => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	friendsProfile.update(value => value.filter(profile => profile.username !== username));
 	const socket = get(eventsSocket);
@@ -246,7 +279,10 @@ export const generateTwoFactorAuthenticationQrCode = async (): Promise<string> =
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	return await res.text();
 }
@@ -264,7 +300,10 @@ export const loginUserWithTwoFactorAuthentication = async (code: string): Promis
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 }
 
@@ -274,14 +313,17 @@ export const fetchBlockList = async () => {
 	})
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	const blockedProfile = await res.json();
 	user.update(value => {
 		let userUpdated = value;
 		userUpdated.blocked = blockedProfile;
 		return userUpdated;
-	})
+	});
 }
 
 export const blockUser = async (usernameToBlock: string) => {
@@ -297,14 +339,17 @@ export const blockUser = async (usernameToBlock: string) => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	let blockedProfile = await res.json();
 	user.update(value => {
 		let userUpdated = value;
 		userUpdated.blocked?.push(blockedProfile);
 		return userUpdated;
-	})
+	});
 }
 
 export const unblockUser = async (usernameToUnblock: string) => {
@@ -320,12 +365,15 @@ export const unblockUser = async (usernameToUnblock: string) => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	let unblockedId = await res.json();
 	user.update(value => {
 		let userUpdated = value;
 		userUpdated.blocked?.splice(value.blocked?.indexOf(unblockedId), 1);
 		return userUpdated;
-	})
+	});
 }

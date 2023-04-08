@@ -16,7 +16,7 @@
     import { chatSocket } from "$lib/stores/chat-socket";
     import { chatMessages } from "$lib/stores/chat-messages";
 
-	$: console.log("user connected :d", $user);
+	$: console.log("user connected", $user);
 
 	onMount(async () => {
 		try {
@@ -30,19 +30,22 @@
 					username: $user.profile.username
 				}
 			});
+
 			$chatSocket = io("localhost:3000/chat", { auth: { username: $user.profile?.username } });
+
 			$chatSocket.on('newMessage', (username: string, message: string, channelId: string) => {
 				if ($chatMessages[channelId]) {
 					$chatMessages[channelId].push({message: message, username: username});
 					$chatMessages[channelId] = $chatMessages[channelId];
 				}
 			});
+
 			$chatSocket.on('joinRoom', (channelId: string) => {
 				if (!$chatMessages[channelId]) {
 					$chatMessages[channelId] = [];
 				}
-			})
-			fetchBlockList();
+			});
+
 			$eventsSocket.on("receive-friend-request", async (data: { id: number, creatorUsername: string }) => {
 				const creatorProfile = await fetchProfile(data.creatorUsername);
 				const newFriendRequest: FriendRequest = { id: data.id, creator: creatorProfile };
