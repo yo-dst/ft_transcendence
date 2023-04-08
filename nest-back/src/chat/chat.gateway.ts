@@ -18,7 +18,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (user) {
 			client.data.userId = user.id;
 			client.data.username = client.handshake.auth.username;
-			client.emit('loaded');
 		}
 	}
 
@@ -38,6 +37,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.join(room.id);
 		this.ChatRooms.push(room);
 		this.server.emit('roomUpdate', this.handleRoom());
+		client.emit('joinRoom', room.id);
 		return room.id;
 	}
 
@@ -49,6 +49,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			room.addUser(client.data.userId);
 			this.sendConnectedUsers(info[0], room);
 			this.server.emit('roomUpdate', this.handleRoom());
+			client.emit('joinRoom', room.id);
 			return true;
 		}
 		return false;
@@ -63,7 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('newMessage')
 	handleNewMessage(client: Socket, info: string) {
 		if (this.ChatRooms.find((room) => (room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId))) {
-			this.server.to(info[0]).emit('newMessage', client.data.username, info[1]);
+			this.server.to(info[0]).emit('newMessage', client.data.username, info[1], info[0]);
 		}
 	}
 
@@ -99,9 +100,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const adminUsername = await Promise.all(room.admins.map(async (user) => ((await this.usersService.getProfile(user)).username)));
 			if (room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId) {
 				client.join(channelId);
-				return { isConnected: true, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), isOwner: room.owner === client.data.userId, connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
+				return { isConnected: true, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
 			}
-			return { isConnected: false, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), isOwner: room.owner === client.data.userId, connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
+			return { isConnected: false, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
 		}
 		return undefined;
 	}

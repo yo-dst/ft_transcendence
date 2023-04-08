@@ -11,7 +11,7 @@
 	export let setShow: any;
 	export let username: string;
 	export let admins: string[];
-	export let isOwner: boolean;
+	export let owner: string;
 	export let channelId: string | undefined;
 
 	let userProfile: Profile;
@@ -51,7 +51,7 @@
 				{#if !userIsFriend}
 					<button on:click={() => sendFriendRequest(userProfile.username)}>Friend request</button>
 				{/if}
-				{#if (admins.includes($user.profile.username) || isOwner) && !admins.includes(userProfile.username)}
+				{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
 					<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
 				{/if}
 				{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}

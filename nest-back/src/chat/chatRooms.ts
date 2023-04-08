@@ -48,8 +48,14 @@ export class ChatRoom {
 		if (this.member.includes(userId)) this.member.splice(this.member.findIndex((member) => (member === userId)), 1);
 		else if (this.admins.includes(userId)) this.admins.splice(this.admins.findIndex((admins) => (admins === userId)), 1);
 		else if (userId === this.owner) {
-			if (this.admins.length > 0) this.owner = this.admins[0];
-			else if (this.member.length > 0) this.owner = this.member[0];
+			if (this.admins.length > 0) {
+				this.owner = this.admins[0];
+				this.admins.splice(0);
+			}
+			else if (this.member.length > 0) {
+				this.owner = this.member[0];
+				this.member.splice(0);
+			}
 			else this.owner = undefined;
 		}
 	}

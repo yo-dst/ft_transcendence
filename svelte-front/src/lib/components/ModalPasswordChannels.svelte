@@ -2,7 +2,6 @@
     import { goto } from "$app/navigation";
     import { chatSocket } from "$lib/stores/chat-socket";
 
-
 	export let closeModal: () => void;
 	export let roomId: string | undefined;
 	let password: string;
@@ -29,7 +28,7 @@
 		<span>Error ! Wrong password.</span>
 		{/if}
 	  <footer>
-		<a href="/channels" on:click={closeModal} role="button" class="secondary">Cancel</a>
+		<a href="/channels" role="button" class="secondary" on:click={closeModal}>Cancel</a>
 		<a href=" " role="button" on:click={sendPassword}>Confirm</a>
 	  </footer>
 	</article>
