@@ -1,14 +1,12 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { chatSocket } from "$lib/stores/chat-socket";
-    import { createEventDispatcher } from "svelte";
 
 	let isPrivate: boolean = false;
 	let name: string;
 	let password: string;
 	let capacity = 25;
 	let error: string = "";
-	const dispatch = createEventDispatcher();
 
 	function createRoom() {
 		if (name.length > 10) {
@@ -20,7 +18,6 @@
 			});
 		}
 	}
-
 </script>
 
 <section>

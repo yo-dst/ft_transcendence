@@ -4,11 +4,10 @@
 	import { user } from "$lib/stores/user";
 	import { onMount } from "svelte";
     import PlayVsFriendsModal from "$lib/components/PlayVsFriendsModal.svelte";
-    import ChatModal from "$lib/components/ChatModal.svelte";
 
 	let selectedGameMode = 0;
 	let isSearching = false;
-	let socket = io("localhost:3000/matchmaking");
+	let socket: Socket;
 	let show = false;
 	const setShow = (value: boolean) => show = value; 
 
@@ -23,14 +22,13 @@
 	}
 
 	onMount(() => {
-		if (!$user.isLoggedIn) {
-			goto("/login");
-		} else {
-			socket.emit("id", $user.id);
-			socket.on("matched", (id) => {
-				goto("/game/" + id);
-			});
-		}
+		socket = io("localhost:3000/matchmaking");
+
+		socket.emit("id", $user.id);
+
+		socket.on("matched", (id) => {
+			goto("/game/" + id);
+		});
 	});
 </script>
 
@@ -84,14 +82,6 @@
 	.game-mode {
 		display: flex;
 		gap: 1rem;
-	}
-
-	.game-mode button {
-		
-	}
-
-	.find-game {
-
 	}
 
 	.or {

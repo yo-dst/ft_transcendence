@@ -3,7 +3,6 @@
 	import Drawer from "svelte-drawer-component";
 	import { user } from "$lib/stores/user";
 	import { goto } from "$app/navigation";
-    import { eventsSocket } from "$lib/stores/events-socket";
     import { logoutUser } from "$lib/api";
 
 	export let show: boolean;
@@ -12,7 +11,6 @@
 	async function logout() {
 		try {
 			await logoutUser();
-			goto("/login");
 		} catch (err) {
 			console.log(err);
 		}
@@ -35,10 +33,10 @@
 	on:clickAway={() => setShow(false)}
 >
 	<div class="drawer-container">
-	{#if $user.isLoggedIn}
+	{#if $user}
 		<div class="profile-wrapper">
-			<img src={$user.profile?.avatar?.url} alt="avatar" />
-			<span class="safe-words">{$user.profile?.username}</span>
+			<img src={$user.profile.avatar.url} alt="avatar" />
+			<span class="safe-words">{$user.profile.username}</span>
 		</div>
 	{/if}
 		<div class="nav-wrapper">
@@ -78,7 +76,7 @@
 							Parameters
 						</a>
 					</li>
-				{#if $user.isLoggedIn}
+				{#if $user}
 					<li>
 						<a href="/" role="button" on:click={logout} class="contrast outline">
 							<iconify-icon icon="material-symbols:logout" />

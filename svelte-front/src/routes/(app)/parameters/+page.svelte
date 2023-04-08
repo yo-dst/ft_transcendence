@@ -5,13 +5,12 @@
     import { logoutUser, turnOffTwoFactorAuthentication, updateUserAvatar, updateUserUsername } from "$lib/api";
     import ModalBlockedUser from "$lib/components/ModalBlockedUser.svelte";
 
-	let newUsername: string = "";
+	let newUsername = "";
 	let files: any;
 	let isTwoFactorAuthenticationEnabled: boolean;
-	let showBlockedModal: boolean = false;
-
-	let updateUsernameError: string;
-	let updateAvatarError: string;
+	let showBlockedModal = false;
+	let updateUsernameError = "";
+	let updateAvatarError = "";
 	
 	async function updateUsername() {
 		try {
@@ -31,14 +30,14 @@
 					throw "Error: can't load image";
 				}
 				await updateUserAvatar(newAvatar);
-				updateAvatarError = undefined;
+				updateAvatarError = "";
 			});
 
 			if (files && files[0]) {
 				reader.readAsDataURL(files[0]);
 			}
 		} catch (err) {
-			updateAvatarError = err;
+			updateAvatarError = err.msg;
 		}
 	}
 
@@ -58,19 +57,14 @@
 	async function logout() {
 		try {
 			await logoutUser();
-			goto("/login");
 		} catch (err) {
 			console.log(err);
 		}
 	}
 
 	onMount(() => {
-		if (!$user.isLoggedIn) {
-			goto("/login");
-		} else {
-			newUsername = $user.profile.username;
-			isTwoFactorAuthenticationEnabled = $user.isTwoFactorAuthenticationEnabled;
-		}
+		newUsername = $user.profile.username;
+		isTwoFactorAuthenticationEnabled = $user.isTwoFactorAuthenticationEnabled;
 	});
 </script>
 

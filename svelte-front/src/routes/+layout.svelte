@@ -8,27 +8,26 @@
 	import { notifications } from "$lib/stores/notifications";
 	import { io } from "socket.io-client";
     import { fetchBlockList, fetchFriendRequests, fetchFriendsProfile, fetchProfile, loginUser } from "$lib/api";
-    import { friendsProfile } from "$lib/stores/friends-profile";
+    import LoginPage from "$lib/components/LoginPage.svelte";
     import type { Notification } from "$lib/types/notification";
+    import type { FriendRequest } from "$lib/types/friend-request";
     import { friendRequests } from "$lib/stores/friend-requests";
+    import { friendsProfile } from "$lib/stores/friends-profile";
     import { chatSocket } from "$lib/stores/chat-socket";
     import { chatMessages } from "$lib/stores/chat-messages";
-    import type { chatMessage } from "$lib/types/chat-messages";
 
-	$: console.log("user", $user);
-
-	$: console.log("eventsSocket", $eventsSocket);
-
-	let hasMounted = false;
+	$: console.log("user connected", $user);
 
 	onMount(async () => {
 		try {
 			await loginUser();
-			$friendsProfile = await fetchFriendsProfile();
-			$friendRequests = await fetchFriendRequests();
+			await fetchFriendsProfile();
+			await fetchFriendRequests();
+			await fetchBlockList();
+			
 			$eventsSocket = io("http://localhost:3000/events", {
 				auth: {
-					username: $user.profile?.username
+					username: $user.profile.username
 				}
 			});
 			$chatSocket = io("localhost:3000/chat", { auth: { username: $user.profile?.username } });
@@ -46,21 +45,36 @@
 			fetchBlockList();
 			$eventsSocket.on("receive-friend-request", async (data: { id: number, creatorUsername: string }) => {
 				const creatorProfile = await fetchProfile(data.creatorUsername);
-				const newNotification: Notification = {
-					type: "friend-request",
-					data: { id: data.id, creator: creatorProfile }
-				};
+				const newFriendRequest: FriendRequest = { id: data.id, creator: creatorProfile };
+				const newNotification: Notification = { type: "friend-request", data: newFriendRequest };
 				$notifications = [...$notifications, newNotification];
+				$friendRequests = [...$friendRequests, newFriendRequest];
 			});
+	
 			$eventsSocket.on("receive-game-request", (data: any) => {
 				$notifications = [...$notifications, { type: "game-request", data }];
 			});
-		} catch (err) {}
 
-		hasMounted = true;
+			$eventsSocket.on("friend-request-accepted", async (username: string) => {
+				try {
+					const newFriendProfile = await fetchProfile(username);
+					$friendsProfile = [...$friendsProfile, newFriendProfile];
+				} catch (err) {
+					console.log(err);
+				}
+			});
+
+			$eventsSocket.on("friend-removed", (username: string) => {
+				$friendsProfile = $friendsProfile.filter(profile => profile.username !== username);
+			});
+		} catch (err) {
+			console.log(err);
+		}
 	});
 </script>
 
-{#if hasMounted}
-	<slot />
+{#if $user}
+	<slot/>
+{:else}
+	<LoginPage/>
 {/if}

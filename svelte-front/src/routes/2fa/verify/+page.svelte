@@ -11,7 +11,7 @@
 			error = "";
 			goto("http://localhost:3000/2fa/redirect");
 		} catch (err) {
-			error = err;
+			error = err.message;
 		}
 	}
 </script>

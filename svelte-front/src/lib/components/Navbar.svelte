@@ -46,12 +46,12 @@
 		</ul>
 	</nav>
 	<div>
-		{#if $user.isLoggedIn}
+		{#if $user}
 		<button class="ring-wrapper" on:click={() => showNotif = !showNotif}>
 			<iconify-icon icon="mdi:bell-ring" style="font-size: 45px; color: #f0f6fc;"></iconify-icon>
 			<span class="ring-notif">{$notifications.length}</span>
 		</button>
-		<img src={$user.profile?.avatar?.url}
+		<img src={$user.profile.avatar.url}
 			alt="avatar"
 			on:click={() => goto("/parameters")}
 			on:keypress

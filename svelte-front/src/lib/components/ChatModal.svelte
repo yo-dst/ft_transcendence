@@ -6,6 +6,7 @@
     import type { Profile } from "$lib/types/profile";
     import { onDestroy, onMount } from "svelte";
     import Loading from "./Loading.svelte";
+    import { friendsProfile } from "$lib/stores/friends-profile";
 
 	export let setShow: any;
 	export let username: string;
@@ -27,6 +28,7 @@
 		document.addEventListener("click", handleClickOutside);
 
 		userProfile = await fetchProfile(username);
+		userIsFriend = $friendsProfile.findIndex(profile => profile.username === userProfile.username) !== -1;
 		isLoading = false;
 	});
 
@@ -39,24 +41,26 @@
 {:else}
 <dialog open={true}>
 	<article id="chat-modal">
-		<header on:click={() => goto(`/profile/${userProfile?.username}`)} on:keypress>
-			<img src={userProfile?.avatar?.url} alt="avatar"/>
-			<span class="safe-words">{userProfile?.username}</span>
+		<header on:click={() => goto(`/profile/${userProfile.username}`)} on:keypress>
+			<img src={userProfile.avatar.url} alt="avatar"/>
+			<span class="safe-words">{userProfile.username}</span>
 		</header>
-		<body>
-			<button on:click={() => {}}>Challenge</button>
-			{#if !userIsFriend}
-				<button on:click={() => sendFriendRequest(userProfile?.username)}>Friend request</button>
-			{/if}
-			{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
-				<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
-			{/if}
-			{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}
-				<button on:click={() => blockUser(userProfile.username)}>Block</button>
-			{:else}
-				<button on:click={() => unblockUser(userProfile.username)}>Unblock</button>
-			{/if}
-		</body>
+		{#if userProfile.username !== $user.profile.username}
+			<body>
+				<button on:click={() => {}}>Challenge</button>
+				{#if !userIsFriend}
+					<button on:click={() => sendFriendRequest(userProfile.username)}>Friend request</button>
+				{/if}
+				{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
+					<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
+				{/if}
+				{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}
+					<button on:click={() => blockUser(userProfile.username)}>Block</button>
+				{:else}
+					<button on:click={() => unblockUser(userProfile.username)}>Unblock</button>
+				{/if}
+			</body>
+		{/if}
 	</article>
 </dialog>
 {/if}

@@ -1,30 +1,25 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
 	import { eventsSocket } from "$lib/stores/events-socket";
     import { onMount } from "svelte";
 
 	let users: string[] = [];
 
 	onMount(() => {
-		if (!$eventsSocket) {
-			goto("/login");
-		} else {
-			$eventsSocket.emit("get-users", (data: string[]) => {
-				users = data;
-			});
-			
-			$eventsSocket.on("user-connected", (data: string) => {
-				users = [...users, data];
-			});
+		$eventsSocket.emit("get-users", (data: string[]) => {
+			users = data;
+		});
+		
+		$eventsSocket.on("user-connected", (data: string) => {
+			users = [...users, data];
+		});
 
-			$eventsSocket.on("user-disconnected", (data: string) => {
-				const index = users.findIndex(x => x === data);
-				if (index !== -1) {
-					users.splice(index, 1);
-					users = users;
-				}
-			});
-		}
+		$eventsSocket.on("user-disconnected", (data: string) => {
+			const index = users.findIndex(x => x === data);
+			if (index !== -1) {
+				users.splice(index, 1);
+				users = users;
+			}
+		});
 	});	
 </script>
 

@@ -1,7 +1,4 @@
 import { writable } from "svelte/store";
 import type { UserType } from "../types/user";
 
-export const user = writable<UserType>({
-	isLoggedIn: false,
-	isTwoFactorAuthenticationEnabled: false
-});
+export const user = writable<UserType>(undefined);
