@@ -13,8 +13,9 @@
     import type { FriendRequest } from "$lib/types/friend-request";
     import { friendRequests } from "$lib/stores/friend-requests";
     import { friendsProfile } from "$lib/stores/friends-profile";
+    import { goto } from "$app/navigation";
 
-	$: console.log("user connected", $user);
+	$: console.log("user connected :d", $user);
 
 	onMount(async () => {
 		try {

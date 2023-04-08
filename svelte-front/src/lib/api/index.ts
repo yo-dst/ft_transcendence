@@ -16,7 +16,7 @@ export const logoutUser = async (): Promise<void> => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		throw new error;
 	}
 	user.set(undefined);
 	eventsSocket.update(value => {
@@ -31,7 +31,7 @@ export const loginUser = async (): Promise<void> => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		throw error;
 	}
 	const data = await res.json();
 	user.set(data);
@@ -43,7 +43,10 @@ export const fetchProfile = async (username: string): Promise<Profile> => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		throw new Error(error.message);
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
 	}
 	return await res.json();
 }
