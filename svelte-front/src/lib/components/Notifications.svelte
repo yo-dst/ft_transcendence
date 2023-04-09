@@ -11,7 +11,17 @@
 		<ul>
 		{#each $notifications as notification}
 			<li>
-				<span>{notification.type} - {notification.data.creator.username}</span>
+				<div>
+					<img src={notification.data.creator.avatar.url} alt="avatar"/>
+					<span>
+						{notification.data.creator.username}
+						{#if notification.type === "game-request"}
+							challenged you
+						{:else}
+							wants to be your friend
+						{/if}
+					</span>
+				</div>
 				<div class="button-wrapper">
 					{#if notification.type === "friend-request"}
 						<button class="accept-button" on:click={() => acceptFriendRequest(notification.data.id)}>
@@ -42,18 +52,38 @@
 		right: 5px;
 		background-color: #161b22;
 		box-shadow: -5px 5px 5px #0d1117;
+		width: 450px;
+		max-width: 95vw;
 	}
 
 	ul {
 		margin: 0;
-		padding: 0;
+		padding: 0.5rem;
 	}
 
 	ul li {
+		background-color: #0d1117;
+		padding: 0.3rem;
 		list-style: none;
 		margin-bottom: 0.5rem;
 		display: flex;
+		justify-content: space-between;
 		align-items: center;
+		gap: 1rem;
+	}
+
+	ul li > :first-child {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	ul li > :first-child img {
+		width: 48px;
+		height: 48px;
+		object-fit: cover;
+		aspect-ratio: 1/1;
+		border-radius: 50%;
 	}
 
 	button {
@@ -64,6 +94,10 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	button:hover iconify-icon {
+		transform: scale(1.05);
 	}
 
 	.button-wrapper {
