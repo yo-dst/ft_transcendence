@@ -54,6 +54,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() client: Socket,
 		@MessageBody() data: any
 	) {
+		if (!data || typeof data.id !== "number") {
+			return;
+		}
 		const index = this.connectedUsers.findIndex(user => user.username === data.receiverUsername);
 		if (index !== -1) {
 			const socketId = this.connectedUsers[index].socketId;
@@ -118,22 +121,18 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("join-game")
 	handleJoinGame(@ConnectedSocket() client: Socket) {
-		this.logger.log("in join-game event");
 		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
 		if (index !== -1) {
 			this.connectedUsers[index].isInGame = true;
-			this.logger.log("before emitting user-joined-game event");
 			this.server.emit("user-joined-game", client.data.username);
 		}
 	}
 
 	@SubscribeMessage("leave-game")
 	handleLeaveGame(@ConnectedSocket() client: Socket) {
-		this.logger.log("in leave-game event");
 		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
 		if (index !== -1) {
 			this.connectedUsers[index].isInGame = false;
-			this.logger.log("before emitting user-left-game event");
 			this.server.emit("user-left-game", client.data.username);
 		}
 	}
