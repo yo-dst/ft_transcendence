@@ -18,7 +18,6 @@
     import { isUserConnected } from "$lib/utils/isUserConnected";
     import { isUserInGame } from "$lib/utils/isUserInGame";
     import type { GameRequest } from "$lib/types/game-request";
-    import PostGameLobby from "$lib/components/PostGameLobby.svelte";
 
 	$: console.log("user connected", $user);
 
@@ -129,10 +128,8 @@
 	});
 </script>
 
-<PostGameLobby/>
-
-<!-- {#if $user}
+{#if $user}
 	<slot/>
 {:else}
 	<LoginPage/>
-{/if} -->
+{/if}
