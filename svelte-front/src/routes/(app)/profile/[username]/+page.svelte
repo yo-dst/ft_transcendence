@@ -34,7 +34,7 @@
 
 <section>
 	<div class="user">
-		<img src={userProfile.avatar.url} alt="profile" />
+		<img src={userProfile?.avatar?.url} alt="profile" />
 		<div class="user-stats">
 			<span>{userProfile?.username}</span>
 			<div>
