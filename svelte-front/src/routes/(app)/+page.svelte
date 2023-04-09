@@ -43,12 +43,12 @@
 		<button class={selectedGameMode === 1 ? "" : "outline"}
 			on:click={() => selectedGameMode = 1}
 		>
-			👻 Ghost
+			⚡ Speed
 		</button>
 		<button class={selectedGameMode === 2 ? "" : "outline"}
 			on:click={() => selectedGameMode = 2}
 		>
-			⚡ Speed
+			👻 Ghost
 		</button>
 	</div>
 </section>

@@ -80,6 +80,10 @@
 		timer = 0;
 	});
 
+	socket.on("resetOpacity", () => {
+		timer = 0;
+	})
+
 	socket.on("deco", () => {
 		$eventsSocket.emit("leave-game");
 		isPlaying = false;
