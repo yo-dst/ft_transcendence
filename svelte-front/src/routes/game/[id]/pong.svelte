@@ -179,12 +179,12 @@
 				{game.score.p2}
 			</strong>
 		</div>
-		<!-- {#if isMobile}
+		{#if isMobile}
 			<div class="buttons">
 				<button class="mobile">hello</button>
 				<button class="mobile">hoy</button>
 			</div>
-		{/if} -->
+		{/if}
 		<canvas
 			bind:this={canvas}
 			width={game.canvasWidth}
