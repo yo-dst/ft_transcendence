@@ -55,6 +55,7 @@ export class GameRoom {
 			) {
 				this.ball.x_vel *= -1.1
 				this.ball.y_vel *= 1.1;
+				if (this.gameInfo.gameMode === 2) server.to(this.id).emit("resetOpacity");
 			}
 
 			// Collision with paddle 2
@@ -67,6 +68,7 @@ export class GameRoom {
 			) {
 				this.ball.x_vel *= -1.1
 				this.ball.y_vel *= 1.1;
+				if (this.gameInfo.gameMode === 2) server.to(this.id).emit("resetOpacity");
 			}
 
 			if (this.ball.x < 0 || this.ball.x > this.gameInfo.width) {
@@ -87,6 +89,7 @@ export class GameRoom {
 				server.to(this.id).emit('updateScore', this.score);
 				this.ball.reset([Math.random() < 0.5 ? 1 : -1, Math.random() < 0.5 ? 1 : -1]);
 				server.to(this.id).emit('updateBall', [this.ball.x, this.ball.y]);
+				if (this.gameInfo.gameMode === 2) server.to(this.id).emit("resetOpacity");
 			}
 
 			if (this.paddle1.dir == DIRECTION.UP && this.paddle1.y > 0) {
