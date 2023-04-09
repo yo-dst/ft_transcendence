@@ -1,4 +1,4 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { v4 } from 'uuid';
 import { gameRooms } from './sharedRooms';
@@ -10,7 +10,7 @@ import { GameService } from 'src/game/game.service';
 	namespace: 'matchmaking',
 	cors: { origin: '*' }
 })
-export class MatchmakingGateway {
+export class MatchmakingGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private gameService: GameService
 	) { }
@@ -18,11 +18,21 @@ export class MatchmakingGateway {
 	@WebSocketServer() server: Server;
 	private masterQueue: CustomSocket[][] = [[], [], []];
 
-	@SubscribeMessage('connection')
 	handleConnection(client: CustomSocket) {
-		client.on('disconnect', () => {
-			//remove from the queue if disconnect
-		})
+		client.userId = client.handshake.auth.userId;
+	}
+
+	handleDisconnect(client: CustomSocket) {
+		for (let i = 0; i < this.masterQueue.length; i++) {
+			const sockets = this.masterQueue[i];
+			const index = sockets.findIndex(socket => socket.userId === client.userId);
+
+			if (index !== -1) {
+				// If the id is found in the array, remove the corresponding CustomSocket object
+				sockets.splice(index, 1);
+				break;
+			}
+		}
 	}
 
 	@SubscribeMessage('joinQueue')
@@ -36,14 +46,9 @@ export class MatchmakingGateway {
 	@SubscribeMessage('leaveQueue')
 	leaveQueue(client: CustomSocket, gameMode: number) {
 		const index = this.masterQueue[gameMode].findIndex((c) => (c.userId === client.userId));
-		if (index) {
+		if (index !== -1) {
 			this.masterQueue[gameMode].splice(index, 1);
 		}
-	}
-
-	@SubscribeMessage('id')
-	setId(client: CustomSocket, id: number) {
-		client.userId = id;
 	}
 
 	// if 2 players in the array, match them and create a new room

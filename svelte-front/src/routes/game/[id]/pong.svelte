@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { paddle, gameInfo, ball as Ball } from "./pong";
 	import { onMount } from "svelte";
 	import Timer from "$lib/components/timer.svelte";
@@ -6,19 +6,15 @@
 	import PostGameLobby from "$lib/components/PostGameLobby.svelte";
 	import DecoTimer from "$lib/components/decoTimer.svelte";
     import { eventsSocket } from "$lib/stores/events-socket";
+    import type { Socket } from "socket.io-client";
 
-	/**
-	 * @type {number}
-	 */
-	export let gameMode;
-	/**
-	 * @type {{ emit: (arg0: string, arg1: number | Ball | undefined, arg2: string | number | undefined) => void; on: (arg0: string, arg1: { (): void; (): void; (newVel: any): void; (newDir: any): void; (newScore: any): void; (newBall: any): void; (nb: any): void; }) => void; disconnect: () => void; }}
-	 */
-	export let socket;
+	export let gameMode: number;
+	export let socket: Socket;
 
 	let isPlaying = true;
 	let turnPhone = false;
 	let lastY = 0;
+	let isMobile: boolean;
 	if (
 		/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
 			navigator.userAgent
@@ -34,35 +30,25 @@
 	};
 	let timer = 0;
 
-	/**
-	 * @type {Ball}
-	 */
-	let ball;
-	/**
-	 * @type {paddle}
-	 */
-	let paddle1;
-	/**
-	 * @type {paddle}
-	 */
-	let paddle2;
+	let ball: Ball;
+	let paddle1: paddle;
+	let paddle2: paddle;
 
-	/**
-	 * @type {CanvasRenderingContext2D | null}
-	 */
-	let context;
-	/**
-	 * @type {HTMLCanvasElement}
-	 */
-	let canvas;
+	let context: CanvasRenderingContext2D;
+	let canvas: HTMLCanvasElement;
 	let game = new gameInfo(window.innerWidth, window.innerHeight, gameMode);
+
+	function handlePopstate(event: PopStateEvent) {
+		alert('You are quitting the game, if you dont comeback in the next 5 seconds, you will automatically lose the game');
+		socket.disconnect();
+	}
 
 	let rand = { x: 1, y: 1 };
 	onMount(() => {
 		paddle1 = new paddle(game, true);
 		paddle2 = new paddle(game, false);
 		ball = new Ball(game, rand);
-		context = canvas.getContext("2d");
+		context = canvas.getContext("2d") as CanvasRenderingContext2D;
 		if (
 			game.width > window.innerWidth ||
 			game.height > window.innerHeight
@@ -70,8 +56,8 @@
 			canvas.style.cssText =
 				"position: absolute;top: 50%;left: 50%;transform: scale(1) translate(-50%, -50%);width: 100%;height: 100%;transform-origin: top left;color: #b6b6f2;";
 		} else
-			canvas.style.cssText =
-				"position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);color: #b6b6f2;";
+		canvas.style.cssText =
+		"position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);color: #b6b6f2;";
 		socket.emit("ready");
 		requestAnimationFrame(draw);
 	});
@@ -165,7 +151,7 @@
 		requestAnimationFrame(draw);
 	};
 
-	function handleKeysDown(event) {
+	function handleKeysDown(event: { key: string; }) {
 		if (event.key == "w") {
 			socket.emit("playerUp", paddle1.dir, paddle2.dir);
 		} else if (event.key == "s") {
@@ -178,7 +164,7 @@
 	}
 </script>
 
-<svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} />
+<svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} on:popstate={handlePopstate} />
 {#if isPlaying}
 	<main>
 		<Timer {socket} />

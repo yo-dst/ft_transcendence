@@ -22,9 +22,7 @@
 	}
 
 	onMount(() => {
-		socket = io("localhost:3000/matchmaking");
-
-		socket.emit("id", $user.id);
+		socket = io("localhost:3000/matchmaking", {auth: {userId: $user.id}});
 
 		socket.on("matched", (id) => {
 			goto("/game/" + id);
