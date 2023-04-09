@@ -39,8 +39,10 @@
 	let game = new gameInfo(window.innerWidth, window.innerHeight, gameMode);
 
 	function handlePopstate(event: PopStateEvent) {
-		alert('You are quitting the game, if you dont comeback in the next 5 seconds, you will automatically lose the game');
-		socket.disconnect();
+		if (isPlaying) {
+			alert('You are quitting the game, if you dont comeback in the next 5 seconds, you will automatically lose the game');
+			socket.disconnect();
+		}
 	}
 
 	let rand = { x: 1, y: 1 };
