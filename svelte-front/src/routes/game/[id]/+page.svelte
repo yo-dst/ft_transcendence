@@ -13,6 +13,14 @@
 	let roomExist: boolean = false;
 	let gameMode = 0;
 	let socket = io("localhost:3000/game");
+	let isMobile = false;
+	if (
+		/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+			navigator.userAgent
+		)
+	) {
+		isMobile = true;
+	}
 
 	// verify that room Exist
 	socket.emit("checkId", id, $user?.id);
@@ -30,7 +38,7 @@
 
 {#if roomExist && !turnPhone}
 	<Pong {gameMode} {socket} />
-{:else if turnPhone}
+{:else if turnPhone && isMobile}
 	<TurnPhone />
 {:else}
 	RoomId not found

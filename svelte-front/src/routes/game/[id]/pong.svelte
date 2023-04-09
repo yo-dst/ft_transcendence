@@ -194,7 +194,7 @@
 	<PostGameLobby />
 {/if}
 
-{#if turnPhone}
+{#if turnPhone && isMobile}
 	<TurnPhone />
 {/if}
 

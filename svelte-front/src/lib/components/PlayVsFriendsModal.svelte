@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { eventsSocket } from "$lib/stores/events-socket";
     import { friends } from "$lib/stores/friends";
     import type { Friend } from "$lib/types/friend";
     import { sendGameRequest } from "$lib/utils/sendGameRequest";
