@@ -17,6 +17,7 @@
     import { friends } from "$lib/stores/friends";
     import { isUserConnected } from "$lib/utils/isUserConnected";
     import { isUserInGame } from "$lib/utils/isUserInGame";
+    import type { GameRequest } from "$lib/types/game-request";
 
 	$: console.log("user connected", $user);
 
@@ -77,8 +78,11 @@
 				$friendRequests = [...$friendRequests, newFriendRequest];
 			});
 	
-			$eventsSocket.on("receive-game-request", (data: any) => {
-				$notifications = [...$notifications, { type: "game-request", data }];
+			$eventsSocket.on("receive-game-request", async (username: string) => {
+				const creatorProfile = await fetchProfile(username);
+				const newGameRequest: GameRequest = { creator: creatorProfile };
+				const newNotification: Notification = { type: "game-request", data: newGameRequest };
+				$notifications = [...$notifications, newNotification];
 			});
 
 			$eventsSocket.on("friend-request-accepted", async (username: string) => {

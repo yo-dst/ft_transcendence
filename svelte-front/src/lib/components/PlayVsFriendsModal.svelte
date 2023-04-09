@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { eventsSocket } from "$lib/stores/events-socket";
     import { friends } from "$lib/stores/friends";
     import type { Friend } from "$lib/types/friend";
 	import { onDestroy, onMount } from "svelte";
@@ -16,6 +17,10 @@
 			setShow(false);
 		}
   	}
+
+	function sendGameRequest(username: string) {
+		$eventsSocket.emit("send-game-request", username);
+	}
 
 	$: getFriendsConnected($friends);
 
@@ -48,7 +53,7 @@
 							{#if friend.isInGame}
 								<iconify-icon icon="mdi:sword-fight" style="font-size: 2rem;"></iconify-icon>
 							{/if}
-							<button on:click={() => {}}>
+							<button on:click={() => sendGameRequest(friend.profile.username)}>
 								<iconify-icon icon="material-symbols:auto-read-play-outline-sharp" style="font-size: 1.5rem;"></iconify-icon>
 							</button>
 						</div>

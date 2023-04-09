@@ -90,12 +90,10 @@
 					<div class="friend-profile">
 						<div class:online={friend.isConnected}></div>
 						<img src={friend.profile.avatar.url} alt="friend"/>
-						<span>{friend.profile.username}</span>
 						{#if friend.isInGame}
 							<iconify-icon icon="mdi:sword-fight" style="font-size: 2rem;"></iconify-icon>
 						{/if}
-					</div>
-					<div>
+						<span>{friend.profile.username}</span>
 					</div>
 				</a>
 				<button on:click={() => removeFriend(friend.profile.username)} style="background-color: var(--del-color);">
@@ -152,12 +150,12 @@
 	ul > li {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 		background-color: #0d1117;
 		list-style-type: none;
 		border-radius: 5px;
 		margin-bottom: 0.7rem;
 		padding: 0.5rem 1rem;
-
 	}
 
 	ul > li:hover {
@@ -175,6 +173,7 @@
 		align-items: center;
 		text-decoration: none;
 		color: #f0f6fc;
+		gap: 0.5rem;
 	}
 
 	ul > li > a:hover img {
@@ -187,7 +186,6 @@
 		object-fit: cover;
 		aspect-ratio: 1/1;
 		border-radius: 50%;
-		margin-right: 0.7rem;
 	}
 
 	ul > li button {

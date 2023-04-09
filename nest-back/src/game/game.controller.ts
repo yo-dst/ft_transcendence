@@ -29,6 +29,6 @@ export class GameController {
 			opponentScore: winner.profile.id == user.id ? scoreLoser : scoreWinner,
 			userScore: winner.profile.id == user.id ? scoreWinner : scoreLoser,
 			opponentProfile: winner.profile.id == user.id ? { avatar: { url: loser.profile.avatar.url }, username: loser.profile.username } : { avatar: { url: winner.profile.avatar.url }, username: winner.profile.username } 
-		}))
+		}));
 	}
 }
