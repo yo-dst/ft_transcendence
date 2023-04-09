@@ -2,6 +2,7 @@
     import { eventsSocket } from "$lib/stores/events-socket";
     import { friends } from "$lib/stores/friends";
     import type { Friend } from "$lib/types/friend";
+    import { sendGameRequest } from "$lib/utils/sendGameRequest";
 	import { onDestroy, onMount } from "svelte";
 
 	export let setShow: any;
@@ -17,10 +18,6 @@
 			setShow(false);
 		}
   	}
-
-	function sendGameRequest(username: string) {
-		$eventsSocket.emit("send-game-request", username);
-	}
 
 	$: getFriendsConnected($friends);
 

@@ -7,6 +7,7 @@
     import { onDestroy, onMount } from "svelte";
     import Loading from "./Loading.svelte";
     import { friends } from "$lib/stores/friends";
+    import { sendGameRequest } from "$lib/utils/sendGameRequest";
 
 	export let setShow: any;
 	export let username: string;
@@ -47,7 +48,7 @@
 		</header>
 		{#if userProfile.username !== $user.profile.username}
 			<body>
-				<button on:click={() => {}}>Challenge</button>
+				<button on:click={() => sendGameRequest(userProfile.username)}>Challenge</button>
 				{#if !userIsFriend}
 					<button on:click={() => sendFriendRequest(userProfile.username)}>Friend request</button>
 				{/if}
