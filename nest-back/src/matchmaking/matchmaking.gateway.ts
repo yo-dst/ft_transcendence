@@ -5,6 +5,8 @@ import { gameRooms } from './sharedRooms';
 import { GameRoom } from './gameRoom';
 import { CustomSocket } from 'src/game/game.customSocket';
 import { GameService } from 'src/game/game.service';
+import { matchFriends } from './matchmaking.interface';
+import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway({
 	namespace: 'matchmaking',
@@ -12,17 +14,25 @@ import { GameService } from 'src/game/game.service';
 })
 export class MatchmakingGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
-		private gameService: GameService
+		private gameService: GameService,
+		private usersService: UsersService
 	) { }
 
 	@WebSocketServer() server: Server;
 	private masterQueue: CustomSocket[][] = [[], [], []];
+	private privateQueue: matchFriends[] = [];
 
 	handleConnection(client: CustomSocket) {
 		client.userId = client.handshake.auth.userId;
 	}
 
 	handleDisconnect(client: CustomSocket) {
+		const index = this.privateQueue.findIndex(socket => socket.idP1 === client.userId);
+		if (index !== -1) {
+			// If the id is found in the array, remove the corresponding CustomSocket object
+			this.privateQueue.splice(index, 1);
+		}
+
 		for (let i = 0; i < this.masterQueue.length; i++) {
 			const sockets = this.masterQueue[i];
 			const index = sockets.findIndex(socket => socket.userId === client.userId);
@@ -32,6 +42,37 @@ export class MatchmakingGateway implements OnGatewayConnection, OnGatewayDisconn
 				sockets.splice(index, 1);
 				break;
 			}
+		}
+	}
+
+	@SubscribeMessage('newGameRequest')
+	async handleNewGameRequest(client: CustomSocket, username: string) {
+		if (!this.privateQueue.find((user) => user.idP1 === client.userId)) {
+			this.privateQueue.push({idP1: client.userId, idP2: (await this.usersService.getByUsername(username)).id, socketP1: client});
+		}
+	}
+
+	@SubscribeMessage('matchDenied')
+	handleMatchDenied(client: CustomSocket) {
+		const match = this.privateQueue.find((user) => user.idP1 === client.userId)
+		if (match) {
+			this.privateQueue.splice(this.privateQueue.indexOf(match));
+		}
+	}
+
+	@SubscribeMessage('gameRequestAccepted')
+	handleGameRequestAccepted(client: CustomSocket) {
+		const match = this.privateQueue.find((user) => user.idP2 === client.userId)
+		if (match) {
+			const p1 = match.idP1;
+			const p2 = match.idP2;
+			const roomId = v4();
+
+			const room = new GameRoom(this.gameService, roomId, 0, p1 , p2);
+			gameRooms.push(room);
+			match.socketP1.emit('matched', roomId);
+			client.emit('matched', roomId);
+			this.privateQueue.splice(this.privateQueue.indexOf(match), 1);
 		}
 	}
 

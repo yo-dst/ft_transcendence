@@ -1,6 +1,8 @@
 <script lang="ts">
     import { acceptFriendRequest, declineFriendRequest } from "$lib/api";
+    import { matchSocket } from "$lib/stores/matchmaking-socket";
 	import { notifications } from "$lib/stores/notifications";
+    import { user } from "$lib/stores/user";
 
 	export let show: boolean;
 	export let top: number;
@@ -31,10 +33,10 @@
 							<iconify-icon icon="radix-icons:cross-2"></iconify-icon>
 						</button>
 					{:else if notification.type === "game-request"}
-						<button class="accept-button">
+						<button class="accept-button" on:click={() => {$matchSocket.emit("gameRequestAccepted")}}>
 							<iconify-icon icon="fluent-mdl2:accept-medium"></iconify-icon>
 						</button>
-						<button class="decline-button">
+						<button class="decline-button" on:click={() => {$matchSocket.emit("matchDenied")}}>
 							<iconify-icon icon="radix-icons:cross-2"></iconify-icon>
 						</button>
 					{/if}

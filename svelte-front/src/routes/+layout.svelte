@@ -18,6 +18,8 @@
     import { isUserConnected } from "$lib/utils/isUserConnected";
     import { isUserInGame } from "$lib/utils/isUserInGame";
     import type { GameRequest } from "$lib/types/game-request";
+    import { matchSocket } from "$lib/stores/matchmaking-socket";
+    import { goto } from "$app/navigation";
 
 	$: console.log("user connected", $user);
 
@@ -34,6 +36,12 @@
 			});
 
 			$chatSocket = io("localhost:3000/chat", { auth: { username: $user.profile?.username } });
+
+			$matchSocket = io("localhost:3000/matchmaking", {auth: {userId: $user.id}});
+			
+			$matchSocket.on("matched", (id) => {
+				goto("/game/" + id);
+			});
 
 			await fetchFriends();
 			await fetchFriendRequests();

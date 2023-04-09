@@ -1,33 +1,21 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
-	import { io, Socket } from "socket.io-client";
-	import { user } from "$lib/stores/user";
-	import { onMount } from "svelte";
     import PlayVsFriendsModal from "$lib/components/PlayVsFriendsModal.svelte";
+    import { matchSocket } from "$lib/stores/matchmaking-socket";
 
 	let selectedGameMode = 0;
 	let isSearching = false;
-	let socket: Socket;
 	let show = false;
 	const setShow = (value: boolean) => show = value; 
 
 	function joinQueue() {
-		socket.emit("joinQueue", selectedGameMode);
+		$matchSocket.emit("joinQueue", selectedGameMode);
 		isSearching = !isSearching;
 	}
 
 	function leaveQueue() {
-		socket.emit("leaveQueue", selectedGameMode);
+		$matchSocket.emit("leaveQueue", selectedGameMode);
 		isSearching = !isSearching;
 	}
-
-	onMount(() => {
-		socket = io("localhost:3000/matchmaking", {auth: {userId: $user.id}});
-
-		socket.on("matched", (id) => {
-			goto("/game/" + id);
-		});
-	});
 </script>
 
 <section>
