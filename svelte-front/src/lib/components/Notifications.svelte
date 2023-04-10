@@ -116,7 +116,3 @@
 		background-color: var(--ins-color);
 	}
 </style>
-
-
-
-
