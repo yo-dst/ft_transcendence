@@ -44,10 +44,8 @@ export class GameGateway {
 	// verify if the room with id exist
 	@SubscribeMessage('checkId')
 	roomExist(client: CustomSocket, info: number) {
-		console.log(info[0]);
 		const room = gameRooms.find((room) => (room.id === info[0]));
 		if (room) {
-			console.log('fgw');
 			client.emit("found", room.gameMode);
 			client.join(info[0]);
 			client.roomId = info[0];

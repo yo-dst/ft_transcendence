@@ -181,8 +181,12 @@
 		</div>
 		{#if isMobile}
 			<div class="buttons">
-				<button class="mobile">hello</button>
-				<button class="mobile">hoy</button>
+				<button class="mobile first">
+					<iconify-icon icon="material-symbols:arrow-circle-right" rotate={3}/>
+				</button>
+				<button class="mobile second">
+					<iconify-icon icon="material-symbols:arrow-circle-right" rotate={1}/>
+				</button>
 			</div>
 		{/if}
 		<canvas
@@ -211,6 +215,15 @@
 		font-size: 3rem;
 		color: hsl(201, 100%, 96%);
 	}
+
+	.first {
+		align-self: flex-start;
+	}
+
+	.second {
+		align-self: flex-end;
+	}
+
 	.score {
 		display: flex;
 		position: absolute;
@@ -220,11 +233,16 @@
 		transform: translate(-50%, -50%);
 	}
 
+	.mobile {
+		font-size: 1.5rem;
+	}
+
 	button {
 		z-index: 1;
 	}
 
 	.buttons {
+		width: 30%;
 		z-index: 1;
 		display: flex;
 		justify-content: space-between;
