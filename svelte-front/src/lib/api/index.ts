@@ -9,7 +9,7 @@ import { getFriendsStatus } from "$lib/utils/getFriendsStatus";
 import { isUserConnected } from "$lib/utils/isUserConnected";
 import { get } from "svelte/store";
 
-const host = "http://localhost:3000";
+const host = "http://backend:3000";
 
 export const logoutUser = async () => {
 	const res = await fetch(`${host}/auth/logout`, {
@@ -295,7 +295,7 @@ export const generateTwoFactorAuthenticationQrCode = async (): Promise<string> =
 }
 
 export const loginUserWithTwoFactorAuthentication = async (code: string) => {
-	const res = await fetch("http://localhost:3000/2fa/login", {
+	const res = await fetch(`http://${host}:3000/2fa/login`, {
 		method: "POST",
 		credentials: "include",
 		headers: {

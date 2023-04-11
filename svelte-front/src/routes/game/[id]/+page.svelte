@@ -12,7 +12,7 @@
 	let id = $page.params.id;
 	let roomExist: boolean = false;
 	let gameMode = 0;
-	let socket = io("localhost:3000/game");
+	let socket = io("backend:3000/game");
 	let isMobile = false;
 	if (
 		/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(

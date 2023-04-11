@@ -9,7 +9,7 @@ type User = {
 }
 
 @WebSocketGateway({
-	cors: { origin: "http://localhost:5173" },
+	cors: { origin: "http://frontend:5173" },
 	namespace: 'events'
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {

@@ -20,7 +20,7 @@ export class TwoFactorAuthController {
 	@Redirect()
 	redirect() {
 		return {
-			url: "http://localhost:5173",
+			url: "frontend:5173",
 			statusCode: 302
 		}
 	}

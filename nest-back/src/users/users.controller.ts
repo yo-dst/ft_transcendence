@@ -9,6 +9,11 @@ export class UsersController {
 	// --- begin testing ---
 	countFakeUser = 0;
 
+	@Get("test")
+	test() {
+		return "test";
+	}
+
 	@Get()
 	findAll() {
 		return this.usersService.getAll();

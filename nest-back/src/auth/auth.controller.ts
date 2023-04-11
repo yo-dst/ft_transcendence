@@ -31,7 +31,7 @@ export class AuthController {
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
 		return {
-			url: "http://localhost:5173",
+			url: `frontend:5173`,
 			statusCode: 302
 		}
 	}
@@ -76,7 +76,7 @@ export class AuthController {
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
 		return {
-			url: user.isTwoFactorAuthenticationEnabled ? "http://localhost:5173/2fa/verify" : "http://localhost:5173",
+			url: user.isTwoFactorAuthenticationEnabled ? "frontend:5173/2fa/verify" : "frontend:5173",
 			statusCode: 302
 		};
 	}

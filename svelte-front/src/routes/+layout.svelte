@@ -29,15 +29,15 @@
 		try {
 			await loginUser();
 
-			$eventsSocket = io("http://localhost:3000/events", {
+			$eventsSocket = io("http://backend:3000/events", {
 				auth: {
 					username: $user.profile.username
 				}
 			});
 
-			$chatSocket = io("localhost:3000/chat", { auth: { username: $user.profile?.username } });
+			$chatSocket = io("backend:3000/chat", { auth: { username: $user.profile?.username } });
 
-			$matchSocket = io("localhost:3000/matchmaking", {auth: {userId: $user.id}});
+			$matchSocket = io("backend:3000/matchmaking", {auth: {userId: $user.id}});
 			
 			$matchSocket.on("matched", (id) => {
 				goto("/game/" + id);

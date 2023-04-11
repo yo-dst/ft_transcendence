@@ -9,7 +9,7 @@
 		try {
 			await loginUserWithTwoFactorAuthentication(code);
 			error = "";
-			goto("http://localhost:3000/2fa/redirect");
+			goto("http://backend:3000/2fa/redirect");
 		} catch (err) {
 			error = err.message;
 		}
