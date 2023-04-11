@@ -164,9 +164,20 @@
 	function handleKeysUp() {
 		socket.emit("keyReleased");
 	}
+
+	function handleMouseDown(e) {
+		if (e.clientY < window.innerHeight / 2)
+			socket.emit("playerUp", paddle1.dir, paddle2.dir);
+		else
+			socket.emit("playerDown", paddle1.dir, paddle2.dir);
+	}
+
+	function handleMouseUp() {
+		socket.emit("keyReleased");
+	}
 </script>
 
-<svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} on:popstate={handlePopstate} />
+<svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} on:popstate={handlePopstate} on:mousedown={handleMouseDown} on:mouseup={handleMouseUp} />
 {#if isPlaying}
 	<main>
 		<Timer {socket} />
@@ -179,16 +190,6 @@
 				{game.score.p2}
 			</strong>
 		</div>
-		{#if isMobile}
-			<div class="buttons">
-				<button class="mobile first">
-					<iconify-icon icon="material-symbols:arrow-circle-right" rotate={3}/>
-				</button>
-				<button class="mobile second">
-					<iconify-icon icon="material-symbols:arrow-circle-right" rotate={1}/>
-				</button>
-			</div>
-		{/if}
 		<canvas
 			bind:this={canvas}
 			width={game.canvasWidth}
@@ -216,14 +217,6 @@
 		color: hsl(201, 100%, 96%);
 	}
 
-	.first {
-		align-self: flex-start;
-	}
-
-	.second {
-		align-self: flex-end;
-	}
-
 	.score {
 		display: flex;
 		position: absolute;
@@ -233,21 +226,4 @@
 		transform: translate(-50%, -50%);
 	}
 
-	.mobile {
-		font-size: 1.5rem;
-	}
-
-	button {
-		z-index: 1;
-	}
-
-	.buttons {
-		width: 30%;
-		z-index: 1;
-		display: flex;
-		justify-content: space-between;
-		padding-top: 85vh;
-		padding-left: 10vw;
-		padding-right: 10vw;
-	}
 </style>
