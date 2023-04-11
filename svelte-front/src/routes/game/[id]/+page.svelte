@@ -36,7 +36,7 @@
 	});
 </script>
 
-{#if roomExist && !turnPhone}
+{#if roomExist && (!turnPhone || !isMobile)}
 	<Pong {gameMode} {socket} />
 {:else if turnPhone && isMobile}
 	<TurnPhone />

@@ -5,8 +5,11 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY svelte.config.js ./
 
-RUN npm install
+RUN npm ci --omit dev
 
-COPY . .
+COPY ./build ./build
 
-CMD [ "npm", "run", "dev" ]
+ENV PORT=5173
+ENV HOST=0.0.0.0
+
+CMD [ "node", "build" ]
