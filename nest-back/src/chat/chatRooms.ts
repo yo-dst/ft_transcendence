@@ -1,4 +1,3 @@
-import { Profile } from 'src/users/entities/profile.entity';
 import { v4 } from 'uuid';
 
 export class ChatRoom {
@@ -13,12 +12,11 @@ export class ChatRoom {
 	public id: string;
 	public isPublic: boolean;
 	public isProtected: boolean;
-	public ownerProfile: Profile;
+	public ownerName: string;
 
-	constructor(owner: number, ownerProfile:Profile,  name: string, capacity: number, password: string, isPrivate: boolean) {
+	constructor(owner: number, name: string, capacity: number, password: string, isPrivate: boolean) {
 		this.name = name;
 		this.owner = owner;
-		this.ownerProfile = ownerProfile;
 		this.isPublic = isPrivate === true ? false : true;
 		if (password) {
 			this.password = password;
