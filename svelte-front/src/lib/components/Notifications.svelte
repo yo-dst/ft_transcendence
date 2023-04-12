@@ -2,7 +2,6 @@
     import { acceptFriendRequest, declineFriendRequest } from "$lib/api";
     import { matchSocket } from "$lib/stores/matchmaking-socket";
 	import { notifications } from "$lib/stores/notifications";
-    import { user } from "$lib/stores/user";
 
 	export let show: boolean;
 	export let top: number;

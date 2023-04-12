@@ -6,6 +6,7 @@ export class ChatRoom {
 	public admins: number[] = [];
 	public member: number[] = [];
 	public banList: number[] = [];
+	public muteList: number[] = [];
 	public owner: number;
 	public password: string;
 	public capacity: number;
@@ -44,6 +45,17 @@ export class ChatRoom {
 		else this.isProtected = false;
 	}
 
+	mute(userId: number) {
+		if (!this.muteList.includes(userId))
+			this.muteList.push(userId);
+	}
+
+	unmute(userId: number) {
+		const index = this.muteList.findIndex(user => user === userId);
+		if (index != -1)
+			this.muteList.splice(index, 1);
+	}
+
 	deleteUser(userId: number){
 		if (this.member.includes(userId)) this.member.splice(this.member.findIndex((member) => (member === userId)), 1);
 		else if (this.admins.includes(userId)) this.admins.splice(this.admins.findIndex((admins) => (admins === userId)), 1);
@@ -67,6 +79,17 @@ export class ChatRoom {
 			}
 			this.admins.push(userId);
 		}
+	}
+
+	ban(userId: number) {
+		if (!this.banList.includes(userId))
+			this.banList.push(userId);
+	}
+
+	unban(userId: number) {
+		const index = this.banList.findIndex(user => user === userId);
+		if (index != -1)
+			this.banList.splice(index, 1);
 	}
 
 }

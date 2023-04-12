@@ -60,6 +60,11 @@
 				{:else}
 					<button on:click={() => unblockUser(userProfile.username)}>Unblock</button>
 				{/if}
+				{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
+					<button on:click={() => {$chatSocket.emit('banUser', channelId, userProfile.username); setShow(false)}}>Ban</button>
+					<button on:click={() => {$chatSocket.emit('kickUser', channelId, userProfile.username); setShow(false)}}>Kick</button>
+					<button on:click={() => ($chatSocket.emit('muteUser', channelId, userProfile.username))}>Mute</button>
+				{/if}
 			</body>
 		{/if}
 	</article>

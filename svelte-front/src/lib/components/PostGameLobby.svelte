@@ -1,26 +1,7 @@
 <script lang="ts">
-    import type { Profile } from "$lib/types/profile";
+    import { goto } from "$app/navigation";
 
 	let userIsWinner = false;
-	let userProfile: Profile = {
-		username: "gnogno",
-		avatar: {
-			url: "https://picsum.photos/600"
-		},
-		wins: 1,
-		losses: 1
-	}
-	let opponentProfile: Profile = {
-		username: "gnagna",
-		avatar: {
-			url: "https://picsum.photos/600"
-		},
-		wins: 1,
-		losses: 1
-	}
-	let userScore = 10;
-	let opponentScore = 3;
-	let opponentWantsRematch = true;
 </script>
 
 <div class="post-game-lobby-page">
@@ -40,12 +21,7 @@
 			<img src={opponentProfile.avatar.url} alt="avatar"/>
 		</div>
 		<div class="buttons-wrapper">
-			<button>Search new game</button>
-			<button>Ask revanche</button>
-			<button class="contrast outline" style="margin-bottom: 2rem;">Go back home</button>
-			{#if opponentWantsRematch}
-				<button class="contrast">Accept revanche</button>
-			{/if}
+			<button class="contrast outline" style="margin-bottom: 2rem;" on:click={() => {goto('/')}}>Go back home</button>
 		</div>
 	</div>
 </div>

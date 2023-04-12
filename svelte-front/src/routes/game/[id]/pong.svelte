@@ -3,15 +3,14 @@
 	import { onMount } from "svelte";
 	import Timer from "$lib/components/timer.svelte";
 	import TurnPhone from "$lib/components/turnPhone.svelte";
-	import PostGameLobby from "$lib/components/PostGameLobby.svelte";
 	import DecoTimer from "$lib/components/decoTimer.svelte";
     import { eventsSocket } from "$lib/stores/events-socket";
     import type { Socket } from "socket.io-client";
+    import { goto } from "$app/navigation";
 
 	export let gameMode: number;
 	export let socket: Socket;
 
-	let isPlaying = true;
 	let turnPhone = false;
 	let lastY = 0;
 	let isMobile: boolean;
@@ -39,10 +38,8 @@
 	let game = new gameInfo(window.innerWidth, window.innerHeight, gameMode);
 
 	function handlePopstate(event: PopStateEvent) {
-		if (isPlaying) {
-			alert('You are quitting the game, if you dont comeback in the next 5 seconds, you will automatically lose the game');
-			socket.disconnect();
-		}
+		alert('You are quitting the game, if you dont comeback in the next 5 seconds, you will automatically lose the game');
+		socket.disconnect();
 	}
 
 	let rand = { x: 1, y: 1 };
@@ -74,7 +71,7 @@
 
 	socket.on("deco", () => {
 		$eventsSocket.emit("leave-game");
-		isPlaying = false;
+		goto('/postgame');
 	});
 
 	socket.on("playerMove", (newDir) => {
@@ -85,7 +82,7 @@
 	socket.on("endGame", () => {
 		$eventsSocket.emit("leave-game");
 		socket.emit("destroyGame");
-		isPlaying = false;
+		goto('/postgame')
 	});
 
 	socket.on("updateBall", (newBallPos) => {
@@ -178,7 +175,6 @@
 </script>
 
 <svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} on:popstate={handlePopstate} on:mousedown={handleMouseDown} on:mouseup={handleMouseUp} />
-{#if isPlaying}
 	<main>
 		<Timer {socket} />
 		<DecoTimer {socket} />
@@ -197,9 +193,6 @@
 			id="pong"
 		/>
 	</main>
-{:else}
-	<PostGameLobby />
-{/if}
 
 {#if turnPhone && isMobile}
 	<TurnPhone />
