@@ -11,7 +11,7 @@
 
 	let isSearching = false;
 	let match: Match;
-	let error = true;
+	let error = false;
 	let isLoading = true;
 
 	function joinQueue() {
