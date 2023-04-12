@@ -69,10 +69,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('createRoom')
 	async handleRoomCreation(client: Socket, info: string | number) {
-		const room = new ChatRoom(client.data.userId, await (this.usersService.getProfile(client.data.userId)), info[0], info[1], info[2], info[3]);
+		const room = new ChatRoom(client.data.userId, info[0], info[1], info[2], info[3]);
 		client.join(room.id);
 		this.ChatRooms.push(room);
-		this.server.emit('roomUpdate', this.handleRoom());
+		this.server.emit('roomUpdate', await this.handleRoom());
 		client.emit('joinRoom', room.id);
 		return room.id;
 	}
@@ -84,7 +84,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.join(room.id);
 			room.addUser(client.data.userId);
 			this.sendConnectedUsers(info[0], room);
-			this.server.emit('roomUpdate', this.handleRoom());
+			this.server.emit('roomUpdate', await this.handleRoom());
 			client.emit('joinRoom', room.id);
 			return true;
 		}
@@ -92,9 +92,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('getRooms')
-	handleRoom() {
+	async handleRoom() {
 		// return only public chatRooms with only the relevant informations
-		return this.ChatRooms.filter((room) => (room.isPublic === true)).map(({ password, ...rest }) => rest);
+		const rooms = this.ChatRooms.filter((room) => (room.isPublic === true)).map(({ password, ...rest }) => rest);
+		const updatedRooms = await Promise.all(rooms.map(async (room) => {
+			const ownerName = (await this.usersService.getProfile(room.owner)).username;
+			return { ...room, ownerName }; // Add ownerName property to the room object and return it
+		}));
+		return updatedRooms;
 	}
 
 	@SubscribeMessage('newMessage')
@@ -105,10 +110,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('roomUpdate')
-	handleRoomUpdate(client: Socket, info: string | boolean) {
+	async handleRoomUpdate(client: Socket, info: string | boolean) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]));
 		room.update(info[1], info[2]);
-		this.server.emit('roomUpdate', this.handleRoom());
+		this.server.emit('roomUpdate', await this.handleRoom());
 	}
 
 	@SubscribeMessage('getRoomScope')
@@ -125,7 +130,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		else {
 			this.sendConnectedUsers(ids[0], room);
 		}
-		this.server.emit('roomUpdate', this.handleRoom());
+		this.server.emit('roomUpdate', await this.handleRoom());
 	}
 
 	@SubscribeMessage('verifyUser')
