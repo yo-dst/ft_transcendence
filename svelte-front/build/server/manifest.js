@@ -4,25 +4,25 @@ const manifest = {
 	assets: new Set(["default_pp.jpeg","favicon.png","menu.svg","pong-icon.svg","xmark.svg"]),
 	mimeTypes: {".jpeg":"image/jpeg",".png":"image/png",".svg":"image/svg+xml"},
 	_: {
-		entry: {"file":"_app/immutable/start-62335535.js","imports":["_app/immutable/start-62335535.js","_app/immutable/chunks/index-5fac9acd.js","_app/immutable/chunks/singletons-846de1f6.js","_app/immutable/chunks/index-07a2c1d0.js"],"stylesheets":[],"fonts":[]},
+		client: {"start":{"file":"_app/immutable/entry/start.2b2b9c5f.js","imports":["_app/immutable/entry/start.2b2b9c5f.js","_app/immutable/chunks/index.85b3f724.js","_app/immutable/chunks/singletons.5212e3d2.js","_app/immutable/chunks/index.a5450dba.js"],"stylesheets":[],"fonts":[]},"app":{"file":"_app/immutable/entry/app.704bc471.js","imports":["_app/immutable/entry/app.704bc471.js","_app/immutable/chunks/index.85b3f724.js"],"stylesheets":[],"fonts":[]}},
 		nodes: [
-			() => import('./chunks/0-620f755b.js'),
-			() => import('./chunks/1-a4822165.js'),
-			() => import('./chunks/2-30c4a7a0.js'),
-			() => import('./chunks/3-8c6ea56e.js'),
-			() => import('./chunks/4-8601f3e5.js'),
-			() => import('./chunks/5-15682d41.js'),
-			() => import('./chunks/6-85cf3e51.js'),
-			() => import('./chunks/7-5c09ea05.js'),
-			() => import('./chunks/8-83d474b5.js'),
-			() => import('./chunks/9-58d0bed3.js'),
-			() => import('./chunks/10-ac5dc9cf.js'),
-			() => import('./chunks/11-7bcbb099.js'),
-			() => import('./chunks/12-0258768b.js'),
-			() => import('./chunks/13-6f0b9de4.js'),
-			() => import('./chunks/14-9a89ccaf.js'),
-			() => import('./chunks/15-bf7a2c69.js'),
-			() => import('./chunks/16-dedcc042.js')
+			() => import('./chunks/0-213f7baf.js'),
+			() => import('./chunks/1-226a22d3.js'),
+			() => import('./chunks/2-7fead045.js'),
+			() => import('./chunks/3-f1aea1d1.js'),
+			() => import('./chunks/4-a5e2cd91.js'),
+			() => import('./chunks/5-d62c9595.js'),
+			() => import('./chunks/6-f71067e5.js'),
+			() => import('./chunks/7-4a08b95b.js'),
+			() => import('./chunks/8-1e589673.js'),
+			() => import('./chunks/9-c5fda764.js'),
+			() => import('./chunks/10-442473a3.js'),
+			() => import('./chunks/11-27ffbbfc.js'),
+			() => import('./chunks/12-b2dd028e.js'),
+			() => import('./chunks/13-082e36ff.js'),
+			() => import('./chunks/14-8ceb41c0.js'),
+			() => import('./chunks/15-d38f74d7.js'),
+			() => import('./chunks/16-ca2b040e.js')
 		],
 		routes: [
 			{
@@ -117,7 +117,7 @@ const manifest = {
 	}
 };
 
-const prerendered = new Set(["/","/2fa/activate","/2fa/verify","/channels","/channels/create","/friends","/parameters","/profile","/users"]);
+const prerendered = new Set([]);
 
 export { manifest, prerendered };
 //# sourceMappingURL=manifest.js.map

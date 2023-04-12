@@ -20,6 +20,7 @@
     import type { GameRequest } from "$lib/types/game-request";
     import { matchSocket } from "$lib/stores/matchmaking-socket";
     import { goto } from "$app/navigation";
+	import { apiUrl } from "$lib/api/apiUrl";
 
 	$: console.log("user connected", $user);
 
@@ -29,15 +30,15 @@
 		try {
 			await loginUser();
 
-			$eventsSocket = io("http://backend:3000/events", {
+			$eventsSocket = io(`${apiUrl}/events`, {
 				auth: {
 					username: $user.profile.username
 				}
 			});
 
-			$chatSocket = io("backend:3000/chat", { auth: { username: $user.profile?.username } });
+			$chatSocket = io(`${apiUrl}/chat`, { auth: { username: $user.profile?.username } });
 
-			$matchSocket = io("backend:3000/matchmaking", {auth: {userId: $user.id}});
+			$matchSocket = io(`${apiUrl}/matchmaking`, {auth: {userId: $user.id}});
 			
 			$matchSocket.on("matched", (id) => {
 				goto("/game/" + id);

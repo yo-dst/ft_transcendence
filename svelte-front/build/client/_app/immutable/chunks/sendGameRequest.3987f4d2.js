@@ -1,0 +1,1 @@
+import{e as s}from"./events-socket.42800548.js";import{m as a}from"./matchmaking-socket.258fe63f.js";import{O as t}from"./index.85b3f724.js";function i(e){const o=t(s),m=t(a);o.emit("send-game-request",e),m.emit("newGameRequest",e)}export{i as s};

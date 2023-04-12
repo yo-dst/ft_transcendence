@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { goto, invalidate } from "$app/navigation";
+	import { goto } from "$app/navigation";
     import { loginUserWithTwoFactorAuthentication } from "$lib/api";
+	import { apiUrl } from "$lib/api/apiUrl";
 
 	let code = "";
 	let error = "";
@@ -9,7 +10,7 @@
 		try {
 			await loginUserWithTwoFactorAuthentication(code);
 			error = "";
-			goto("http://backend:3000/2fa/redirect");
+			goto(`${apiUrl}:3000/2fa/redirect`);
 		} catch (err) {
 			error = err.message;
 		}

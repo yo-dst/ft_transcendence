@@ -8,11 +8,10 @@ import type { Profile } from "$lib/types/profile";
 import { getFriendsStatus } from "$lib/utils/getFriendsStatus";
 import { isUserConnected } from "$lib/utils/isUserConnected";
 import { get } from "svelte/store";
-
-const host = "http://backend:3000";
+import { apiUrl } from "./apiUrl";
 
 export const logoutUser = async () => {
-	const res = await fetch(`${host}/auth/logout`, {
+	const res = await fetch(`${apiUrl}/auth/logout`, {
 		credentials: "include",
 	});
 	if (!res.ok) {
@@ -27,7 +26,7 @@ export const logoutUser = async () => {
 }
 
 export const loginUser = async () => {
-	const res = await fetch(`${host}/user`, {
+	const res = await fetch(`${apiUrl}/user`, {
 		credentials: "include"
 	});
 	if (!res.ok) {
@@ -39,7 +38,7 @@ export const loginUser = async () => {
 }
 
 export const fetchProfile = async (username: string): Promise<Profile> => {
-	const res = await fetch(`${host}/users/profile/${username}`, {
+	const res = await fetch(`${apiUrl}/users/profile/${username}`, {
 		credentials: "include"
 	});
 	if (!res.ok) {
@@ -57,7 +56,7 @@ export const fetchMatchHistory = async (
 	startIndex: number,
 	pageSize: number
 ): Promise<Match[]> => {
-	const res = await fetch(`${host}/game?startIndex=${startIndex}&pageSize=${pageSize}&username=${username}`, {
+	const res = await fetch(`${apiUrl}/game?startIndex=${startIndex}&pageSize=${pageSize}&username=${username}`, {
 		credentials: "include"
 	});
 	if (!res.ok) {
@@ -71,7 +70,7 @@ export const fetchMatchHistory = async (
 }
 
 export const updateUserUsername = async (newUsername: string) => {
-	const res = await fetch(`${host}/user/username`, {
+	const res = await fetch(`${apiUrl}/user/username`, {
 		method: "PATCH",
 		credentials: "include",
 		headers: {
@@ -98,7 +97,7 @@ export const updateUserUsername = async (newUsername: string) => {
 }
 
 export const updateUserAvatar = async (newAvatar: string) => {
-	const res = await fetch(`${host}/user/avatar`, {
+	const res = await fetch(`${apiUrl}/user/avatar`, {
 		method: "PATCH",
 		credentials: "include",
 		headers: {
@@ -123,7 +122,7 @@ export const updateUserAvatar = async (newAvatar: string) => {
 }
 
 export const turnOnTwoFactorAuthentication = async (code: string) => {
-	const res = await fetch(`${host}/2fa/turn-on`, {
+	const res = await fetch(`${apiUrl}/2fa/turn-on`, {
 		method: "POST",
 		credentials: "include",
 		headers: {
@@ -146,7 +145,7 @@ export const turnOnTwoFactorAuthentication = async (code: string) => {
 }
 
 export const turnOffTwoFactorAuthentication = async () => {
-	const res = await fetch(`${host}/2fa/turn-off`, {
+	const res = await fetch(`${apiUrl}/2fa/turn-off`, {
 		method: "POST",
 		credentials: "include",
 	});
@@ -163,7 +162,7 @@ export const turnOffTwoFactorAuthentication = async () => {
 } 
 
 export const fetchFriends = async () => {
-	const res = await fetch(`${host}/user/friends`, {
+	const res = await fetch(`${apiUrl}/user/friends`, {
 		credentials: "include"
 	});
 	if (!res.ok) {
@@ -179,7 +178,7 @@ export const fetchFriends = async () => {
 }
 
 export const fetchFriendRequests = async () => {
-	const res = await fetch(`${host}/user/friend-requests`, {
+	const res = await fetch(`${apiUrl}/user/friend-requests`, {
 		credentials: "include"
 	});
 	if (!res.ok) {
@@ -194,7 +193,7 @@ export const fetchFriendRequests = async () => {
 }
 
 export const sendFriendRequest = async (username: string) => {
-	const res = await fetch(`${host}/friend-requests`, {
+	const res = await fetch(`${apiUrl}/friend-requests`, {
 		method: "POST",
 		credentials: "include",
 		headers: {
@@ -218,7 +217,7 @@ export const sendFriendRequest = async (username: string) => {
 }
 
 export const acceptFriendRequest = async (friendRequestId: number) => {
-	const res = await fetch(`${host}/friend-requests/accept/${friendRequestId}`, {
+	const res = await fetch(`${apiUrl}/friend-requests/accept/${friendRequestId}`, {
 		method: "POST",
 		credentials: "include"
 	});
@@ -243,7 +242,7 @@ export const acceptFriendRequest = async (friendRequestId: number) => {
 }
 
 export const declineFriendRequest = async (friendRequestId: number) => {
-	const res = await fetch(`${host}/friend-requests/decline/${friendRequestId}`, {
+	const res = await fetch(`${apiUrl}/friend-requests/decline/${friendRequestId}`, {
 		method: "POST",
 		credentials: "include"
 	});
@@ -259,7 +258,7 @@ export const declineFriendRequest = async (friendRequestId: number) => {
 }
 
 export const removeFriend = async (username: string) => {
-	const res = await fetch(`${host}/user/remove-friend`, {
+	const res = await fetch(`${apiUrl}/user/remove-friend`, {
 		method: "PATCH",
 		credentials: "include",
 		headers: {
@@ -280,7 +279,7 @@ export const removeFriend = async (username: string) => {
 }
 
 export const generateTwoFactorAuthenticationQrCode = async (): Promise<string> => {
-	const res = await fetch(`${host}/2fa/generate`, {
+	const res = await fetch(`${apiUrl}/2fa/generate`, {
 		method: "post",
 		credentials: "include",
 	});
@@ -295,7 +294,7 @@ export const generateTwoFactorAuthenticationQrCode = async (): Promise<string> =
 }
 
 export const loginUserWithTwoFactorAuthentication = async (code: string) => {
-	const res = await fetch(`http://${host}:3000/2fa/login`, {
+	const res = await fetch(`http://${apiUrl}:3000/2fa/login`, {
 		method: "POST",
 		credentials: "include",
 		headers: {
@@ -315,7 +314,7 @@ export const loginUserWithTwoFactorAuthentication = async (code: string) => {
 }
 
 export const fetchBlockList = async () => {
-	const res = await fetch(`${host}/user/blocked-users`, {
+	const res = await fetch(`${apiUrl}/user/blocked-users`, {
 		credentials: "include",
 	})
 	if (!res.ok) {
@@ -334,7 +333,7 @@ export const fetchBlockList = async () => {
 }
 
 export const blockUser = async (usernameToBlock: string) => {
-	const res = await fetch(`${host}/user/block-user`, {
+	const res = await fetch(`${apiUrl}/user/block-user`, {
 		method: "PATCH",
 		credentials: "include",
 		headers: {
@@ -360,7 +359,7 @@ export const blockUser = async (usernameToBlock: string) => {
 }
 
 export const unblockUser = async (usernameToUnblock: string) => {
-	const res = await fetch(`${host}/user/unblock-user`, {
+	const res = await fetch(`${apiUrl}/user/unblock-user`, {
 		method: "PATCH",
 		credentials: "include",
 		headers: {

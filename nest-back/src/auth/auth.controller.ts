@@ -5,6 +5,7 @@ import { UsersService } from 'src/users/users.service';
 import { AuthService } from './auth.service';
 import { RequestWithUser } from './request-with-user.interface';
 import JwtTwoFactorAuthGuard from './two-factor-auth/jwt-two-factor-auth.guard';
+import { ConfigService } from '@nestjs/config';
 
 /*
 	notes
@@ -14,7 +15,8 @@ import JwtTwoFactorAuthGuard from './two-factor-auth/jwt-two-factor-auth.guard';
 export class AuthController {
 	constructor(
 		private authService: AuthService,
-		private usersService: UsersService
+		private usersService: UsersService,
+		private configService: ConfigService
 	) { }
 
 	// --- begin testing ---
@@ -31,7 +33,7 @@ export class AuthController {
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
 		return {
-			url: `frontend:5173`,
+			url: `http://${this.configService.get("SVELTEKIT_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
 			statusCode: 302
 		}
 	}
@@ -76,7 +78,7 @@ export class AuthController {
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
 		return {
-			url: user.isTwoFactorAuthenticationEnabled ? "frontend:5173/2fa/verify" : "frontend:5173",
+			url: user.isTwoFactorAuthenticationEnabled ? `http://${this.configService.get("SVELTEKIT_HOST")}:${this.configService.get("SVELTEKIT_PORT")}/2fa/verify` : `http://${this.configService.get("SVELTEKIT_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
 			statusCode: 302
 		};
 	}

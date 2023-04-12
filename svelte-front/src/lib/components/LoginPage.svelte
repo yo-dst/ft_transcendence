@@ -1,10 +1,11 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+	import { apiUrl } from "$lib/api/apiUrl";
 
 	let username: string;
 
 	async function createFakeUser() {
-		await fetch("http://backend:3000/users/fake", {
+		await fetch(`${apiUrl}/users/fake`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -24,7 +25,7 @@
 		</a>
 		
 		<input bind:value={username} style="margin-top: 2rem;"/>
-		<button on:click={() => goto(`http://backend:3000/auth/username?username=${username}`)}>Login with username</button>
+		<button on:click={() => goto(`${apiUrl}/auth/username?username=${username}`)}>Login with username</button>
 	
 		<button on:click={createFakeUser}>Create fake user</button>
 	</div>

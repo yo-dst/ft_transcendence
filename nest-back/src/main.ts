@@ -3,12 +3,16 @@ import { AppModule } from './app.module';
 import * as cookieParser from "cookie-parser";
 import { ValidationPipe } from '@nestjs/common';
 import { json } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
+
+	const configService = app.get(ConfigService);
+
 	app.enableCors({
 		origin: [
-			"http://frontend:5173"
+			`http://${configService.get("SVELTEKIT_HOST")}:${configService.get("SVELTEKIT_PORT")}`
 		],
 		credentials: true,
 		methods: [
@@ -21,6 +25,6 @@ async function bootstrap() {
 	app.use(cookieParser());
 	app.use(json({ limit: "50mb" }));
 	app.useGlobalPipes(new ValidationPipe());
-	await app.listen(3000);
+	await app.listen(configService.get("PORT"));
 }
 bootstrap();

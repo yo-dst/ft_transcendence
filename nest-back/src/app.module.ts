@@ -7,7 +7,6 @@ import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from './chat/chat.module';
 import * as Joi from 'joi';
-import { EventsGateway } from './events/events.gateway';
 import { EventsModule } from './events/events.module';
 
 @Module({
@@ -24,7 +23,10 @@ import { EventsModule } from './events/events.module';
 				POSTGRES_USER: Joi.string().required(),
 				POSTGRES_PASSWORD: Joi.string().required(),
 				JWT_SECRET: Joi.string().required(),
-				JWT_EXPIRATION_TIME: Joi.string().required()
+				JWT_EXPIRATION_TIME: Joi.string().required(),
+				SVELTEKIT_HOST: Joi.string().required(),
+				SVELTEKIT_PORT: Joi.number().required(),
+				PORT: Joi.number().required()
       		})
 		}),
 		DatabaseModule,

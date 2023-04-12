@@ -7,12 +7,13 @@
 	import { waitFlip } from "./pong";
 	import { user } from "$lib/stores/user";
     import { eventsSocket } from "$lib/stores/events-socket";
+	import { apiUrl } from "$lib/api/apiUrl";
 
 	let turnPhone = true;
 	let id = $page.params.id;
 	let roomExist: boolean = false;
 	let gameMode = 0;
-	let socket = io("backend:3000/game");
+	let socket = io(`${apiUrl}/game`);
 	let isMobile = false;
 	if (
 		/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(

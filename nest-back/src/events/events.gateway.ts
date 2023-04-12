@@ -1,5 +1,6 @@
 import { Logger } from "@nestjs/common";
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { ConfigService } from "@nestjs/config";
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 
 type User = {
@@ -9,7 +10,7 @@ type User = {
 }
 
 @WebSocketGateway({
-	cors: { origin: "http://frontend:5173" },
+	origin: { cors: "*" },
 	namespace: 'events'
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {

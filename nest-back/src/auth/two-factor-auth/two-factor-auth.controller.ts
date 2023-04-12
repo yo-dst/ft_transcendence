@@ -7,20 +7,22 @@ import { RequestWithUser } from "../request-with-user.interface";
 import TwoFactorAuthCodeDto from "./dto/two-factor-auth-code.dto";
 import JwtTwoFactorAuthGuard from "./jwt-two-factor-auth.guard";
 import { TwoFactorAuthService } from "./two-factor-auth.service";
+import { ConfigService } from "@nestjs/config";
 
 @Controller("2fa")
 export class TwoFactorAuthController {
 	constructor(
 		private twoFactorAuthService: TwoFactorAuthService,
 		private usersService: UsersService,
-		private authService: AuthService
+		private authService: AuthService,
+		private configService: ConfigService
 	) {}
 
 	@Get("redirect")
 	@Redirect()
 	redirect() {
 		return {
-			url: "frontend:5173",
+			url: `http://${this.configService.get("SVELTEKIT_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
 			statusCode: 302
 		}
 	}
