@@ -4,6 +4,7 @@
 
 	let timeLeft = 5;
 	socket.on("decoTimer", () => {
+		timeLeft = 5;
 		showTimer = true;
 		let id = setInterval(() => {
 			timeLeft -= 1;

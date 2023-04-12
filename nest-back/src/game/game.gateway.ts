@@ -54,8 +54,6 @@ export class GameGateway {
 			if (!room.playersMap.get(client.userId)) {
 				room.player[room.index++] = client.userId;
 			}
-			else
-				room.playersMap.set(client.userId, false);
 			client.isSpectator = room.isSpecator(info[1]);
 		}
 	}
@@ -63,7 +61,11 @@ export class GameGateway {
 	@SubscribeMessage('ready')
 	checkReady(client: CustomSocket) {
 		const room = gameRooms.find((room) => (room.id === client.roomId));
-		if (client.isPlayer && !room.playersMap.get(client.userId)) {
+		if (room.playersMap.get(client.userId)) {
+			room.playersMap.set(client.userId, false);
+			return;
+		}
+		if (client.isPlayer) {
 			client.playerIndex = room.nbPlayerRdy++;
 			if (room.nbPlayerRdy == 2) {
 				room.nbPlayerRdy = 0;
