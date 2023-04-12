@@ -38,14 +38,22 @@
 
 {#if roomExist && (!turnPhone || !isMobile)}
 	<Pong {gameMode} {socket} />
-{:else if turnPhone && isMobile}
+{:else if turnPhone && isMobile && roomExist}
 	<TurnPhone />
 {:else}
-	RoomId not found
-
-	<button
-		on:click={() => {
-			goto("/");
-		}}>Go back home</button
-	>
+<div class="container">
+	<h2 style="text-align:center">RoomId not found</h2>
+	<a href="/" role="button" style="">Go back home</a>
+  </div>
 {/if}
+
+<style>
+	.container {
+	  display: flex;
+	  flex-direction: column;
+	  justify-content: center;
+	  align-items: center;
+	  height: 100vh; /* set the height of the container to the height of the viewport */
+	}
+</style>
+  

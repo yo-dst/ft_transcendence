@@ -5,31 +5,13 @@
     import { matchSocket } from "$lib/stores/matchmaking-socket";
     import { user } from "$lib/stores/user";
     import type { Match } from "$lib/types/match";
-    import type { Profile } from "$lib/types/profile";
     import { sendGameRequest } from "$lib/utils/sendGameRequest";
     import { onMount } from "svelte";
-	let userIsWinner = false;
-	let userProfile: Profile = {
-		username: "gnogno",
-		avatar: {
-			url: "https://picsum.photos/600"
-		},
-		wins: 1,
-		losses: 1
-	}
-	let opponentProfile: Profile = {
-		username: "gnagna",
-		avatar: {
-			url: "https://picsum.photos/600"
-		},
-		wins: 1,
-		losses: 1
-	}
-	let userScore = 10;
-	let opponentScore = 3;
+
 
 	let isSearching = false;
 	let match: Match;
+	let error = true;
 	let isLoading = true;
 
 	function joinQueue() {
@@ -45,17 +27,24 @@
 	onMount(async () => {
 		try {
 			const data = await fetchMatchHistory($user.profile.username, 0, 1);
+			console.log("data:",data);
+			if (!data || data.length === 0) {
+				error = true;
+			}
 			match = data[0];
+			isLoading = false;
 		} catch (err) {
 			console.log(err);
 		}
-		console.log(match);
-		isLoading = false;
 	})
 </script>
 
 {#if isLoading}
 <Loading/>
+{:else if error}
+<p>
+	Nothing to see here...
+</p>
 {:else}
 <div class="post-game-lobby-page">
 	<div class="container">
