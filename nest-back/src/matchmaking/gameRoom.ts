@@ -79,7 +79,7 @@ export class GameRoom {
 					// p1 scores
 					this.score[0]++;
 				}
-				if (this.score[0] >= 10 || this.score[1] >= 10) {
+				if (this.score[0] >= 5 || this.score[1] >= 5) {
 					this.gameService.save(this.score, this.player);
 					server.to(this.id).emit('endGame');
 					clearInterval(this.intervalId);
