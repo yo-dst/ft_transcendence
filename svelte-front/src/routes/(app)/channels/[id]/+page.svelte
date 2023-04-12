@@ -60,6 +60,12 @@
 	// 	$chatMessages = $chatMessages;
 	// })
 
+	$chatSocket.on('kicked', (username: string) => {
+		if (username === $user.profile.username) {
+			goto('/channels');
+		}
+	});
+
 	$chatSocket.on('updateConnectedUsers', (info: any) => {
 		connectedUser = info;
 		connectedUser = connectedUser;

@@ -25,6 +25,42 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	}
 
+	@SubscribeMessage('banUser')
+	async handleMute(client: Socket, info: string) {
+		const room = this.ChatRooms.find((room) => (room.id === info[0]))
+		const user = await this.usersService.getByUsername(info[1]);
+		if (room && user) {
+			this.handleKickUser(client, info);
+			room.ban(user.id);
+			setTimeout(() => {
+				room.unban(user.id);
+			}, 10000);
+		}
+	}
+
+	@SubscribeMessage('kickUser')
+	async handleKickUser(client: Socket, info: string) {
+		const room = this.ChatRooms.find((room) => (room.id === info[0]));
+		const user = await this.usersService.getByUsername(info[1]);
+		if (room) {
+			room.deleteUser(user.id);
+			this.sendConnectedUsers(info[0], room);
+			this.server.to(info[0]).emit('kicked', info[1]);
+		}
+	}
+
+	@SubscribeMessage('muteUser')
+	async handleMuteUser(client: Socket, info: string) {
+		const room = this.ChatRooms.find((room) => (room.id === info[0]));
+		const user = await this.usersService.getByUsername(info[1]);
+		if (room && user) {
+			room.mute(user.id);
+			setTimeout(() => {
+				room.unmute(user.id);
+			}, 10000);
+		}
+	}
+
 	async sendConnectedUsers(channelId: string, room: ChatRoom) {
 		const memberUsername = await Promise.all(room.member.map(async (user) => ((await this.usersService.getProfile(user)).username)));
 		const adminUsername = await Promise.all(room.admins.map(async (user) => ((await this.usersService.getProfile(user)).username)));
@@ -44,7 +80,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('joinRoom')
 	async handleClientJoinRoom(client: Socket, info: string) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]))
-		if (room && (!room.isProtected || info[1] === room.password || room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId)) {
+		if (room && !room.banList.includes(client.data.userId) && (!room.isProtected || info[1] === room.password || room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId)) {
 			client.join(room.id);
 			room.addUser(client.data.userId);
 			this.sendConnectedUsers(info[0], room);
@@ -58,12 +94,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('getRooms')
 	handleRoom() {
 		// return only public chatRooms with only the relevant informations
-		return this.ChatRooms.filter((room) => (room.isPublic === true)).map(({ password, banList, ...rest }) => rest);
+		return this.ChatRooms.filter((room) => (room.isPublic === true)).map(({ password, ...rest }) => rest);
 	}
 
 	@SubscribeMessage('newMessage')
 	handleNewMessage(client: Socket, info: string) {
-		if (this.ChatRooms.find((room) => (room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId))) {
+		if (this.ChatRooms.find((room) => ((room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId) && !room.muteList.includes(client.data.userId)))) {
 			this.server.to(info[0]).emit('newMessage', client.data.username, info[1], info[0]);
 		}
 	}
