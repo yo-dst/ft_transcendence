@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { chatSocket } from "$lib/stores/chat-socket";
+	import CryptoJS from 'crypto-js';
 
 	let isPrivate: boolean = false;
 	let name: string;
@@ -13,7 +14,8 @@
 			error = "Name cannot be longer than 10 characters";
 		}
 		else {
-			$chatSocket.emit('createRoom', name, capacity, password, isPrivate, (id: string) => {
+			const hashedPassword = !password || password === "" ? "" : CryptoJS.SHA256(password).toString();
+			$chatSocket.emit('createRoom', name, capacity, hashedPassword, isPrivate, (id: string) => {
 				goto(id);
 			});
 		}
