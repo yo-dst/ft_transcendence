@@ -34,6 +34,13 @@
 			});
 
 			if (files && files[0]) {
+				const type = files[0].type;
+				if (type !== "image/jpg"
+					&& type !== "image/jpeg"
+					&& type !== "image/png") {
+					updateAvatarError = "Only jpg, jpeg or png files are allowed";
+					return;
+				}
 				reader.readAsDataURL(files[0]);
 			}
 		} catch (err) {
@@ -75,10 +82,10 @@
 	<div class="input-button-container">
 		<input name="username" bind:value={newUsername} />
 		<button on:click={updateUsername}>Update</button>
+		{#if updateUsernameError}
+			<span class="error">{updateUsernameError}</span>
+		{/if}
 	</div>
-{#if updateUsernameError}
-	<p class="error">{updateUsernameError}</p>
-{/if}
 
 	<label for="avatar">Avatar </label>
 	<div class="input-button-container">
@@ -89,10 +96,10 @@
 			accept="image/png image/jpeg image/jpg"
 		/>
 		<button on:click={updateAvatar}>Update</button>
+		{#if updateAvatarError}
+			<span class="error">{updateAvatarError}</span>
+		{/if}
 	</div>
-{#if updateAvatarError}
-	<span class="error">{updateAvatarError}</span>
-{/if}
 
 	<label for="isTwoFactorAuthenticationEnabled">
 		<input
@@ -110,10 +117,23 @@
 	</label>
 </section>
 
-<button style="width:40%; margin:0" on:click={() => {showBlockedModal = true}}>Block list</button>
-{#if showBlockedModal}
-	<ModalBlockedUser closeModal={() => {showBlockedModal = false}}/>
-{/if}
+<!-- <section>
+	<h3>Users blocked</h3>
+	<ul>
+		<li>
+			<img src=""/>
+			Fake1
+		</li>
+		<li>
+			Fake2
+		</li>
+		{#each $user.blocked as userBlocked}
+			<li>
+				{userBlocked.username}
+			</li>
+		{/each}
+	</ul>
+</section> -->
 
 <div class="logout-wrapper">
 	<h3>Log in with another account</h3>
@@ -127,10 +147,6 @@
 	h3 {
 		margin-bottom: 1rem;
 		font-weight: normal;
-	}
-
-	.error {
-		margin-top: -1.5rem;
 	}
 
 	.logout-wrapper {
