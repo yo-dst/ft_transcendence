@@ -17,7 +17,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const user = await this.usersService.getByUsername(client.handshake.auth.username)
 		if (user) {
 			client.data.userId = user.id;
-			client.data.username = client.handshake.auth.username;
 		}
 	}
 
@@ -42,7 +41,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleKickUser(client: Socket, info: string) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]));
 		const user = await this.usersService.getByUsername(info[1]);
-		if (room) {
+		if (room && user) {
 			room.deleteUser(user.id);
 			this.sendConnectedUsers(info[0], room);
 			this.server.to(info[0]).emit('kicked', info[1]);
@@ -105,7 +104,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('newMessage')
 	handleNewMessage(client: Socket, info: string) {
 		if (this.ChatRooms.find((room) => ((room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId) && !room.muteList.includes(client.data.userId)))) {
-			this.server.to(info[0]).emit('newMessage', client.data.username, info[1], info[0]);
+			this.server.to(info[2]).emit('newMessage', info[0], info[1], info[2]);
 		}
 	}
 
@@ -151,8 +150,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('newAdmin')
 	async addNewUser(client: Socket, info: any) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]));
-		if (room) {
-			room.addAdmin((await this.usersService.getByUsername(info[1])).id);
+		const user = await this.usersService.getByUsername(info[1]);
+		if (room && user) {
+			room.addAdmin(user.id);
 			this.sendConnectedUsers(info[0], room);
 		}
 	}

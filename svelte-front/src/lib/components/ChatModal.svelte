@@ -28,8 +28,13 @@
 	onMount(async () => {
 		document.addEventListener("click", handleClickOutside);
 
-		userProfile = await fetchProfile(username);
-		userIsFriend = $friends.findIndex(friend => friend.profile.username === userProfile.username) !== -1;
+		try {
+			userProfile = await fetchProfile(username);
+			userIsFriend = $friends.findIndex(friend => friend.profile.username === userProfile.username) !== -1;
+		}
+		catch (err) {
+			setShow(false);
+		}
 		isLoading = false;
 	});
 

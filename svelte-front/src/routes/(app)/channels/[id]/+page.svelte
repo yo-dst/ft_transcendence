@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from "$lib/stores/user";
-    import { afterUpdate, getContext, onMount } from "svelte";
+    import { afterUpdate } from "svelte";
     import { page } from "$app/stores";
     import ModalChannelSettings from "$lib/components/ModalChannelSettings.svelte";
     import { chatSocket } from "$lib/stores/chat-socket";
@@ -18,7 +18,6 @@
 	let showSettingsModal:boolean = false;
 	let isLoading: boolean = true;
 	let showPasswordModal: boolean = true;
-	let userIsAdmin: boolean;
 	let showUserList = false;
 	let connectedUser: connectedUser;
 
@@ -36,7 +35,6 @@
 		}
 		else showPasswordModal = true;
 		roomName = info.roomName;
-		userIsAdmin = info.isAdmin;
 		isLoading = false;
 		connectedUser = info.connectedUser;
 	})
@@ -55,14 +53,10 @@
 
 	function sendMessage() {
 		if (input){
-			$chatSocket.emit('newMessage', channelId, input);
+			$chatSocket.emit('newMessage', $user.profile.username, input, channelId);
 			input = "";
 		}
 	}
-
-	// $chatSocket.on('newMessage', () => {
-	// 	$chatMessages = $chatMessages;
-	// })
 
 	$chatSocket.on('kicked', (username: string) => {
 		if (username === $user.profile.username) {

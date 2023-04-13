@@ -8,13 +8,15 @@
 	let password: string;
 	let capacity = 25;
 	let error: string = "";
+	let isDisabled: boolean = false;
 
 	function createRoom() {
-		if (name.length > 10) {
-			error = "Name cannot be longer than 10 characters";
+		if (!name || name.length > 10) {
+			error = "Name cannot be longer than 10 characters or empty.";
 		}
 		else {
 			const hashedPassword = !password || password === "" ? "" : CryptoJS.SHA256(password).toString();
+			isDisabled = true;
 			$chatSocket.emit('createRoom', name, capacity, hashedPassword, isPrivate, (id: string) => {
 				goto(id);
 			});
@@ -62,7 +64,7 @@
 		</fieldset>
 
 		<button
-			on:click={createRoom}>Create channel</button
+			on:click={createRoom} disabled={isDisabled}>Create channel</button
 		>
 	</form>
 </section>
