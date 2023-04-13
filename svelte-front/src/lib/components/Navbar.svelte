@@ -53,7 +53,7 @@
 		</button>
 		<img src={$user.profile.avatar.url}
 			alt="avatar"
-			on:click={() => goto("/profile")}
+			on:click={() => goto(`/profile/${$user.profile.username}`)}
 			on:keypress
 			class="img-avatar"/>
 	{:else}
