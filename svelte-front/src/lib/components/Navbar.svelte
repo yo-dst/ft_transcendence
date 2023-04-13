@@ -18,12 +18,12 @@
 			path: "/channels"
 		},
 		{
-			name: "Profile",
-			path: "/profile"
-		},
-		{
 			name: "Friends",
 			path: "/friends"
+		},
+		{
+			name: "Parameters",
+			path: "/parameters"
 		}
 	];
 </script>
@@ -53,7 +53,7 @@
 		</button>
 		<img src={$user.profile.avatar.url}
 			alt="avatar"
-			on:click={() => goto("/parameters")}
+			on:click={() => goto("/profile")}
 			on:keypress
 			class="img-avatar"/>
 	{:else}

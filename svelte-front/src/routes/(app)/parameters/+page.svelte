@@ -117,23 +117,20 @@
 	</label>
 </section>
 
-<!-- <section>
+<section class="bg-light-dark" style="padding: 1rem; border-radius: 5px; margin-top: 4rem;">
 	<h3>Users blocked</h3>
 	<ul>
-		<li>
-			<img src=""/>
-			Fake1
-		</li>
-		<li>
-			Fake2
-		</li>
 		{#each $user.blocked as userBlocked}
 			<li>
-				{userBlocked.username}
+				<div>
+					<img src={userBlocked.avatar.url} alt="avatar"/>
+					<span class="safe-words">{userBlocked.username}</span>
+				</div>
+				<button on:click={() => {}}>Unblock</button>
 			</li>
 		{/each}
 	</ul>
-</section> -->
+</section>
 
 <div class="logout-wrapper">
 	<h3>Log in with another account</h3>
@@ -150,7 +147,7 @@
 	}
 
 	.logout-wrapper {
-		margin-top: 100px;
+		margin-top: 50px;
 		display: block;
 	}
 
@@ -165,6 +162,43 @@
 	.logout-wrapper a:hover {
 		background-color: var(--contrast);
 		color: black;
+	}
+
+	ul {
+		padding: 0;
+		margin: 0;
+	}
+
+	ul li {
+		list-style: none;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.5rem;
+		background-color: #11191f;
+		border-radius: 5px;
+		padding: 0.5rem;
+		gap: 1rem;
+	}
+
+	ul li > :first-child {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	ul li img {
+		width: 64px;
+		height: 64px;
+		object-fit: cover;
+		aspect-ratio: 1/1;
+		border-radius: 50%;
+	}
+
+	ul li button {
+		width: auto;
+		height: auto;
+		margin-bottom: 0;
 	}
 
 	@media (max-width: 700px) {
