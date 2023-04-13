@@ -91,7 +91,9 @@
 				const creatorProfile = await fetchProfile(username);
 				const newGameRequest: GameRequest = { creator: creatorProfile };
 				const newNotification: Notification = { type: "game-request", data: newGameRequest };
-				$notifications = [...$notifications, newNotification];
+				if ($notifications.findIndex(notification => notification.data.creator.username === newNotification.data.creator.username) === -1) {
+					$notifications = [...$notifications, newNotification];
+				}
 			});
 
 			$eventsSocket.on("friend-request-accepted", async (username: string) => {

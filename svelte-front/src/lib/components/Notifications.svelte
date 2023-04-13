@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { acceptFriendRequest, declineFriendRequest } from "$lib/api";
+    import { acceptFriendRequest, acceptGameRequest, declineFriendRequest, declineGameRequest } from "$lib/api";
     import { matchSocket } from "$lib/stores/matchmaking-socket";
 	import { notifications } from "$lib/stores/notifications";
 
@@ -7,7 +7,7 @@
 	export let top: number;
 </script>
 
-{#if show}
+{#if show && $notifications.length}
 	<div class="notifications-container" style="--top:{top}px">
 		<ul>
 		{#each $notifications as notification}
@@ -32,10 +32,10 @@
 							<iconify-icon icon="radix-icons:cross-2"></iconify-icon>
 						</button>
 					{:else if notification.type === "game-request"}
-						<button class="accept-button" on:click={() => {$matchSocket.emit("gameRequestAccepted")}}>
+						<button class="accept-button" on:click={() => acceptGameRequest(notification.data.creator.username)}>
 							<iconify-icon icon="fluent-mdl2:accept-medium"></iconify-icon>
 						</button>
-						<button class="decline-button" on:click={() => {$matchSocket.emit("matchDenied")}}>
+						<button class="decline-button" on:click={() => declineGameRequest(notification.data.creator.username)}>
 							<iconify-icon icon="radix-icons:cross-2"></iconify-icon>
 						</button>
 					{/if}
@@ -71,6 +71,7 @@
 		justify-content: space-between;
 		align-items: center;
 		gap: 1rem;
+		border-radius: 5px;
 	}
 
 	ul li > :first-child {

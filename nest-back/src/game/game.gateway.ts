@@ -133,5 +133,4 @@ export class GameGateway {
 			gameRooms.splice(room, 1);
 		}
 	}
-
 }

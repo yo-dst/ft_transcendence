@@ -9,6 +9,7 @@ import { getFriendsStatus } from "$lib/utils/getFriendsStatus";
 import { isUserConnected } from "$lib/utils/isUserConnected";
 import { get } from "svelte/store";
 import { apiUrl } from "./apiUrl";
+import { matchSocket } from "$lib/stores/matchmaking-socket";
 
 export const logoutUser = async () => {
 	const res = await fetch(`${apiUrl}/auth/logout`, {
@@ -92,8 +93,8 @@ export const updateUserUsername = async (newUsername: string) => {
 		userUpdated.profile.username = newUsername;
 		return userUpdated;
 	});
-	const socket = get(eventsSocket);
-	socket.emit("update-username", newUsername);
+	const evSocket = get(eventsSocket);
+	evSocket.emit("update-username", newUsername);
 }
 
 export const updateUserAvatar = async (newAvatar: string) => {
@@ -236,7 +237,12 @@ export const acceptFriendRequest = async (friendRequestId: number) => {
 	};
 	friends.update(value => [...value, newFriend]);
 	friendRequests.update(value => value.filter(request => request.id !== friendRequestId));
-	notifications.update(value => value.filter(notification => (notification.type !== "friend-request" && notification.data.id === friendRequestId)));
+	notifications.update(value => value.filter(notification => {
+		if (notification.type === "friend-request" && notification.data.id === friendRequestId) {
+			return false;
+		}
+		return true;
+	}));
 	const socket = get(eventsSocket);
 	socket.emit("accept-friend-request", creatorProfile.username);
 }
@@ -382,4 +388,26 @@ export const unblockUser = async (usernameToUnblock: string) => {
 		userUpdated.blocked?.splice(value.blocked?.indexOf(unblockedId), 1);
 		return userUpdated;
 	});
+}
+
+export const acceptGameRequest = (creatorUsername: string) => {
+	const socket = get(matchSocket);
+	socket.emit("gameRequestAccepted");
+	notifications.update(value => value.filter(notification => {
+		if (notification.type === "game-request" && notification.data.creator.username === creatorUsername) {
+			return false;
+		}
+		return true;
+	}));
+}
+
+export const declineGameRequest = (creatorUsername: string) => {
+	const socket = get(matchSocket);
+	socket.emit("matchDenied");
+	notifications.update(value => value.filter(notification => {
+		if (notification.type === "game-request" && notification.data.creator.username === creatorUsername) {
+			return false;
+		}
+		return true;
+	}));
 }
