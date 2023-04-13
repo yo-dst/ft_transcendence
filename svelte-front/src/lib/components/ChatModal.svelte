@@ -37,41 +37,52 @@
 		document.removeEventListener("click", handleClickOutside);
 	});
 </script>
-{#if isLoading}
-<Loading/>
-{:else}
+
 <dialog open={true}>
-	<article id="chat-modal">
-		<header on:click={() => goto(`/profile/${userProfile.username}`)} on:keypress>
-			<img src={userProfile.avatar.url} alt="avatar"/>
-			<span class="safe-words">{userProfile.username}</span>
-		</header>
-		{#if userProfile.username !== $user.profile.username}
-			<body>
-				<button on:click={() => sendGameRequest(userProfile.username)}>Challenge</button>
-				{#if !userIsFriend}
-					<button on:click={() => sendFriendRequest(userProfile.username)}>Friend request</button>
-				{/if}
-				{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
-					<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
-				{/if}
-				{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}
-					<button on:click={() => blockUser(userProfile.username)}>Block</button>
-				{:else}
-					<button on:click={() => unblockUser(userProfile.username)}>Unblock</button>
-				{/if}
-				{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
-					<button on:click={() => {$chatSocket.emit('banUser', channelId, userProfile.username); setShow(false)}}>Ban</button>
-					<button on:click={() => {$chatSocket.emit('kickUser', channelId, userProfile.username); setShow(false)}}>Kick</button>
-					<button on:click={() => ($chatSocket.emit('muteUser', channelId, userProfile.username))}>Mute</button>
-				{/if}
-			</body>
-		{/if}
-	</article>
+	{#if isLoading}
+		<div class="loading">
+			<Loading/>
+		</div>
+	{:else}
+		<article id="chat-modal">
+			<header on:click={() => goto(`/profile/${userProfile.username}`)} on:keypress>
+				<img src={userProfile.avatar.url} alt="avatar"/>
+				<span class="safe-words">{userProfile.username}</span>
+			</header>
+			{#if userProfile.username !== $user.profile.username}
+				<body>
+					<button on:click={() => sendGameRequest(userProfile.username)}>Challenge</button>
+					{#if !userIsFriend}
+						<button on:click={() => sendFriendRequest(userProfile.username)}>Friend request</button>
+					{/if}
+					{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
+						<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
+					{/if}
+					{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}
+						<button on:click={() => blockUser(userProfile.username)}>Block</button>
+					{:else}
+						<button on:click={() => unblockUser(userProfile.username)}>Unblock</button>
+					{/if}
+					{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
+						<button on:click={() => {$chatSocket.emit('banUser', channelId, userProfile.username); setShow(false)}}>Ban</button>
+						<button on:click={() => {$chatSocket.emit('kickUser', channelId, userProfile.username); setShow(false)}}>Kick</button>
+						<button on:click={() => ($chatSocket.emit('muteUser', channelId, userProfile.username))}>Mute</button>
+					{/if}
+				</body>
+			{/if}
+		</article>
+	{/if}
 </dialog>
-{/if}
 
 <style>
+	.loading {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	article {
 		padding: 0;
 		width: 300px;
