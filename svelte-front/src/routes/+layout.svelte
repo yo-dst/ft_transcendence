@@ -51,8 +51,8 @@
 			await fetchFriendRequests();
 			await fetchBlockList();
 
-			$chatSocket.on('newMessage', (username: string, message: string, channelId: string) => {
-				if ($chatMessages[channelId]) {
+			$chatSocket.on('newMessage', (username: string, message: string, channelId: string, id: number) => {
+				if ($chatMessages[channelId] && !$user.blocked.includes(id)) {
 					$chatMessages[channelId].push({message: message, username: username});
 					$chatMessages[channelId] = $chatMessages[channelId];
 				}

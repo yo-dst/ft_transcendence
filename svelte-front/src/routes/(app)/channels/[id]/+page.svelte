@@ -53,7 +53,7 @@
 
 	function sendMessage() {
 		if (input){
-			$chatSocket.emit('newMessage', $user.profile.username, input, channelId);
+			$chatSocket.emit('newMessage', $user.profile.username, input, channelId, $user.id);
 			input = "";
 		}
 	}

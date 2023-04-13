@@ -356,10 +356,10 @@ export const blockUser = async (usernameToBlock: string) => {
 		}
 		throw error;
 	}
-	let blockedProfile = await res.json();
+	let blockedId = await res.json();
 	user.update(value => {
 		let userUpdated = value;
-		userUpdated.blocked?.push(blockedProfile);
+		userUpdated.blocked?.push(blockedId);
 		return userUpdated;
 	});
 }
