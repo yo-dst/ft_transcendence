@@ -23,6 +23,17 @@ export class GameService {
 		await this.usersService.addLoss(match.loser.id);
 	}
 
+	async saveDeco(score: number[], player: number[], loser: number) {
+		const match = new Match();
+		match.scoreWinner = Math.max(...score);
+		match.scoreLoser = Math.min(...score);
+		match.winner = await this.usersService.getById(player[0] === loser ? player[1] : player[0]);
+		match.loser = await this.usersService.getById(loser);
+		await this.matchRepository.save(match);
+		await this.usersService.addWin(match.winner.id);
+		await this.usersService.addLoss(match.loser.id);
+	}
+
 	async findMatches(pageNumber: number, pageSize: number, userId: number) {
 		const matches = await this.matchRepository.find({
 			relations: {
