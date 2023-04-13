@@ -15,8 +15,6 @@ services:
       - docker-network
     environment:
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-    env_file:
-      - ./.env
     restart: on-failure
   nestjs:
     depends_on:

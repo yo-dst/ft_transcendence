@@ -21,10 +21,13 @@
     import { matchSocket } from "$lib/stores/matchmaking-socket";
     import { goto } from "$app/navigation";
 	import { apiUrl } from "$lib/environment";
+    import Loading from "$lib/components/Loading.svelte";
 
 	$: console.log("user connected", $user);
 
 	$: console.log("friends", $friends);
+
+	let loading = true;
 
 	onMount(async () => {
 		try {
@@ -91,7 +94,7 @@
 				const creatorProfile = await fetchProfile(username);
 				const newGameRequest: GameRequest = { creator: creatorProfile };
 				const newNotification: Notification = { type: "game-request", data: newGameRequest };
-				if ($notifications.findIndex(notification => notification.data.creator.username === newNotification.data.creator.username) === -1) {
+				if ($notifications.findIndex(notification => (notification.type === "game-request" && notification.data.creator.username === newNotification.data.creator.username)) === -1) {
 					$notifications = [...$notifications, newNotification];
 				}
 			});
@@ -136,11 +139,29 @@
 		} catch (err) {
 			console.log(err);
 		}
+
+		loading = false;
 	});
 </script>
 
-{#if $user}
-	<slot/>
+{#if loading}
+	<div class="loading-page">
+		<Loading/>
+	</div>
 {:else}
-	<LoginPage/>
+	{#if $user}
+		<slot/>
+	{:else}
+		<LoginPage/>
+	{/if}
 {/if}
+
+<style>
+	.loading-page {
+		height: 100vh;
+		width: 100vw;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+</style>

@@ -148,6 +148,7 @@
 							<span style="color: #FEA347;"
 								on:click|stopPropagation={() => { usernameForModal = userInfo.username; setShow(true); }}
 								on:keypress
+								class="cursor-pointer"
 							>
 								{userInfo.username}
 								<!-- {usernames[index]} -->
@@ -188,6 +189,10 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 3rem;
+	}
+
+	.cursor-pointer {
+		cursor: pointer;
 	}
 
 	header h3 {
