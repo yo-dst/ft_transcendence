@@ -228,7 +228,7 @@ export class UsersService {
 	const userToBlock = await this.getByUsername(usernameToBlock);
 	user.blockedUser.push(userToBlock.id);
 	await this.usersRepository.save(user);
-	return await this.getProfile(userToBlock.id);
+	  return userToBlock.id;
   }
 
   async removeBlockedUser(userId: number, usernameToUnblock: string) {
@@ -236,6 +236,6 @@ export class UsersService {
 	const userToUnblock = await this.getByUsername(usernameToUnblock);
 	user.blockedUser.splice(user.blockedUser.indexOf(userToUnblock.id), 1);
 	await this.usersRepository.save(user);
-	return await this.getProfile(userToUnblock.id);
+	  return userToUnblock.id;
   }
 }
