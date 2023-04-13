@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-	import { apiUrl } from "$lib/api/apiUrl";
+	import { apiUrl } from "$lib/environment";
 
 	let username: string;
 

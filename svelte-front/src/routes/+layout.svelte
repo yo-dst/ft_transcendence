@@ -20,7 +20,7 @@
     import type { GameRequest } from "$lib/types/game-request";
     import { matchSocket } from "$lib/stores/matchmaking-socket";
     import { goto } from "$app/navigation";
-	import { apiUrl } from "$lib/api/apiUrl";
+	import { apiUrl } from "$lib/environment";
 
 	$: console.log("user connected", $user);
 

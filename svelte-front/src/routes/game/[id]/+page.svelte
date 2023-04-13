@@ -7,7 +7,7 @@
 	import { waitFlip } from "./pong";
 	import { user } from "$lib/stores/user";
     import { eventsSocket } from "$lib/stores/events-socket";
-	import { apiUrl } from "$lib/api/apiUrl";
+	import { apiUrl } from "$lib/environment";
 
 	let turnPhone = true;
 	let id = $page.params.id;

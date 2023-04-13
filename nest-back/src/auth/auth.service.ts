@@ -27,7 +27,7 @@ export class AuthService {
 			client_id: "u-s4t2ud-7470221ce45a9a6950c2b7324e6e5a9a069460af572ce5daa2a0fb547a3d5fda",
 			client_secret: "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",
 			code: code,
-			redirect_uri: "http://localhost:3000/auth/login"
+			redirect_uri: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("VITE_NESTJS_PORT")}/auth/login`
 		});
 		return res.data?.access_token;
 	}

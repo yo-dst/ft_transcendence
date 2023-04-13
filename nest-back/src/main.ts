@@ -12,7 +12,7 @@ async function bootstrap() {
 
 	app.enableCors({
 		origin: [
-			`http://${configService.get("SVELTEKIT_HOST")}:${configService.get("SVELTEKIT_PORT")}`
+			`http://${configService.get("VITE_HOST")}:${configService.get("SVELTEKIT_PORT")}`
 		],
 		credentials: true,
 		methods: [
@@ -25,6 +25,6 @@ async function bootstrap() {
 	app.use(cookieParser());
 	app.use(json({ limit: "50mb" }));
 	app.useGlobalPipes(new ValidationPipe());
-	await app.listen(configService.get("PORT"));
+	await app.listen(configService.get("VITE_NESTJS_PORT"));
 }
 bootstrap();

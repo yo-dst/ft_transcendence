@@ -24,9 +24,9 @@ import { EventsModule } from './events/events.module';
 				POSTGRES_PASSWORD: Joi.string().required(),
 				JWT_SECRET: Joi.string().required(),
 				JWT_EXPIRATION_TIME: Joi.string().required(),
-				SVELTEKIT_HOST: Joi.string().required(),
+				VITE_HOST: Joi.string().required(),
 				SVELTEKIT_PORT: Joi.number().required(),
-				PORT: Joi.number().required()
+				VITE_NESTJS_PORT: Joi.number().required()
       		})
 		}),
 		DatabaseModule,

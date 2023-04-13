@@ -8,7 +8,7 @@ import type { Profile } from "$lib/types/profile";
 import { getFriendsStatus } from "$lib/utils/getFriendsStatus";
 import { isUserConnected } from "$lib/utils/isUserConnected";
 import { get } from "svelte/store";
-import { apiUrl } from "./apiUrl";
+import { apiUrl } from "$lib/environment";
 import { matchSocket } from "$lib/stores/matchmaking-socket";
 
 export const logoutUser = async () => {

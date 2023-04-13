@@ -7,10 +7,6 @@ import { RequestWithUser } from './request-with-user.interface';
 import JwtTwoFactorAuthGuard from './two-factor-auth/jwt-two-factor-auth.guard';
 import { ConfigService } from '@nestjs/config';
 
-/*
-	notes
-*/
-
 @Controller('auth')
 export class AuthController {
 	constructor(
@@ -33,7 +29,7 @@ export class AuthController {
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
 		return {
-			url: `http://${this.configService.get("SVELTEKIT_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
+			url: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
 			statusCode: 302
 		}
 	}
@@ -78,14 +74,9 @@ export class AuthController {
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
 		return {
-			url: user.isTwoFactorAuthenticationEnabled ? `http://${this.configService.get("SVELTEKIT_HOST")}:${this.configService.get("SVELTEKIT_PORT")}/2fa/verify` : `http://${this.configService.get("SVELTEKIT_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
+			url: user.isTwoFactorAuthenticationEnabled ? `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}/2fa/verify` : `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
 			statusCode: 302
 		};
-	}
-
-	@Get("fakeUser")
-	async fakeUser() {
-		return { id: "4325325", state: 1, email: "email@mossad-co.il", username: "larry silverstein" }
 	}
 
 	@Get("logout")

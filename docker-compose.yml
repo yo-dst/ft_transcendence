@@ -6,20 +6,22 @@ networks:
     driver: bridge
 
 services:
-  db:
+  postgres:
     container_name: postgres
     image: postgres
     ports:
-      - 5432:5432
+      - 5432
     networks:
       - docker-network
+    environment:
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
     env_file:
       - ./.env
-    restart: always
-  nest:
+    restart: on-failure
+  nestjs:
     depends_on:
-      - db
-    container_name: backend
+      - postgres
+    container_name: nestjs
     build: ./nest-back
     ports:
       - 3000:3000
@@ -27,16 +29,19 @@ services:
       - docker-network
     env_file:
       - ./.env
-    restart: always
-  svelte:
+    restart: on-failure
+  sveltekit:
     depends_on:
-      - nest
-    container_name: frontend
-    build: ./svelte-front
+      - nestjs
+    container_name: sveltekit
+    build:
+      context: ./svelte-front
+      args:
+        - VITE_HOST=$VITE_HOST
+        - VITE_NESTJS_PORT=$VITE_NESTJS_PORT
+        - SVELTEKIT_PORT=$SVELTEKIT_PORT
     ports:
      - 5173:5173
     networks:
       - docker-network
-    env_file:
-      - ./.env
-    restart: always
+    restart: on-failure
