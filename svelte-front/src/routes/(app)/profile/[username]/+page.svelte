@@ -4,6 +4,7 @@
     import { fetchMatchHistory, fetchProfile } from "$lib/api";
     import { page } from "$app/stores";
     import type { Profile } from "$lib/types/profile";
+    import { match } from "../../../../params/number";
 
 	let nbMatchesToLoad = 5;
 	let index = 0;
@@ -33,10 +34,6 @@
 	}
 
 	$: handleUsernameModified(username);
-
-	onMount(async () => {
-		handleUsernameModified(username);
-	});
 </script>
 
 <section>
