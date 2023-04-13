@@ -30,6 +30,10 @@
 	
 	$chatSocket.emit('verifyUser', channelId, (info: any) => {
 		if (info.isConnected) showPasswordModal = false;
+		else if (!info.isProtected) {
+			$chatSocket.emit('joinRoom', channelId, "");
+			showPasswordModal = false;
+		}
 		else showPasswordModal = true;
 		roomName = info.roomName;
 		userIsAdmin = info.isAdmin;

@@ -141,9 +141,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const adminUsername = await Promise.all(room.admins.map(async (user) => ((await this.usersService.getProfile(user)).username)));
 			if (room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId) {
 				client.join(channelId);
-				return { isConnected: true, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
+				return { isConnected: true, isProtected: room.isProtected, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
 			}
-			return { isConnected: false, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
+			return { isConnected: false, isProtected: room.isProtected, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
 		}
 		return undefined;
 	}

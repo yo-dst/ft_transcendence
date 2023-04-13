@@ -45,12 +45,10 @@
 	onMount(() => {
 		$chatSocket.emit('getRooms', (data: chatRoom[]) => {
 			rooms = data;
-			console.log('rooms get:',rooms);
 		});
 		
 		$chatSocket.on('roomUpdate', (data: chatRoom[]) => {
 			rooms = data;
-			console.log('rooms update:',rooms);
 		});
 	});
 </script>

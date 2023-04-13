@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
     import { chatSocket } from "$lib/stores/chat-socket";
     import { user } from "$lib/stores/user";
+	import CryptoJS from 'crypto-js';
 
 	export let closeModal: () => void;
 	export let channelId: string | undefined;
@@ -13,7 +13,8 @@
 	})
 
 	function sendChange() {
-		$chatSocket.emit('roomUpdate', channelId, isPrivate, password);
+		const hashedPassword = !password || password === "" ? "" : CryptoJS.SHA256(password).toString();
+		$chatSocket.emit('roomUpdate', channelId, isPrivate, hashedPassword);
 		closeModal();
 	}
 

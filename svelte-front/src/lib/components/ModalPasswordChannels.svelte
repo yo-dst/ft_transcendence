@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { chatSocket } from "$lib/stores/chat-socket";
+	import CryptoJS from 'crypto-js';
 
 	export let closeModal: () => void;
 	export let roomId: string | undefined;
@@ -8,7 +9,8 @@
 	let showError: boolean = false;
 
 	function sendPassword() {
-		$chatSocket.emit('joinRoom', roomId, password, (accepted: boolean) => {
+		const hashedPassword = !password || password === "" ? "" : CryptoJS.SHA256(password).toString();
+		$chatSocket.emit('joinRoom', roomId, hashedPassword, (accepted: boolean) => {
 			if (accepted) {
 				closeModal();
 				goto('/channels/' + roomId);
