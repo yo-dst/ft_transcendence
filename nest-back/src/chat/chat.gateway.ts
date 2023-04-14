@@ -123,6 +123,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('leaveRoom')
 	async handleQuitRoom(client: Socket, ids: string | number) {
 		const room = this.ChatRooms.find((room) => (room.id === ids[0]));
+		if (!room)
+			return
 		room.deleteUser(ids[1]);
 		if (room.owner === undefined)
 			this.ChatRooms.splice(this.ChatRooms.indexOf(room), 1);
