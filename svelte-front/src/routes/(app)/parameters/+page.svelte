@@ -2,7 +2,7 @@
 	import { user } from "$lib/stores/user";
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
-    import { fetchBlockedUsersProfile, logoutUser, turnOffTwoFactorAuthentication, unblockUser, updateUserAvatar, updateUserUsername } from "$lib/api";
+    import { fetchBlockList, fetchBlockedUsersProfile, logoutUser, turnOffTwoFactorAuthentication, unblockUser, updateUserAvatar, updateUserUsername } from "$lib/api";
     import Loading from "$lib/components/Loading.svelte";
     import type { Profile } from "$lib/types/profile";
 
@@ -74,7 +74,6 @@
 	onMount(async () => {
 		try {
 			blockedUsers = await fetchBlockedUsersProfile();
-			console.log(blockedUsers);
 			isLoading = false;
 		}
 		catch (err) {
@@ -139,7 +138,7 @@
 					<img src={userBlocked.avatar.url} alt="avatar"/>
 					<span class="safe-words">{userBlocked.username}</span>
 				</div>
-				<button on:click={() => {unblockUser(userBlocked.username); blockedUsers.splice(blockedUsers.indexOf(userBlocked), 1)}}>Unblock</button>
+				<button on:click={() => {unblockUser(userBlocked.username); blockedUsers.splice(blockedUsers.indexOf(userBlocked), 1); blockedUsers = blockedUsers}}>Unblock</button>
 			</li>
 		{/each}
 	</ul>

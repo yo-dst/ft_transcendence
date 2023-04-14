@@ -27,10 +27,10 @@ export class GameGateway {
 								if (room.playersMap.get(client.userId)) {
 									const index = gameRooms.findIndex((room) => room.id === client.roomId);
 									if (room.playersMap.get(client.userId)) {
-										this.server.to(client.roomId).emit('deco');
 										await this.gameService.saveDeco(room.score, room.player, client.userId);
 										clearInterval(room.intervalId);
 										gameRooms.splice(index, 1);
+										this.server.to(client.roomId).emit('deco');
 									}
 								}
 							}, 5000)

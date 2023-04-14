@@ -172,27 +172,35 @@
 	function handleMouseUp() {
 		socket.emit("keyReleased");
 	}
+
+	function handleTouchDown(e) {
+		if (e.touches[0].clientY < window.innerHeight / 2)
+			socket.emit("playerUp", paddle1.dir, paddle2.dir);
+		else
+			socket.emit("playerDown", paddle1.dir, paddle2.dir);
+	}
 </script>
 
-<svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} on:popstate={handlePopstate} on:mousedown={handleMouseDown} on:mouseup={handleMouseUp} />
-<main>
-	<Timer {socket} />
-	<DecoTimer {socket} />
-	<div class="score">
-		<strong>
-			{game.score.p1}
-		</strong>
-		<strong>
-			{game.score.p2}
-		</strong>
-	</div>
-	<canvas
-		bind:this={canvas}
-		width={game.canvasWidth}
-		height={game.canvasHeight}
-		id="pong"
-	/>
-</main>
+<svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} on:popstate={handlePopstate} on:mousedown={handleMouseDown} on:mouseup={handleMouseUp} on:touchstart={handleTouchDown} on:touchend={handleMouseUp} />
+	<main>
+		<Timer {socket} />
+		<DecoTimer {socket} />
+		<div class="score">
+			<strong>
+				{game.score.p1}
+			</strong>
+			<strong>
+				{game.score.p2}
+			</strong>
+		</div>
+		<canvas
+			bind:this={canvas}
+			width={game.canvasWidth}
+			height={game.canvasHeight}
+			id="pong"
+			class="canvas-container"
+		/>
+	</main>
 
 {#if turnPhone && isMobile}
 	<TurnPhone />
@@ -219,5 +227,20 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 	}
+
+	.canvas-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+    }
+    
+    canvas {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+    }
 
 </style>
