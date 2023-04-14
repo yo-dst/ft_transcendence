@@ -51,4 +51,8 @@ export class GameService {
 		})
 		return matches;
 	}
+
+	async findAll() {
+		return this.matchRepository.find();
+	}
 }

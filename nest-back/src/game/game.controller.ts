@@ -11,6 +11,11 @@ export class GameController {
 		private usersService: UsersService
 	) {}
 
+	@Get("all")
+	getAll() {
+		return this.gameService.findAll();
+	}
+	
 	@Get()
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async findmatchPage(

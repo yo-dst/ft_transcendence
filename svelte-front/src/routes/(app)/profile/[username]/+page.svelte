@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import { user } from "$lib/stores/user";
+	import { afterUpdate, onMount } from "svelte";
 	import type { Match } from "$lib/types/match";
     import { fetchMatchHistory, fetchProfile } from "$lib/api";
     import { page } from "$app/stores";
     import type { Profile } from "$lib/types/profile";
+    import { match } from "../../../../params/number";
 
 	let nbMatchesToLoad = 5;
 	let index = 0;
 	let matches: Match[] = [];
-	const username = $page.url.pathname.split("/")[2];
+	$: username = $page.url.pathname.split("/")[2];
 	let userProfile: Profile;
 
 	async function loadMore() {
 		try {
-			const data = await fetchMatchHistory($user.profile.username, index, nbMatchesToLoad);
+			const data = await fetchMatchHistory(userProfile.username, index, nbMatchesToLoad);
 			matches = [...matches, ...data];
 			index += nbMatchesToLoad;
 		} catch (err) {
@@ -22,14 +22,18 @@
 		}
 	}
 
-	onMount(async () => {
+	async function handleUsernameModified(username: string) {
 		try {
+			matches = [];
+			index = 0;
 			userProfile = await fetchProfile(username);
-			await loadMore()
+			await loadMore();
 		} catch (err) {
 			console.log(err);
 		}
-	});
+	}
+
+	$: handleUsernameModified(username);
 </script>
 
 <section>

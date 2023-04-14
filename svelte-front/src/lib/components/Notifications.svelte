@@ -55,11 +55,16 @@
 		box-shadow: -5px 5px 5px #0d1117;
 		width: 450px;
 		max-width: 95vw;
+		z-index: 10;
 	}
 
 	ul {
 		margin: 0;
 		padding: 0.5rem;
+	}
+
+	ul > :last-child {
+		margin-bottom: 0;
 	}
 
 	ul li {

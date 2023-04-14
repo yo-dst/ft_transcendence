@@ -55,7 +55,7 @@
 						</a>
 					</li>
 					<li>
-						<a role="button" href="/profile">
+						<a role="button" href={`/profile/${$user.profile.username}`}>
 							<iconify-icon icon="carbon:user-profile"/>
 							Profile
 						</a>
