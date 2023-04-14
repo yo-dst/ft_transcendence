@@ -16,7 +16,7 @@
 </main>
 <footer>
 	<div>
-		<span>Made with love by <a href="https://github.com/nferre">him</a>, <a href="https://github.com/yo-dst">I</a> and <a href="https://fr.wikipedia.org/wiki/Angelina_Jolie">her </a></span>
+		<span>Made with love by <a href="https://github.com/nferre">him</a>, <a href="https://github.com/LXVSWS">him</a>, <a href="https://github.com/yo-dst">him</a> and <a href="https://fr.wikipedia.org/wiki/Angelina_Jolie">her </a></span>
 	</div>
 </footer>
 

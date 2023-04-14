@@ -90,7 +90,7 @@
 					on:keypress
 				></iconify-icon>
 			{/if}
-			<h3 class="safe-words">Channel {roomName}</h3>
+			<h3>Channel {roomName}</h3>
 		</div>
 		<div>
 			{#if !showUserList}

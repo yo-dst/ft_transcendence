@@ -88,12 +88,12 @@
 			<li>
 				<a href={`/profile/${friend.profile.username}`}>
 					<div class="friend-profile">
-						<div class:online={friend.isConnected}></div>
 						<img src={friend.profile.avatar.url} alt="friend"/>
 						{#if friend.isInGame}
-							<iconify-icon icon="mdi:sword-fight" style="font-size: 2rem;"></iconify-icon>
+						<iconify-icon icon="mdi:sword-fight" style="font-size: 2rem;"></iconify-icon>
 						{/if}
 						<span>{friend.profile.username}</span>
+						<div class:online={friend.isConnected}></div>
 					</div>
 				</a>
 				<button on:click={() => removeFriend(friend.profile.username)} style="background-color: var(--del-color);">
@@ -224,7 +224,7 @@
 		height: 16px;
 		border-radius: 50%;
 		box-shadow: 0 0 5px black;
-		z-index: 10;
+		z-index: 9;
 	}
 
 	.error {
