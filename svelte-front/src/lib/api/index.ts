@@ -260,7 +260,12 @@ export const declineFriendRequest = async (friendRequestId: number) => {
 		throw error;
 	}
 	friendRequests.update(value => value.filter(request => request.id !== friendRequestId));
-	notifications.update(value => value.filter(notification => (notification.type !== "friend-request" && notification.data.id === friendRequestId)));
+	notifications.update(value => value.filter(notification => {
+		if (notification.type === "friend-request" && notification.data.id === friendRequestId) {
+			return false;
+		}
+		return true;
+	}));
 }
 
 export const removeFriend = async (username: string) => {

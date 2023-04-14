@@ -56,7 +56,7 @@
 				"position: absolute;top: 50%;left: 50%;transform: scale(1) translate(-50%, -50%);width: 100%;height: 100%;transform-origin: top left;color: #b6b6f2;";
 		} else
 		canvas.style.cssText =
-		"position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);color: #b6b6f2;";
+			"position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);color: #b6b6f2;";
 		socket.emit("ready");
 		requestAnimationFrame(draw);
 	});
@@ -175,24 +175,24 @@
 </script>
 
 <svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} on:popstate={handlePopstate} on:mousedown={handleMouseDown} on:mouseup={handleMouseUp} />
-	<main>
-		<Timer {socket} />
-		<DecoTimer {socket} />
-		<div class="score">
-			<strong>
-				{game.score.p1}
-			</strong>
-			<strong>
-				{game.score.p2}
-			</strong>
-		</div>
-		<canvas
-			bind:this={canvas}
-			width={game.canvasWidth}
-			height={game.canvasHeight}
-			id="pong"
-		/>
-	</main>
+<main>
+	<Timer {socket} />
+	<DecoTimer {socket} />
+	<div class="score">
+		<strong>
+			{game.score.p1}
+		</strong>
+		<strong>
+			{game.score.p2}
+		</strong>
+	</div>
+	<canvas
+		bind:this={canvas}
+		width={game.canvasWidth}
+		height={game.canvasHeight}
+		id="pong"
+	/>
+</main>
 
 {#if turnPhone && isMobile}
 	<TurnPhone />
@@ -202,6 +202,7 @@
 	canvas {
 		position: absolute;
 		z-index: 0;
+		border: 2px solid green;
 	}
 	strong {
 		padding: 5vw;
