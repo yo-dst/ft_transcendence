@@ -15,6 +15,7 @@
 			const data = await fetchMatchHistory(userProfile.username, index, nbMatchesToLoad);
 			matches = [...matches, ...data];
 			index += nbMatchesToLoad;
+			console.log(matches);
 		} catch (err) {
 			console.log(err);
 		}
