@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Redirect, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, HttpCode, Post, Redirect, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Response } from "express";
 import { UsersService } from "src/users/users.service";
 import { AuthService } from "../auth.service";
@@ -43,7 +43,7 @@ export class TwoFactorAuthController {
 	) {
 		const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, req.user.twoFactorAuthenticationSecret);
 		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentication code');
+			throw new BadRequestException('Wrong authentication code');
 		}
 		await this.usersService.turnOnTwoFactorAuthentication(req.user.id);
 	}
@@ -65,7 +65,7 @@ export class TwoFactorAuthController {
 	) {
 		const isCodeValid = this.twoFactorAuthService.isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode, req.user.twoFactorAuthenticationSecret);
 		if (!isCodeValid) {
-			throw new UnauthorizedException("Wrong authentication code");
+			throw new BadRequestException("Wrong authentication code");
 		}
 		const cookie = this.authService.getCookieWithJwtAccessToken(req.user.id, true);
 		res.setHeader("Set-Cookie", cookie);

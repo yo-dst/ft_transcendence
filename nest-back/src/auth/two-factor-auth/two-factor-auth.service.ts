@@ -2,16 +2,18 @@ import { Injectable } from "@nestjs/common";
 import { UsersService } from "src/users/users.service";
 import { authenticator } from 'otplib';
 import * as qrcode from "qrcode";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class TwoFactorAuthService {
 	constructor(
-		private usersService: UsersService
+		private usersService: UsersService,
+    private configService: ConfigService
 	) {}
 
 	async generateTwoFactorAuthenticationSecret(userId: number, userEmail: string) {
     const secret = authenticator.generateSecret();
-    const otpauthUrl = authenticator.keyuri(userEmail, 'AUTH_APP_NAME', secret);
+    const otpauthUrl = authenticator.keyuri(userEmail, this.configService.get("AUTH_APP_NAME"), secret);
     await this.usersService.setTwoFactorAuthenticationSecret(secret, userId);
     return { otpauthUrl };
   }
