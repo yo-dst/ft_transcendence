@@ -1,6 +1,5 @@
 <script lang="ts">
     import { acceptFriendRequest, acceptGameRequest, declineFriendRequest, declineGameRequest } from "$lib/api";
-    import { matchSocket } from "$lib/stores/matchmaking-socket";
 	import { notifications } from "$lib/stores/notifications";
 
 	export let show: boolean;

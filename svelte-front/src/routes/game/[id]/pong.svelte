@@ -56,7 +56,7 @@
 				"position: absolute;top: 50%;left: 50%;transform: scale(1) translate(-50%, -50%);width: 100%;height: 100%;transform-origin: top left;color: #b6b6f2;";
 		} else
 		canvas.style.cssText =
-		"position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);color: #b6b6f2;";
+			"position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);color: #b6b6f2;";
 		socket.emit("ready");
 		requestAnimationFrame(draw);
 	});
@@ -210,6 +210,7 @@
 	canvas {
 		position: absolute;
 		z-index: 0;
+		border: 2px solid green;
 	}
 	strong {
 		padding: 5vw;

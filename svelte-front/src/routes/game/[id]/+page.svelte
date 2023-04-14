@@ -42,10 +42,10 @@
 {:else if turnPhone && isMobile && roomExist}
 	<TurnPhone />
 {:else}
-<div class="container">
-	<h2 style="text-align:center">RoomId not found</h2>
-	<a href="/" role="button" style="">Go back home</a>
-  </div>
+	<div class="container">
+		<h2 style="text-align:center">RoomId not found</h2>
+		<a href="/" role="button" style="">Go back home</a>
+  	</div>
 {/if}
 
 <style>

@@ -63,7 +63,7 @@
 				<body>
 					<button on:click={() => sendGameRequest(userProfile.username)}>Challenge</button>
 					{#if !userIsFriend}
-						<button on:click={() => sendFriendRequest(userProfile.username)}>Friend request</button>
+						<button on:click={() => sendFriendRequest(userProfile.username).catch(err => {})}>Friend request</button>
 					{/if}
 					{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
 						<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>

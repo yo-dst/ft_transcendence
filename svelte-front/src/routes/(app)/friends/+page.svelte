@@ -59,7 +59,7 @@
 
 	async function sendRequest() {
 		try {
-			sendFriendRequest(sendRequestValue);
+			await sendFriendRequest(sendRequestValue);
 			sendRequestError = "";
 		} catch (err) {
 			sendRequestError = err.message;

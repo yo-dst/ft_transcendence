@@ -50,8 +50,12 @@ export class FriendRequestsController {
 		if (await this.usersService.areFriends(creator.id, receiver.id)) {
 			throw new BadRequestException("You are already friend with this user");
 		}
-		const friendRequest = await this.friendRequestsService.getOneByCreatorAndReceiver(creator.id, receiver.id);
-		if (friendRequest) {
+		const friendRequestFirstWay = await this.friendRequestsService.getOneByCreatorAndReceiver(creator.id, receiver.id);
+		if (friendRequestFirstWay) {
+			throw new BadRequestException("Friend request already exists");
+		}
+		const friendRequestSecondWay = await this.friendRequestsService.getOneByCreatorAndReceiver(receiver.id, creator.id);
+		if (friendRequestSecondWay) {
 			throw new BadRequestException("Friend request already exists");
 		}
 		const newFriendRequest = await this.friendRequestsService.create(creator, receiver);

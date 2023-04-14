@@ -81,6 +81,11 @@
 					}
 					return friend;
 				});
+				const index = $notifications.findIndex(notif => (notif.type === "game-request" && notif.data.creator.username));
+				if (index !== -1) {
+					$notifications.splice(index, 1);
+					$notifications = $notifications;
+				}
 			});
 
 			$eventsSocket.on("receive-friend-request", async (data: { id: number, creatorUsername: string }) => {

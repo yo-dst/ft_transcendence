@@ -10,7 +10,7 @@ services:
     container_name: postgres
     image: postgres
     ports:
-      - 5432
+      - $POSTGRES_PORT
     networks:
       - docker-network
     environment:
@@ -22,7 +22,7 @@ services:
     container_name: nestjs
     build: ./nest-back
     ports:
-      - 3000:3000
+      - $VITE_NESTJS_PORT:$VITE_NESTJS_PORT
     networks:
       - docker-network
     env_file:
@@ -39,7 +39,7 @@ services:
         - VITE_NESTJS_PORT=$VITE_NESTJS_PORT
         - SVELTEKIT_PORT=$SVELTEKIT_PORT
     ports:
-     - 5173:5173
+     - $SVELTEKIT_PORT:$SVELTEKIT_PORT
     networks:
       - docker-network
     restart: on-failure
