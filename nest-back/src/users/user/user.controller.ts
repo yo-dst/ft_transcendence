@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { RequestWithUser } from "src/auth/request-with-user.interface";
 import JwtTwoFactorAuthGuard from "src/auth/two-factor-auth/jwt-two-factor-auth.guard";
 import { UsersService } from "../users.service";
@@ -7,6 +7,7 @@ import UpdateAvatarDto from "./dto/update-avatar.dto";
 import UpdateUsernameDto from "./dto/update-username.dto";
 import BlockedDto from "./dto/block.dto";
 import UnblockDto from "./dto/unblock.dto";
+import usernameToId from "./dto/id.dto";
 
 @Controller("user")
 export class UserController {
@@ -65,6 +66,14 @@ export class UserController {
 		await this.usersService.removeFriends(req.user.id, friendToBeRemoved.id);
 	}
 
+	@Patch("id")
+	@UseGuards(JwtTwoFactorAuthGuard)
+	async getId(
+		@Req() req: RequestWithUser,
+		@Body() { usernameToId }: usernameToId
+	) {
+		return (await this.usersService.getByUsername(usernameToId)).id;
+	}
 	
 	@Get("friends")
 	@UseGuards(JwtTwoFactorAuthGuard)
@@ -91,6 +100,7 @@ export class UserController {
 		}));
 	}
 
+
 	@Patch("block-user")
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async blockUser(
@@ -104,7 +114,7 @@ export class UserController {
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async unblockUser(
 		@Req() req: RequestWithUser,
-		@Body() {usernameToUnblock}: UnblockDto
+		@Body() { usernameToUnblock }: UnblockDto
 	) {
 		return await this.usersService.removeBlockedUser(req.user.id, usernameToUnblock);
 	}
@@ -115,9 +125,20 @@ export class UserController {
 		return this.usersService.getProfile(req.user.id);
 	}
 
+	@Get("profile-blocked-users")
+	@UseGuards(JwtTwoFactorAuthGuard)
+	async blockedUser(
+		@Req() req: RequestWithUser,
+		@Query('id') id: number
+	) {
+		const blockedList = await this.usersService.getBlocked(id);
+		const blockedListProfile = blockedList.map(async (user) => (await this.usersService.getProfile(user.id)));
+		return await Promise.all(blockedListProfile);
+	}
+
 	@Get("blocked-users")
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async getBlockedUser(@Req() req: RequestWithUser) {
-		return this.usersService.getBlockedUsers(req.user.id);
+		return this.usersService.getBlocked(req.user.id);
 	}
 }

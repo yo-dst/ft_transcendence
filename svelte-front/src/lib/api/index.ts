@@ -319,6 +319,24 @@ export const loginUserWithTwoFactorAuthentication = async (code: string) => {
 	}
 }
 
+export const fetchId = async (username: string) => {
+	const res = await fetch(`${apiUrl}/user/id`, {
+		method: "PATCH",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			usernameToId: username
+		})
+	})
+	if (!res.ok) {
+		const error = await res.json();
+		throw error;
+	}
+	return await res.json();
+}
+
 export const fetchBlockList = async () => {
 	const res = await fetch(`${apiUrl}/user/blocked-users`, {
 		credentials: "include",
@@ -330,12 +348,7 @@ export const fetchBlockList = async () => {
 		}
 		throw error;
 	}
-	const blockedProfile = await res.json();
-	user.update(value => {
-		let userUpdated = value;
-		userUpdated.blocked = blockedProfile;
-		return userUpdated;
-	});
+	return await res.json();
 }
 
 export const blockUser = async (usernameToBlock: string) => {
@@ -356,12 +369,7 @@ export const blockUser = async (usernameToBlock: string) => {
 		}
 		throw error;
 	}
-	let blockedId = await res.json();
-	user.update(value => {
-		let userUpdated = value;
-		userUpdated.blocked?.push(blockedId);
-		return userUpdated;
-	});
+	return await res.json();
 }
 
 export const unblockUser = async (usernameToUnblock: string) => {
@@ -382,12 +390,7 @@ export const unblockUser = async (usernameToUnblock: string) => {
 		}
 		throw error;
 	}
-	let unblockedId = await res.json();
-	user.update(value => {
-		let userUpdated = value;
-		userUpdated.blocked?.splice(value.blocked?.indexOf(unblockedId), 1);
-		return userUpdated;
-	});
+	return await res.json();
 }
 
 export const acceptGameRequest = (creatorUsername: string) => {
@@ -400,6 +403,26 @@ export const acceptGameRequest = (creatorUsername: string) => {
 		return true;
 	}));
 }
+
+export const fetchBlockedUsersProfile = async (userId?: string) => {
+	const query = userId ? `?id=${userId}` : '';
+	const res = await fetch(`${apiUrl}/user/profile-blocked-users${query}`, {
+		method: "GET",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+	if (!res.ok) {
+		const error = await res.json();
+		if (error.statusCode === 401) {
+			user.set(undefined);
+		}
+		throw error;
+	}
+	return await res.json();
+};
+
 
 export const declineGameRequest = (creatorUsername: string) => {
 	const socket = get(matchSocket);

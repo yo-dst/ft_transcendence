@@ -58,6 +58,7 @@ export class UsersService {
 		return user;
 	}
 
+
 	async create(userData: CreateUserDto) {
 		const newAvatar = new Avatar();
 		newAvatar.url = userData.avatarUrl;
@@ -216,26 +217,47 @@ export class UsersService {
 		return this.usersRepository.save(user);
   }
 
-  async getBlockedUsers(userId: number) {
-	const user = await this.getById(userId);
-	const usersProfilePromises = user.blockedUser.map(async (number: number) => {return await this.getProfile(number)});
-	const usersProfile = await Promise.all(usersProfilePromises);
-	return usersProfile;
+	async getBlocked(id: number) {
+		const user = await this.usersRepository.findOne({
+			relations: { blockedUser: true },
+			where: { id }
+		})
+		if (user)
+			return user.blockedUser;
+		return null;
+	}
+
+	async getUserWithBlocked(id: number) {
+		const user = await this.usersRepository.findOne({
+			relations: { blockedUser: true },
+			where: { id }
+		})
+		if (user)
+			return user;
+		return null;
+	}
+
+	async addBlockedUser(userId: number, usernameToBlock: string) {
+		const user = await this.getUserWithBlocked(userId);
+		if (!user)
+			return null;
+		const userToBlock = await this.getByUsername(usernameToBlock);
+		if (!userToBlock)
+			return null;
+		user.blockedUser.push(userToBlock);
+		await this.usersRepository.save(user);
+		return userToBlock;
   }
 
-  async addBlockedUser(userId: number, usernameToBlock: string) {
-	const user = await this.getById(userId);
-	const userToBlock = await this.getByUsername(usernameToBlock);
-	user.blockedUser.push(userToBlock.id);
-	await this.usersRepository.save(user);
-	  return userToBlock.id;
-  }
-
-  async removeBlockedUser(userId: number, usernameToUnblock: string) {
-	const user = await this.getById(userId);
-	const userToUnblock = await this.getByUsername(usernameToUnblock);
-	user.blockedUser.splice(user.blockedUser.indexOf(userToUnblock.id), 1);
-	await this.usersRepository.save(user);
-	  return userToUnblock.id;
+	async removeBlockedUser(userId: number, usernameToUnblock: string) {
+		const user = await this.getUserWithBlocked(userId);
+		if (!user)
+			return null;
+		const userToBlock = await this.getByUsername(usernameToUnblock);
+		if (!userToBlock)
+			return null;
+		user.blockedUser.splice(user.blockedUser.indexOf(userToBlock), 1);
+		await this.usersRepository.save(user);
+		return userToBlock;
   }
 }

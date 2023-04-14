@@ -22,6 +22,7 @@
     import { goto } from "$app/navigation";
 	import { apiUrl } from "$lib/environment";
     import Loading from "$lib/components/Loading.svelte";
+    import type { UserType } from "$lib/types/user";
 
 	$: console.log("user connected", $user);
 
@@ -49,10 +50,10 @@
 
 			await fetchFriends();
 			await fetchFriendRequests();
-			await fetchBlockList();
 
-			$chatSocket.on('newMessage', (username: string, message: string, channelId: string, id: number) => {
-				if ($chatMessages[channelId] && !$user.blocked.includes(id)) {
+			$chatSocket.on('newMessage', async (username: string, message: string, channelId: string, id: number) => {
+				const blockList: UserType[] = await fetchBlockList();
+				if ($chatMessages[channelId] && blockList.every((user) => user.id !== id)) {
 					$chatMessages[channelId].push({message: message, username: username});
 					$chatMessages[channelId] = $chatMessages[channelId];
 				}

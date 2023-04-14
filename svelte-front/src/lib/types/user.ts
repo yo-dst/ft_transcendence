@@ -4,5 +4,4 @@ export type UserType = {
 	id: number
 	isTwoFactorAuthenticationEnabled: boolean,
 	profile: Profile,
-	blocked: number[]
 }

@@ -17,8 +17,9 @@ class User {
 	@Column({ default: false })
 	isTwoFactorAuthenticationEnabled: boolean;
 
-	@Column({ type: 'jsonb', default: [] })
-	blockedUser: number[];
+	@ManyToMany(type => User, user => user.blockedUser)
+	@JoinTable()
+	blockedUser: User[];
 
 	@OneToOne(type => Profile, {
 		cascade: true

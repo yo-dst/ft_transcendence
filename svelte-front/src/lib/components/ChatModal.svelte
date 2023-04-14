@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { blockUser, fetchProfile, sendFriendRequest, unblockUser } from "$lib/api";
+    import { blockUser, fetchBlockList, fetchId, fetchProfile, sendFriendRequest, unblockUser } from "$lib/api";
     import { chatSocket } from "$lib/stores/chat-socket";
     import { user } from "$lib/stores/user";
     import type { Profile } from "$lib/types/profile";
@@ -18,6 +18,8 @@
 	let userProfile: Profile;
 	let userIsFriend: boolean;
 	let isLoading: boolean = true;
+	let blockedList: number[];
+	let userId: number;
 	
 	function handleClickOutside(event: any) {
     	if (!event.target.closest('#chat-modal')) {
@@ -30,7 +32,10 @@
 
 		try {
 			userProfile = await fetchProfile(username);
+			userId = await fetchId(username);
+			console.log("user id:", userId);
 			userIsFriend = $friends.findIndex(friend => friend.profile.username === userProfile.username) !== -1;
+			blockedList = await fetchBlockList();
 		}
 		catch (err) {
 			setShow(false);
@@ -63,10 +68,10 @@
 					{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
 						<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
 					{/if}
-					{#if $user.blocked.every((blockedProfile) => (userProfile === blockedProfile))}
-						<button on:click={() => blockUser(userProfile.username)}>Block</button>
+					{#if blockedList.every((blockedUser) => (userId === blockedUser))}
+						<button on:click={() => {blockUser(userProfile.username); setShow(false);}}>Block</button>
 					{:else}
-						<button on:click={() => unblockUser(userProfile.username)}>Unblock</button>
+						<button on:click={() => {unblockUser(userProfile.username); setShow(false);}}>Unblock</button>
 					{/if}
 					{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
 						<button on:click={() => {$chatSocket.emit('banUser', channelId, userProfile.username); setShow(false)}}>Ban</button>

@@ -2,15 +2,17 @@
 	import { user } from "$lib/stores/user";
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
-    import { logoutUser, turnOffTwoFactorAuthentication, updateUserAvatar, updateUserUsername } from "$lib/api";
-    import ModalBlockedUser from "$lib/components/ModalBlockedUser.svelte";
+    import { fetchBlockedUsersProfile, logoutUser, turnOffTwoFactorAuthentication, unblockUser, updateUserAvatar, updateUserUsername } from "$lib/api";
+    import Loading from "$lib/components/Loading.svelte";
+    import type { Profile } from "$lib/types/profile";
 
 	let newUsername = "";
 	let files: any;
 	let isTwoFactorAuthenticationEnabled: boolean;
-	let showBlockedModal = false;
 	let updateUsernameError = "";
 	let updateAvatarError = "";
+	let blockedUsers: Profile[];
+	let isLoading = true;
 	
 	async function updateUsername() {
 		try {
@@ -69,7 +71,15 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
+		try {
+			blockedUsers = await fetchBlockedUsersProfile();
+			console.log(blockedUsers);
+			isLoading = false;
+		}
+		catch (err) {
+			console.log(err);
+		}
 		newUsername = $user.profile.username;
 		isTwoFactorAuthenticationEnabled = $user.isTwoFactorAuthenticationEnabled;
 	});
@@ -117,21 +127,24 @@
 	</label>
 </section>
 
+{#if isLoading}
+<Loading/>
+{:else}
 <section class="bg-light-dark" style="padding: 1rem; border-radius: 5px; margin-top: 4rem;">
 	<h3>Users blocked</h3>
 	<ul>
-		{#each $user.blocked as userBlocked}
+		{#each blockedUsers as userBlocked}
 			<li>
 				<div>
 					<img src={userBlocked.avatar.url} alt="avatar"/>
 					<span class="safe-words">{userBlocked.username}</span>
 				</div>
-				<button on:click={() => {}}>Unblock</button>
+				<button on:click={() => {unblockUser(userBlocked.username); blockedUsers.splice(blockedUsers.indexOf(userBlocked), 1)}}>Unblock</button>
 			</li>
 		{/each}
 	</ul>
 </section>
-
+{/if}
 <div class="logout-wrapper">
 	<h3>Log in with another account</h3>
 	<a href="/" role="button" on:click={logout} class="contrast outline">
