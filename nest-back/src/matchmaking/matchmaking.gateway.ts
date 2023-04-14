@@ -61,8 +61,9 @@ export class MatchmakingGateway implements OnGatewayConnection, OnGatewayDisconn
 	}
 
 	@SubscribeMessage('gameRequestAccepted')
-	handleGameRequestAccepted(client: CustomSocket) {
-		const match = this.privateQueue.find((user) => user.idP2 === client.userId)
+	async handleGameRequestAccepted(client: CustomSocket, creatorUsername: string) {
+		const creatorId = await this.usersService.getByUsername(creatorUsername);
+		const match = this.privateQueue.find((user) => user.idP2 === client.userId && user.idP1 === creatorId.id)
 		if (match) {
 			const p1 = match.idP1;
 			const p2 = match.idP2;

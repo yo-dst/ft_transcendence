@@ -395,7 +395,7 @@ export const unblockUser = async (usernameToUnblock: string) => {
 
 export const acceptGameRequest = (creatorUsername: string) => {
 	const socket = get(matchSocket);
-	socket.emit("gameRequestAccepted");
+	socket.emit("gameRequestAccepted", creatorUsername);
 	notifications.update(value => value.filter(notification => {
 		if (notification.type === "game-request" && notification.data.creator.username === creatorUsername) {
 			return false;
