@@ -172,9 +172,16 @@
 	function handleMouseUp() {
 		socket.emit("keyReleased");
 	}
+
+	function handleTouchDown(e) {
+		if (e.touches[0].clientY < window.innerHeight / 2)
+			socket.emit("playerUp", paddle1.dir, paddle2.dir);
+		else
+			socket.emit("playerDown", paddle1.dir, paddle2.dir);
+	}
 </script>
 
-<svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} on:popstate={handlePopstate} on:mousedown={handleMouseDown} on:mouseup={handleMouseUp} />
+<svelte:window on:keydown={handleKeysDown} on:keyup={handleKeysUp} on:popstate={handlePopstate} on:mousedown={handleMouseDown} on:mouseup={handleMouseUp} on:touchstart={handleTouchDown} on:touchend={handleMouseUp} />
 	<main>
 		<Timer {socket} />
 		<DecoTimer {socket} />
