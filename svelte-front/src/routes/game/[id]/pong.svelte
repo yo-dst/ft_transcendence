@@ -39,6 +39,7 @@
 
 	function handlePopstate(event: PopStateEvent) {
 		alert('You are quitting the game, if you dont comeback in the next 5 seconds, you will automatically lose the game');
+		$eventsSocket.emit("leave-game");
 		socket.disconnect();
 	}
 
