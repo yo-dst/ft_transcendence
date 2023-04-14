@@ -405,8 +405,7 @@ export const acceptGameRequest = (creatorUsername: string) => {
 }
 
 export const fetchBlockedUsersProfile = async (userId?: string) => {
-	const query = userId ? `?id=${userId}` : '';
-	const res = await fetch(`${apiUrl}/user/profile-blocked-users${query}`, {
+	const res = await fetch(`${apiUrl}/user/profile-blocked-users`, {
 		method: "GET",
 		credentials: "include",
 		headers: {

@@ -129,9 +129,8 @@ export class UserController {
 	@UseGuards(JwtTwoFactorAuthGuard)
 	async blockedUser(
 		@Req() req: RequestWithUser,
-		@Query('id') id: number
 	) {
-		const blockedList = await this.usersService.getBlocked(id);
+		const blockedList = await this.usersService.getBlocked(req.user.id);
 		const blockedListProfile = blockedList.map(async (user) => (await this.usersService.getProfile(user.id)));
 		return await Promise.all(blockedListProfile);
 	}

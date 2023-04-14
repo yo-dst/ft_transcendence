@@ -191,6 +191,7 @@
 			width={game.canvasWidth}
 			height={game.canvasHeight}
 			id="pong"
+			class="canvas-container"
 		/>
 	</main>
 
@@ -218,5 +219,20 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 	}
+
+	.canvas-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+    }
+    
+    canvas {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+    }
 
 </style>
