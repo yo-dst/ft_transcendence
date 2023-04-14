@@ -302,7 +302,7 @@ export const generateTwoFactorAuthenticationQrCode = async (): Promise<string> =
 }
 
 export const loginUserWithTwoFactorAuthentication = async (code: string) => {
-	const res = await fetch(`http://${apiUrl}:3000/2fa/login`, {
+	const res = await fetch(`${apiUrl}/2fa/login`, {
 		method: "POST",
 		credentials: "include",
 		headers: {

@@ -29,5 +29,6 @@
 		margin-top: -0.5rem;
 		margin-bottom: 1.5rem;
 		color: var(--del-color);
+		font-size: 0.8rem;
 	}
 </style>
