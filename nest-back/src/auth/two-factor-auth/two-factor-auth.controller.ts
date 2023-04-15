@@ -22,8 +22,8 @@ export class TwoFactorAuthController {
 	@Redirect()
 	redirect() {
 		return {
-			// url: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
-			url: `http://${this.configService.get("VITE_HOST")}`,
+			url: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
+			// url: `http://${this.configService.get("VITE_HOST")}`,
 			statusCode: 302
 		}
 	}

@@ -44,8 +44,9 @@ export class ChatRoom {
 	}
 
 	mute(userId: number) {
-		if (!this.muteList.includes(userId))
+		if (!this.muteList.includes(userId)) {
 			this.muteList.push(userId);
+		}
 	}
 
 	unmute(userId: number) {

@@ -103,7 +103,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('newMessage')
 	handleNewMessage(client: Socket, info: string) {
-		if (this.ChatRooms.find((room) => ((room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId) && !room.muteList.includes(client.data.userId)))) {
+		if (this.ChatRooms.find((room) => ((room.member.includes(client.data.userId) || room.admins.includes(client.data.userId) || room.owner === client.data.userId) && !room.muteList.includes(client.data.userId) && room.id === info[2]))) {
 			this.server.to(info[2]).emit('newMessage', info[0], info[1], info[2], info[3]);
 		}
 	}
