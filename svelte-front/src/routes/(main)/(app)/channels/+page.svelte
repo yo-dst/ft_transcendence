@@ -73,13 +73,9 @@
 					</div>
 				</div>
 				<div class="channel-right">
-					{#if room.member.length + room.admins.length + 1 >= room.capacity}
-						<p>room filled</p>
-					{:else}
 						<button class="secondary" on:click={() => {joinRoom(room.id)}}>
 							<iconify-icon icon="material-symbols:open-in-browser"></iconify-icon>
 						</button>
-					{/if}
 				</div>
 			</li>
 		{/each}
