@@ -135,9 +135,6 @@ export const turnOnTwoFactorAuthentication = async (code: string) => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		if (error.statusCode === 401) {
-			user.set(undefined);
-		}
 		throw error;
 	}
 	user.update(value => {
@@ -317,9 +314,6 @@ export const loginUserWithTwoFactorAuthentication = async (code: string) => {
 	});
 	if (!res.ok) {
 		const error = await res.json();
-		if (error.statusCode === 401) {
-			user.set(undefined);
-		}
 		throw error;
 	}
 }
