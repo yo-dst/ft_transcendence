@@ -19,7 +19,7 @@ export class AuthService {
 	async getAccessToken42(code: string): Promise<string> {
 		const res = await this.httpService.axiosRef.post("https://api.intra.42.fr/oauth/token", {
 			grant_type: "authorization_code",
-			client_id: this.configService.get("INTRA_CLIENT_UID"),
+			client_id: this.configService.get("VITE_INTRA_CLIENT_UID"),
 			client_secret: this.configService.get("INTRA_SECRET"),
 			code: code,
 			redirect_uri: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("VITE_NESTJS_PORT")}/auth/login`

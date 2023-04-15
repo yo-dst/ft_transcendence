@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-	import { apiUrl, environment } from "$lib/environment";
+	import { apiUrl, intraLoginUrl } from "$lib/environment";
 
 	let username: string;
 
@@ -18,7 +18,7 @@
 	<div class="container">
 		<a role="button"
 			class="contrast outline"
-			href={`${environment.intraLoginUrl}`}
+			href={intraLoginUrl}
 		>
 			<iconify-icon icon="material-symbols:login" />
 			Log In

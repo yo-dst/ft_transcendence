@@ -26,7 +26,7 @@ import { EventsModule } from './events/events.module';
 				VITE_HOST: Joi.string().required(),
 				SVELTEKIT_PORT: Joi.number().required(),
 				VITE_NESTJS_PORT: Joi.number().required(),
-				INTRA_CLIENT_UID: Joi.string().required(),
+				VITE_INTRA_CLIENT_UID: Joi.string().required(),
 				INTRA_SECRET: Joi.string().required()			
       		})
 		}),
