@@ -11,9 +11,7 @@
 	async function logout() {
 		try {
 			await logoutUser();
-		} catch (err) {
-			console.log(err);
-		}
+		} catch (err) {}
 	}
 
 	onMount(async () => {

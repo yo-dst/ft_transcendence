@@ -33,7 +33,6 @@
 		try {
 			userProfile = await fetchProfile(username);
 			userId = await fetchId(username);
-			console.log("user id:", userId);
 			userIsFriend = $friends.findIndex(friend => friend.profile.username === userProfile.username) !== -1;
 			blockedList = await fetchBlockList();
 		}

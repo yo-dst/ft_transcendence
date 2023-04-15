@@ -58,7 +58,6 @@
 				await turnOffTwoFactorAuthentication();
 			} catch (err) {
 				isTwoFactorAuthenticationEnabled = true;
-				console.log(err);
 			}
 		}
 	}
@@ -66,9 +65,7 @@
 	async function logout() {
 		try {
 			await logoutUser();
-		} catch (err) {
-			console.log(err);
-		}
+		} catch (err) {}
 	}
 
 	onMount(async () => {
@@ -76,9 +73,7 @@
 			blockedUsers = await fetchBlockedUsersProfile();
 			isLoading = false;
 		}
-		catch (err) {
-			console.log(err);
-		}
+		catch (err) {}
 		newUsername = $user.profile.username;
 		isTwoFactorAuthenticationEnabled = $user.isTwoFactorAuthenticationEnabled;
 	});

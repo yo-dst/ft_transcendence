@@ -15,10 +15,7 @@
 			const data = await fetchMatchHistory(userProfile.username, index, nbMatchesToLoad);
 			matches = [...matches, ...data];
 			index += nbMatchesToLoad;
-			console.log(matches);
-		} catch (err) {
-			console.log(err);
-		}
+		} catch (err) {}
 	}
 
 	async function handleUsernameModified(username: string) {
@@ -27,9 +24,7 @@
 			index = 0;
 			userProfile = await fetchProfile(username);
 			await loadMore();
-		} catch (err) {
-			console.log(err);
-		}
+		} catch (err) {}
 	}
 
 	$: handleUsernameModified(username);

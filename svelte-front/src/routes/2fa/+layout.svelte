@@ -1,11 +1,3 @@
-<script lang="ts">
-    import { onMount } from "svelte";
-
-	onMount(() => {
-		console.log("2fa layout mounting...");
-	})
-</script>
-
 <main>
 	<div>
 		<slot></slot>

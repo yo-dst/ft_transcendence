@@ -20,43 +20,6 @@
 		});
 	}
 
-	$: friendsSorted = sortFriends($friends);
-	
-	var countFakeFriend = 0;
-	function addFakeFriend() {
-		const fakeFriend = {
-			isConnected: countFakeFriend % 2 === 0,
-			isInGame: false,
-			profile: {
-				username: `fake${countFakeFriend}`,
-				avatar: {
-					url: "https://picsum.photos/200"
-				},
-				wins: countFakeFriend,
-				losses: countFakeFriend
-			}
-		}
-		$friends = [...$friends, fakeFriend];
-		countFakeFriend++;
-	}
-
-	var countFakeFriendRequest = 0;
-	function addFakeFriendRequest() {
-		const fakeFriendRequest = {
-			id: countFakeFriend,
-			creator: {
-				username: `fake${countFakeFriendRequest}`,
-				avatar: {
-					url: "https://picsum.photos/200"
-				},
-				wins: countFakeFriend,
-				losses: countFakeFriend
-			}
-		}
-		$friendRequests = [...$friendRequests, fakeFriendRequest];
-		countFakeFriendRequest++;
-	}
-
 	async function sendRequest() {
 		try {
 			await sendFriendRequest(sendRequestValue);
@@ -65,6 +28,8 @@
 			sendRequestError = err.message;
 		}
 	}
+
+	$: friendsSorted = sortFriends($friends);
 </script>
 
 <section>
@@ -127,11 +92,6 @@
 		{/each}
 		</ul>
 	</div>
-</section>
-
-<section>
-	<button on:click={addFakeFriend}>Add fake friend</button>
-	<button on:click={addFakeFriendRequest} style="margin-bottom: 2rem;">Add fake friend request</button>
 </section>
 
 <style>

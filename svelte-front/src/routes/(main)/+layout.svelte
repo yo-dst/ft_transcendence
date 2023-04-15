@@ -21,14 +21,9 @@
     import Loading from "$lib/components/Loading.svelte";
     import type { UserType } from "$lib/types/user";
 
-	$: console.log("user connected", $user);
-
-	$: console.log("friends", $friends);
-
 	let loading = true;
 
 	onMount(async () => {
-		console.log("main layout mounting...");
 		try {
 			await loginUser();
 
@@ -112,9 +107,7 @@
 						profile: newFriendProfile
 					}
 					$friends = [...$friends, newFriend];
-				} catch (err) {
-					console.log(err);
-				}
+				} catch (err) {}
 			});
 
 			$eventsSocket.on("friend-removed", (username: string) => {
@@ -122,7 +115,6 @@
 			});
 
 			$eventsSocket.on("user-joined-game", (username: string) => {
-				console.log("user-joined-game", username);
 				$friends = $friends.map(friend => {
 					if (friend.profile.username === username) {
 						friend.isInGame = true;
@@ -132,7 +124,6 @@
 			});
 
 			$eventsSocket.on("user-left-game", (username: string) => {
-				console.log("user-left-game", username);
 				$friends = $friends.map(friend => {
 					if (friend.profile.username === username) {
 						friend.isInGame = false;
@@ -140,9 +131,7 @@
 					return friend;
 				});
 			});
-		} catch (err) {
-			console.log(err);
-		}
+		} catch (err) {}
 
 		loading = false;
 	});

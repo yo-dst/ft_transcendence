@@ -27,15 +27,12 @@
 	onMount(async () => {
 		try {
 			const data = await fetchMatchHistory($user.profile.username, 0, 1);
-			console.log("data:",data);
 			if (!data || data.length === 0) {
 				error = true;
 			}
 			match = data[0];
 			isLoading = false;
-		} catch (err) {
-			console.log(err);
-		}
+		} catch (err) {}
 	})
 </script>
 
