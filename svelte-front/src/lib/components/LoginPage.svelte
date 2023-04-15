@@ -29,7 +29,6 @@
 	
 		<button on:click={createFakeUser}>Create fake user</button>
 	</div>
-	
 </div>
 
 <style>
