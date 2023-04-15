@@ -11,6 +11,7 @@ export class GameRoom {
 	public ready: Boolean = true;
 	public nbPlayerRdy: number = 0;
 	public index: number = 0;
+	public end: boolean = false;
 	public ball: ball;
 	public paddle1: paddle;
 	public paddle2: paddle;
@@ -80,9 +81,10 @@ export class GameRoom {
 					this.score[0]++;
 				}
 				if (this.score[0] >= 5 || this.score[1] >= 5) {
+					clearInterval(this.intervalId);
+					this.end = true;
 					this.gameService.save(this.score, this.player);
 					server.to(this.id).emit('endGame');
-					clearInterval(this.intervalId);
 					return true;
 				}
 				//reset the ball
