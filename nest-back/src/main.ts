@@ -12,6 +12,7 @@ async function bootstrap() {
 
 	app.enableCors({
 		origin: [
+			// `http://${configService.get("VITE_HOST")}:${configService.get("SVELTEKIT_PORT")}`
 			`http://${configService.get("VITE_HOST")}`
 		],
 		credentials: true,
