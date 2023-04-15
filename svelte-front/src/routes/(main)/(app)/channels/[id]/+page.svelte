@@ -24,8 +24,6 @@
 	let connectedUser: connectedUser;
 	let blockedUsers: Profile[];
 
-	$: console.log(blockedUsers);	
-
 	if (!$chatMessages[channelId]) $chatMessages[channelId] = [];
 
 	let show = false;

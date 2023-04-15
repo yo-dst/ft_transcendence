@@ -88,7 +88,6 @@
 			});
 	
 			$eventsSocket.on("receive-game-request", async (username: string) => {
-				console.log('hello', username);
 				const creatorProfile = await fetchProfile(username);
 				const newGameRequest: GameRequest = { creator: creatorProfile };
 				const newNotification: Notification = { type: "game-request", data: newGameRequest };
