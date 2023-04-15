@@ -30,18 +30,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 		this.server.emit("user-connected", username);
 
-		this.logger.log(username + " connected");
+		this.logger.log(username + " connected " + client.id);
 	}
 
 	handleDisconnect(client: Socket) {
-		const username = client.handshake.auth.username;
-		const index = this.connectedUsers.findIndex(user => user.username === username);
+		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
 		if (index !== -1) {
 			this.connectedUsers.splice(index, 1);
-			this.server.emit("user-disconnected", username);
+			this.server.emit("user-disconnected", client.data.username);
 		}
 		
-		this.logger.log(username + " disconnected");
+		this.logger.log(client.data.username + " disconnected");
 	}
 
 	@SubscribeMessage("get-users")
