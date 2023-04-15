@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from "$lib/stores/user";
-    import { afterUpdate } from "svelte";
+    import { afterUpdate, onDestroy } from "svelte";
     import { page } from "$app/stores";
     import ModalChannelSettings from "$lib/components/ModalChannelSettings.svelte";
     import { chatSocket } from "$lib/stores/chat-socket";
@@ -37,6 +37,10 @@
 		roomName = info.roomName;
 		isLoading = false;
 		connectedUser = info.connectedUser;
+	})
+
+	onDestroy(() => {
+		$chatSocket.off('kicked');
 	})
 
 	// triggers after component has been updated
