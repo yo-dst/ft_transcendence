@@ -93,7 +93,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('getRooms')
 	async handleRoom() {
 		// return only public chatRooms with only the relevant informations
-		const rooms = this.ChatRooms.filter((room) => (room.isPublic === true)).map(({ password, ...rest }) => rest);
+		const rooms = this.ChatRooms.map(({ password, ...rest }) => rest);
 		const updatedRooms = await Promise.all(rooms.map(async (room) => {
 			const ownerName = (await this.usersService.getProfile(room.owner)).username;
 			return { ...room, ownerName }; // Add ownerName property to the room object and return it

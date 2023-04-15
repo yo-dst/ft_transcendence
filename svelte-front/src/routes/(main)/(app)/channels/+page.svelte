@@ -86,7 +86,7 @@
 	<h3>Channels</h3>
 	<ul>
 		{#each rooms as room}
-			{#if !roomIsJoined(room)}
+			{#if room.isPublic && !roomIsJoined(room)}
 				<li>
 					<div class="channel-left">
 						<div class="users">
