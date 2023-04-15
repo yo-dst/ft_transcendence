@@ -42,8 +42,9 @@ services:
         - VITE_HOST=$VITE_HOST
         - VITE_NESTJS_PORT=$VITE_NESTJS_PORT
         - SVELTEKIT_PORT=$SVELTEKIT_PORT
+        - VITE_INTRA_LOGIN_URL=$VITE_INTRA_LOGIN_URL
     ports:
-     - $SVELTEKIT_PORT:$SVELTEKIT_PORT
+     - 80:$SVELTEKIT_PORT
     networks:
       - docker-network
     restart: on-failure

@@ -25,7 +25,9 @@ import { EventsModule } from './events/events.module';
 				JWT_EXPIRATION_TIME: Joi.string().required(),
 				VITE_HOST: Joi.string().required(),
 				SVELTEKIT_PORT: Joi.number().required(),
-				VITE_NESTJS_PORT: Joi.number().required()
+				VITE_NESTJS_PORT: Joi.number().required(),
+				INTRA_CLIENT_UID: Joi.string().required(),
+				INTRA_SECRET: Joi.string().required()			
       		})
 		}),
 		DatabaseModule,

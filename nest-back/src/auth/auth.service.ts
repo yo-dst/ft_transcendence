@@ -7,11 +7,6 @@ import { UsersService } from 'src/users/users.service';
 import { TokenPayload } from './token-payload.interface';
 import { uniqueNamesGenerator, adjectives } from 'unique-names-generator';
 
-/*
-	notes
-	- what does happen when intra api throws an error?
-*/
-
 @Injectable()
 export class AuthService {
 	constructor(
@@ -24,8 +19,8 @@ export class AuthService {
 	async getAccessToken42(code: string): Promise<string> {
 		const res = await this.httpService.axiosRef.post("https://api.intra.42.fr/oauth/token", {
 			grant_type: "authorization_code",
-			client_id: "u-s4t2ud-7470221ce45a9a6950c2b7324e6e5a9a069460af572ce5daa2a0fb547a3d5fda",
-			client_secret: "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",
+			client_id: this.configService.get("INTRA_CLIENT_UID"),
+			client_secret: this.configService.get("INTRA_SECRET"),
 			code: code,
 			redirect_uri: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("VITE_NESTJS_PORT")}/auth/login`
 		});

@@ -211,7 +211,6 @@
 	canvas {
 		position: absolute;
 		z-index: 0;
-		border: 2px solid green;
 	}
 	strong {
 		padding: 5vw;
