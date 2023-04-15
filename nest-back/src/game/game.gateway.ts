@@ -16,7 +16,7 @@ export class GameGateway {
 
 		client.on('disconnect', () => {
 			const room = gameRooms.find((room) => (room.id === client.roomId));
-			if (room) {
+			if (room && room.end === false) {
 				if (client.isPlayer) {
 					room.playersMap.set(client.userId, true);
 					client.leave(client.roomId);
@@ -125,9 +125,7 @@ export class GameGateway {
 	@SubscribeMessage('keyReleased')
 	HandleKeyDown(client: CustomSocket) {
 		const room = gameRooms.find((room) => (room.id === client.roomId));
-		if (!room)
-			return;
-		if (client.isPlayer === true && room.gameInfo != undefined) {
+		if (room && client.isPlayer === true && room.gameInfo != undefined) {
 			if (client.userId === room.player[0]) room.paddle1.dir = 0;
 			else if (client.userId === room.player[1]) room.paddle2.dir = 0;
 			this.server.to(client.roomId).emit('Down', [{ x: room.paddle1.x, y: room.paddle1.y, dir: room.paddle1.dir }, { x: room.paddle2.x, y: room.paddle2.y, dir: room.paddle2.dir }]);
@@ -137,8 +135,6 @@ export class GameGateway {
 	@SubscribeMessage('destroyGame')
 	handleGameEnd(client: CustomSocket) {
 		const room = gameRooms.findIndex((room) => (room.id === client.roomId));
-		if (!room)
-			return;
 		if (client.isPlayer === true && room != -1) {
 			gameRooms.splice(room, 1);
 		}
