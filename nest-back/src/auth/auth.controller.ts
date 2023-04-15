@@ -29,8 +29,8 @@ export class AuthController {
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
 		return {
-			url: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
-			// url: `http://${this.configService.get("VITE_HOST")}`,
+			// url: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
+			url: `http://${this.configService.get("VITE_HOST")}`,
 			statusCode: 302
 		}
 	}
@@ -75,8 +75,8 @@ export class AuthController {
 		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
 		res.setHeader("Set-Cookie", cookie);
 		return {
-			url: user.isTwoFactorAuthenticationEnabled ? `http://${this.configService.get("VITE_HOST")}/2fa/verify` : `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
-			// url: user.isTwoFactorAuthenticationEnabled ? `http://${this.configService.get("VITE_HOST")}/2fa/verify` : `http://${this.configService.get("VITE_HOST")}`,
+			// url: user.isTwoFactorAuthenticationEnabled ? `http://${this.configService.get("VITE_HOST")}/2fa/verify` : `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
+			url: user.isTwoFactorAuthenticationEnabled ? `http://${this.configService.get("VITE_HOST")}/2fa/verify` : `http://${this.configService.get("VITE_HOST")}`,
 			statusCode: 302
 		};
 	}
