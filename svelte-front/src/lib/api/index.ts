@@ -10,6 +10,7 @@ import { isUserConnected } from "$lib/utils/isUserConnected";
 import { get } from "svelte/store";
 import { apiUrl } from "$lib/environment";
 import { matchSocket } from "$lib/stores/matchmaking-socket";
+import { chatMessages } from "$lib/stores/chat-messages";
 
 export const logoutUser = async () => {
 	const res = await fetch(`${apiUrl}/auth/logout`, {

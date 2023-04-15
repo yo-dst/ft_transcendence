@@ -2,7 +2,7 @@
 	import { user } from "$lib/stores/user";
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
-    import { fetchBlockList, fetchBlockedUsersProfile, logoutUser, turnOffTwoFactorAuthentication, unblockUser, updateUserAvatar, updateUserUsername } from "$lib/api";
+    import { fetchBlockedUsersProfile, logoutUser, turnOffTwoFactorAuthentication, unblockUser, updateUserAvatar, updateUserUsername } from "$lib/api";
     import Loading from "$lib/components/Loading.svelte";
     import type { Profile } from "$lib/types/profile";
 

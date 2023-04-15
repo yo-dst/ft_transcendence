@@ -4,7 +4,7 @@
 	import { eventsSocket } from "$lib/stores/events-socket";
 	import { notifications } from "$lib/stores/notifications";
 	import { io } from "socket.io-client";
-    import { fetchBlockList, fetchFriendRequests, fetchFriends, fetchProfile, loginUser } from "$lib/api";
+    import { fetchFriendRequests, fetchFriends, fetchProfile, loginUser } from "$lib/api";
     import LoginPage from "$lib/components/LoginPage.svelte";
     import type { Notification } from "$lib/types/notification";
     import type { FriendRequest } from "$lib/types/friend-request";
@@ -19,7 +19,6 @@
     import { goto } from "$app/navigation";
 	import { apiUrl } from "$lib/environment";
     import Loading from "$lib/components/Loading.svelte";
-    import type { UserType } from "$lib/types/user";
 
 	let loading = true;
 
@@ -45,8 +44,7 @@
 			await fetchFriendRequests();
 
 			$chatSocket.on('newMessage', async (username: string, message: string, channelId: string, id: number) => {
-				const blockList: UserType[] = await fetchBlockList();
-				if ($chatMessages[channelId] && blockList.every((user) => user.id !== id)) {
+				if ($chatMessages[channelId]) {
 					$chatMessages[channelId].push({message: message, username: username});
 					$chatMessages[channelId] = $chatMessages[channelId];
 				}
@@ -90,6 +88,7 @@
 			});
 	
 			$eventsSocket.on("receive-game-request", async (username: string) => {
+				console.log('hello', username);
 				const creatorProfile = await fetchProfile(username);
 				const newGameRequest: GameRequest = { creator: creatorProfile };
 				const newNotification: Notification = { type: "game-request", data: newGameRequest };

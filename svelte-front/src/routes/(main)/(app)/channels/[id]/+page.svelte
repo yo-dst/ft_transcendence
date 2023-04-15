@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from "$lib/stores/user";
-    import { afterUpdate, onDestroy } from "svelte";
+    import { afterUpdate, onDestroy, onMount } from "svelte";
     import { page } from "$app/stores";
     import ModalChannelSettings from "$lib/components/ModalChannelSettings.svelte";
     import { chatSocket } from "$lib/stores/chat-socket";
@@ -10,6 +10,8 @@
     import ChatModal from "$lib/components/ChatModal.svelte";
     import type { connectedUser } from "$lib/types/connected-user";
     import { chatMessages } from "$lib/stores/chat-messages";
+    import { fetchBlockedUsersProfile } from "$lib/api";
+    import type { Profile } from "$lib/types/profile";
 
 	let input: string = "";
 	let element: any;
@@ -20,6 +22,9 @@
 	let showPasswordModal: boolean = true;
 	let showUserList = false;
 	let connectedUser: connectedUser;
+	let blockedUsers: Profile[];
+
+	$: console.log(blockedUsers);	
 
 	if (!$chatMessages[channelId]) $chatMessages[channelId] = [];
 
@@ -33,22 +38,30 @@
 			$chatSocket.emit('joinRoom', channelId, "");
 			showPasswordModal = false;
 		}
+		else if (info === undefined)
+			goto('/');
 		else showPasswordModal = true;
 		roomName = info.roomName;
-		isLoading = false;
 		connectedUser = info.connectedUser;
+	})
+
+	onMount(async () => {
+		blockedUsers = await fetchBlockedUsersProfile();
+		isLoading = false;
 	})
 
 	onDestroy(() => {
 		$chatSocket.off('kicked');
 	})
-
+	
 	// triggers after component has been updated
 	afterUpdate(() => {
 		if (showUserList) {
 			return;
 		}
-		if($chatMessages[channelId] && element) scrollToBottom(element);
+		if($chatMessages[channelId] && element) {
+			scrollToBottom(element);
+		}
 	})
 
 	const scrollToBottom = async (node: any) => {
@@ -146,8 +159,8 @@
 					<span style="color: #9F2B68">System</span> : Welcome to the channel {$user.profile?.username} !
 				</li>
 				{#each $chatMessages[channelId] as userInfo}
+				{#if blockedUsers.every((user) => (user.username !== userInfo.username))}
 					<li>
-						<!-- {#if usernames[index] !== $user.profile?.username} -->
 							{#if userInfo.username !== $user.profile?.username}
 							<span style="color: #FEA347;"
 								on:click|stopPropagation={() => { usernameForModal = userInfo.username; setShow(true); }}
@@ -165,6 +178,7 @@
 						{/if}
 						: {userInfo.message}
 					</li>
+					{/if}
 				{/each}
 			</ul>
 		</body>
@@ -183,7 +197,7 @@
 {/if}
 
 {#if show}
-	<ChatModal {setShow} username={usernameForModal} admins={connectedUser.admin} {channelId} owner={connectedUser.owner}/>
+	<ChatModal {setShow} username={usernameForModal} admins={connectedUser.admin} {channelId} owner={connectedUser.owner} updateBlocked={(newBlocked) => (blockedUsers = newBlocked)}/>
 {/if}
 
 <style>

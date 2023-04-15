@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { blockUser, fetchBlockList, fetchId, fetchProfile, sendFriendRequest, unblockUser } from "$lib/api";
+    import { blockUser, fetchBlockList, fetchBlockedUsersProfile, fetchId, fetchProfile, sendFriendRequest, unblockUser } from "$lib/api";
     import { chatSocket } from "$lib/stores/chat-socket";
     import { user } from "$lib/stores/user";
     import type { Profile } from "$lib/types/profile";
@@ -8,12 +8,14 @@
     import Loading from "./Loading.svelte";
     import { friends } from "$lib/stores/friends";
     import { sendGameRequest } from "$lib/utils/sendGameRequest";
+    import { chatMessages } from "$lib/stores/chat-messages";
 
 	export let setShow: any;
 	export let username: string;
 	export let admins: string[];
 	export let owner: string;
-	export let channelId: string | undefined;
+	export let channelId: string;
+	export let updateBlocked: (blocked: Profile[]) => void;
 
 	let userProfile: Profile;
 	let userIsFriend: boolean;
@@ -68,9 +70,9 @@
 						<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
 					{/if}
 					{#if blockedList.every((blockedUser) => (userId === blockedUser))}
-						<button on:click={() => {blockUser(userProfile.username); setShow(false);}}>Block</button>
+						<button on:click={async () => {await blockUser(userProfile.username); updateBlocked(await fetchBlockedUsersProfile()) ;setShow(false);}}>Block</button>
 					{:else}
-						<button on:click={() => {unblockUser(userProfile.username); setShow(false);}}>Unblock</button>
+						<button on:click={async () => {await unblockUser(userProfile.username); updateBlocked(await fetchBlockedUsersProfile()) ;setShow(false);}}>Unblock</button>
 					{/if}
 					{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
 						<button on:click={() => {$chatSocket.emit('banUser', channelId, userProfile.username); setShow(false)}}>Ban</button>
