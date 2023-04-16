@@ -16,40 +16,25 @@ export class AuthController {
 	) { }
 
 	// --- begin testing ---
-	@Get("username")
-	@Redirect()
-	async loginWithUsername(
-		@Res({ passthrough: true }) res: Response,
-		@Query("username") username: string
-	) {
-		let user = await this.usersService.getByUsername(username);
-		if (!user) {
-			throw new NotFoundException();
-		}
-		const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
-		res.setHeader("Set-Cookie", cookie);
-		return {
-			url: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
-			// url: `http://${this.configService.get("VITE_HOST")}`,
-			statusCode: 302
-		}
-	}
+	// @Get("username")
+	// @Redirect()
+	// async loginWithUsername(
+	// 	@Res({ passthrough: true }) res: Response,
+	// 	@Query("username") username: string
+	// ) {
+	// 	let user = await this.usersService.getByUsername(username);
+	// 	if (!user) {
+	// 		throw new NotFoundException();
+	// 	}
+	// 	const cookie = this.authService.getCookieWithJwtAccessToken(user.id);
+	// 	res.setHeader("Set-Cookie", cookie);
+	// 	return {
+	// 		url: `http://${this.configService.get("VITE_HOST")}:${this.configService.get("SVELTEKIT_PORT")}`,
+	// 		// url: `http://${this.configService.get("VITE_HOST")}`,
+	// 		statusCode: 302
+	// 	}
+	// }
 	// --- end testing ---
-
-	// retrieve sensitive data
-	@Get()
-	@UseGuards(JwtTwoFactorAuthGuard)
-	authenticate(@Req() req: RequestWithUser) {
-		const user = this.usersService.getBy({
-			relations: {
-				friends: true,
-				friendRequestsCreated: true,
-				friendRequestsReceived: true
-			},
-			where: { id: req.user.id }
-		});
-		return user;
-	}
 
 	// callback endpoint to be supplied to 42 intra app page
 	@Get("login")

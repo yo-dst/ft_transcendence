@@ -2,16 +2,16 @@
     import { goto } from "$app/navigation";
 	import { apiUrl, intraLoginUrl } from "$lib/environment";
 
-	let username: string;
+	// let username: string;
 
-	async function createFakeUser() {
-		await fetch(`${apiUrl}/users/fake`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			}
-		});
-	}
+	// async function createFakeUser() {
+	// 	await fetch(`${apiUrl}/users/fake`, {
+	// 		method: "POST",
+	// 		headers: {
+	// 			"Content-Type": "application/json",
+	// 		}
+	// 	});
+	// }
 </script>
 
 <div class="page">
@@ -24,10 +24,10 @@
 			Log In
 		</a>
 		
-		<input bind:value={username} style="margin-top: 2rem;"/>
+		<!-- <input bind:value={username} style="margin-top: 2rem;"/>
 		<button on:click={() => goto(`${apiUrl}/auth/username?username=${username}`)}>Login with username</button>
 	
-		<button on:click={createFakeUser}>Create fake user</button>
+		<button on:click={createFakeUser}>Create fake user</button> -->
 	</div>
 </div>
 

@@ -18,19 +18,19 @@ export class FriendRequestsController {
 	) {}
 
 	// --- begin testing ---
-	@Get()
-	async getAll() {
-		return this.friendRequestsService.getAll();
-	}
+	// @Get()
+	// async getAll() {
+	// 	return this.friendRequestsService.getAll();
+	// }
 
-	@Delete(":id")
-	async remove(@Param("id", ParseIntPipe) id: number) {
-		const fr = await this.friendRequestsService.getById(id);
-		if (!fr) {
-			throw new BadRequestException();
-		}
-		return this.friendRequestsService.remove(fr);
-	}
+	// @Delete(":id")
+	// async remove(@Param("id", ParseIntPipe) id: number) {
+	// 	const fr = await this.friendRequestsService.getById(id);
+	// 	if (!fr) {
+	// 		throw new BadRequestException();
+	// 	}
+	// 	return this.friendRequestsService.remove(fr);
+	// }
 	// --- end testing ---
 
 	@Post()

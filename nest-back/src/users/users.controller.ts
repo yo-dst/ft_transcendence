@@ -7,33 +7,28 @@ export class UsersController {
 	constructor(private usersService: UsersService) { }
 
 	// --- begin testing ---
-	countFakeUser = 0;
+	// countFakeUser = 0;
 
-	@Get("test")
-	test() {
-		return "test";
-	}
+	// @Get()
+	// findAll() {
+	// 	return this.usersService.getAll();
+	// }
 
-	@Get()
-	findAll() {
-		return this.usersService.getAll();
-	}
+	// @Post("fake")
+	// addFakeUser() {
+	// 	const fakeUser = {
+	// 		email: `test${this.countFakeUser}@gmail.com`,
+	// 		username: `test${this.countFakeUser}`,
+	// 		avatarUrl: "https://picsum.photos/200"
+	// 	};
+	// 	this.countFakeUser++;
+	// 	return this.usersService.create(fakeUser);
+	// }
 
-	@Post("fake")
-	addFakeUser() {
-		const fakeUser = {
-			email: `test${this.countFakeUser}@gmail.com`,
-			username: `test${this.countFakeUser}`,
-			avatarUrl: "https://picsum.photos/200"
-		};
-		this.countFakeUser++;
-		return this.usersService.create(fakeUser);
-	}
-
-	@Delete(":id")
-	remove(@Param("id", ParseIntPipe) id: number) {
-		return this.usersService.remove(id);
-	}
+	// @Delete(":id")
+	// remove(@Param("id", ParseIntPipe) id: number) {
+	// 	return this.usersService.remove(id);
+	// }
 	// --- end testing ---
 
 	@Get(":id")
@@ -55,14 +50,4 @@ export class UsersController {
 		}
 		return this.usersService.getProfile(user.id);
 	}
-
-	// @Get(":username/match-history")
-	// @UseGuards(JwtTwoFactorAuthGuard)
-	// async getMatchHistory(@Param("username") username: string) {
-	// 	const user = await this.usersService.getByUsername(username);
-	// 	if (!user) {
-	// 		throw new NotFoundException();
-	// 	}
-	// 	return this.matchHistoryService.matchHistory(user.id);
-	// }
 }
