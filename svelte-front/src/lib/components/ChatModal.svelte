@@ -34,6 +34,7 @@
 
 		try {
 			userProfile = await fetchProfile(username);
+			console.log("userProfile", userProfile);
 			userId = await fetchId(username);
 			userIsFriend = $friends.findIndex(friend => friend.profile.username === userProfile.username) !== -1;
 			blockedList = await fetchBlockList();
@@ -69,7 +70,7 @@
 					{#if (admins.includes($user.profile.username) || owner === $user.profile.username) && !admins.includes(userProfile.username) && owner != userProfile.username}
 						<button on:click={() => {$chatSocket.emit('newAdmin', channelId, userProfile.username)}}>Give admin rights</button>
 					{/if}
-					{#if blockedList.every((blockedUser) => (userId === blockedUser))}
+					{#if blockedList.findIndex(blocked => blocked === userId) === -1}
 						<button on:click={async () => {await blockUser(userProfile.username); updateBlocked(await fetchBlockedUsersProfile()) ;setShow(false);}}>Block</button>
 					{:else}
 						<button on:click={async () => {await unblockUser(userProfile.username); updateBlocked(await fetchBlockedUsersProfile()) ;setShow(false);}}>Unblock</button>
