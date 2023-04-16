@@ -21,31 +21,29 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
  	server: Server;
 
 	handleConnection(client: Socket) {
-		const username = client.handshake.auth.username;
-		client.data.username = username;
+		client.data.username = client.handshake.auth.username;
+		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
 		this.connectedUsers.push({
 			socketId: client.id,
-			username: username,
+			username: client.data.username,
 			isInGame: false
 		});
-		this.server.emit("user-connected", username);
-
-		this.logger.log(username + " connected " + client.id);
+		if (index === -1) {
+			this.server.emit("user-connected", client.data.username);
+		}
+		this.logger.log(client.data.username + " connected");
 	}
 
 	handleDisconnect(client: Socket) {
-		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
+		let index = this.connectedUsers.findIndex(user => user.username === client.data.username);
 		if (index !== -1) {
 			this.connectedUsers.splice(index, 1);
+		}
+		index = this.connectedUsers.findIndex(user => user.username === client.data.username);
+		if (index === -1) {
 			this.server.emit("user-disconnected", client.data.username);
 		}
-		
 		this.logger.log(client.data.username + " disconnected");
-	}
-
-	@SubscribeMessage("get-users")
-	getUsers(): string[] {
-		return this.connectedUsers.map(user => user.username);
 	}
 
 	@SubscribeMessage("send-friend-request")
@@ -56,9 +54,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!data || typeof data.id !== "number") {
 			return;
 		}
-		const index = this.connectedUsers.findIndex(user => user.username === data.receiverUsername);
-		if (index !== -1) {
-			const socketId = this.connectedUsers[index].socketId;
+		const connectedUserInstances = this.connectedUsers.filter(user => user.username === data.receiverUsername);
+		for(let i = 0; i < connectedUserInstances.length; i++) {
+			const socketId = connectedUserInstances[i].socketId;
 			this.server.to(socketId).emit("receive-friend-request", { id: data.id, creatorUsername: client.data.username });
 		}
 	}
@@ -68,9 +66,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() client: Socket,
 		@MessageBody() username: string
 	) {
-		const index = this.connectedUsers.findIndex(user => user.username === username);
-		if (index !== -1) {
-			const socketId = this.connectedUsers[index].socketId;
+		const connectedUserInstances = this.connectedUsers.filter(user => user.username === username);
+		for(let i = 0; i < connectedUserInstances.length; i++) {
+			const socketId = connectedUserInstances[i].socketId;
 			this.server.to(socketId).emit("receive-game-request", client.data.username);
 		}
 	}
@@ -80,9 +78,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() client: Socket,
 		@MessageBody() username: string
 	): void {
-		const index = this.connectedUsers.findIndex(user => user.username === username);
-		if (index !== -1) {
-			const socketId = this.connectedUsers[index].socketId;
+		const connectedUserInstances = this.connectedUsers.filter(user => user.username === username);
+		for(let i = 0; i < connectedUserInstances.length; i++) {
+			const socketId = connectedUserInstances[i].socketId;
 			this.server.to(socketId).emit("friend-removed", client.data.username);
 		}
 	}
@@ -98,9 +96,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() client: Socket,
 		@MessageBody() username: string
 	) {
-		const index = this.connectedUsers.findIndex(user => user.username === username);
-		if (index !== -1) {
-			this.server.to(this.connectedUsers[index].socketId).emit("friend-request-accepted", client.data.username);
+		const connectedUserInstances = this.connectedUsers.filter(user => user.username === username);
+		for(let i = 0; i < connectedUserInstances.length; i++) {
+			const socketId = connectedUserInstances[i].socketId;
+			this.server.to(socketId).emit("friend-request-accepted", client.data.username);
 		}
 	}
 
@@ -109,31 +108,45 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() client: Socket,
 		@MessageBody() newUsername: string
 	) {
-		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
-		if (index !== -1) {
-			this.connectedUsers[index].username = newUsername;
-			this.server.emit("user-disconnected", client.data.username);
-			this.server.emit("user-connected", newUsername);
-			client.data.username = newUsername;
-		}
+		this.connectedUsers = this.connectedUsers.map(user => {
+			if (user.username === client.data.username) {
+				user.username = newUsername;
+				this.server.to(user.socketId).emit("updated-username", newUsername);
+			}
+			return user;
+		});
+		this.server.emit("user-disconnected", client.data.username);
+		this.server.emit("user-connected", newUsername);
+	}
+
+	@SubscribeMessage("synchronize-username")
+	handleSynchronizeUsername(
+		@ConnectedSocket() client: Socket,
+		@MessageBody() newUsername: string
+	) {
+		client.data.username = newUsername;
 	}
 
 	@SubscribeMessage("join-game")
 	handleJoinGame(@ConnectedSocket() client: Socket) {
-		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
-		if (index !== -1) {
-			this.connectedUsers[index].isInGame = true;
-			this.server.emit("user-joined-game", client.data.username);
-		}
+		this.connectedUsers = this.connectedUsers.map(user => {
+			if (user.username === client.data.username) {
+				user.isInGame = true;
+			}
+			return user;
+		});
+		this.server.emit("user-joined-game", client.data.username);
 	}
 
 	@SubscribeMessage("leave-game")
 	handleLeaveGame(@ConnectedSocket() client: Socket) {
-		const index = this.connectedUsers.findIndex(user => user.username === client.data.username);
-		if (index !== -1) {
-			this.connectedUsers[index].isInGame = false;
-			this.server.emit("user-left-game", client.data.username);
-		}
+		this.connectedUsers = this.connectedUsers.map(user => {
+			if (user.username === client.data.username) {
+				user.isInGame = false;
+			}
+			return user;
+		});
+		this.server.emit("user-left-game", client.data.username);
 	}
 
 	@SubscribeMessage("is-user-in-game")
