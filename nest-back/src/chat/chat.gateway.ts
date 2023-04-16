@@ -111,13 +111,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('roomUpdate')
 	async handleRoomUpdate(client: Socket, info: string | boolean) {
 		const room = this.ChatRooms.find((room) => (room.id === info[0]));
+		if (!room)
+			return;
 		room.update(info[1], info[2]);
 		this.server.emit('roomUpdate', await this.handleRoom());
 	}
 
 	@SubscribeMessage('getRoomScope')
 	returnRoomScore(client: Socket, roomId: string) {
-		return this.ChatRooms.find((room) => (room.id === roomId)).isPublic;
+		const room = this.ChatRooms.find((room) => (room.id === roomId))
+		if (room)
+			return room.isPublic;
+		return;
 	}
 
 	@SubscribeMessage('leaveRoom')
@@ -146,7 +151,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 			return { isConnected: false, isProtected: room.isProtected, roomName: room.name, isAdmin: room.admins.includes(client.data.userId), connectedUser: { member: memberUsername, admin: adminUsername, owner: (await this.usersService.getProfile(room.owner)).username } }
 		}
-		return undefined;
+		return false;
 	}
 
 	@SubscribeMessage('newAdmin')

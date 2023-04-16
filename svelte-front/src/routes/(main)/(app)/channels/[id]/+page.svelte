@@ -30,22 +30,26 @@
 	const setShow = (value: boolean) => show = value;
 	let usernameForModal = "";
 	
-	$chatSocket.emit('verifyUser', channelId, (info: any) => {
-		if (info.isConnected) showPasswordModal = false;
-		else if (!info.isProtected) {
-			$chatSocket.emit('joinRoom', channelId, "");
-			showPasswordModal = false;
-		}
-		else if (info === undefined)
-			goto('/');
-		else showPasswordModal = true;
-		roomName = info.roomName;
-		connectedUser = info.connectedUser;
-	})
-
+	
 	onMount(async () => {
 		blockedUsers = await fetchBlockedUsersProfile();
-		isLoading = false;
+		$chatSocket.emit('verifyUser', channelId, (info: any) => {
+			if (info === false)
+			{
+				showPasswordModal = false;
+				goto('/');
+				return;
+			}
+			else if (info.isConnected) showPasswordModal = false;
+			else if (!info.isProtected) {
+				$chatSocket.emit('joinRoom', channelId, "");
+				showPasswordModal = false;
+			}
+			else showPasswordModal = true;
+			roomName = info.roomName;
+			connectedUser = info.connectedUser;
+			isLoading = false;
+		})
 	})
 
 	onDestroy(() => {
