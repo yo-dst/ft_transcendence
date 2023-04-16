@@ -129,6 +129,11 @@
 					return friend;
 				});
 			});
+
+			$eventsSocket.on("updated-username", (newUsername: string) => {
+				$user.profile.username = newUsername;
+				$eventsSocket.emit("synchronize-username", newUsername);
+			});
 		} catch (err) {}
 
 		loading = false;
