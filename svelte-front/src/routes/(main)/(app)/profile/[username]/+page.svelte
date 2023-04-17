@@ -3,6 +3,7 @@
     import { fetchMatchHistory, fetchProfile } from "$lib/api";
     import { page } from "$app/stores";
     import type { Profile } from "$lib/types/profile";
+    import { goto } from "$app/navigation";
 
 	let nbMatchesToLoad = 5;
 	let index = 0;
@@ -24,7 +25,9 @@
 			index = 0;
 			userProfile = await fetchProfile(username);
 			await loadMore();
-		} catch (err) {}
+		} catch (err) {
+			goto('/');
+		}
 	}
 
 	$: handleUsernameModified(username);
