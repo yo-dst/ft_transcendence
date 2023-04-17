@@ -369,7 +369,10 @@ export const blockUser = async (usernameToBlock: string) => {
 		}
 		throw error;
 	}
-	return await res.json();
+	const rep = await res.json();
+	if (rep)
+		return rep;
+	return null;
 }
 
 export const unblockUser = async (usernameToUnblock: string) => {
